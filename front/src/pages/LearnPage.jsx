@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import danceVideo from "../assets/sample.mp4";
 
 export default function LearnPage() {
   const cameraRef = useRef();
@@ -30,5 +31,14 @@ export default function LearnPage() {
     setCamera();
   }, [setCamera]);
 
-  return <video id="userCamera" ref={cameraRef} autoPlay playsInline></video>;
+  return (
+    <div>
+      <video
+        src={danceVideo}
+        controls
+        style={{ width: "100%", height: "100%" }}
+      ></video>
+      <video id="userCamera" ref={cameraRef} autoPlay playsInline></video>
+    </div>
+  );
 }
