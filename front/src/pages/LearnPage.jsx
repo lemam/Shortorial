@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import styled from "styled-components";
 import danceVideo from "../assets/sample.mp4";
 
 export default function LearnPage() {
@@ -32,13 +33,62 @@ export default function LearnPage() {
   }, [setCamera]);
 
   return (
-    <div>
-      <video
-        src={danceVideo}
-        controls
-        style={{ width: "100%", height: "100%" }}
-      ></video>
-      <video id="userCamera" ref={cameraRef} autoPlay playsInline></video>
-    </div>
+    <LearnContainer>
+      <VideoContainer>
+        <video src={danceVideo} controls></video>
+      </VideoContainer>
+      <CameraContainer>
+        <video id="userCamera" ref={cameraRef} autoPlay playsInline></video>
+      </CameraContainer>
+    </LearnContainer>
   );
 }
+
+const LearnContainer = styled.div`
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+
+  @media (orientation: portrait) {
+    display: block;
+    background-color: red;
+  }
+
+  @media (orientation: landscape) {
+    display: flex;
+    justify-content: center;
+    background-color: blue;
+  }
+`;
+
+const VideoContainer = styled.div`
+  position: relative;
+  height: 100%;
+
+  @media (orientation: portrait) {
+    video {
+      width: 100%;
+    }
+  }
+
+  @media (orientation: landscape) {
+    video {
+      height: 100%;
+    }
+  }
+`;
+
+const CameraContainer = styled.div`
+  position: relative;
+  height: 100%;
+
+  @media (orientation: portrait) {
+    display: none;
+  }
+
+  @media (orientation: landscape) {
+    video {
+      height: 100%;
+    }
+  }
+`;
