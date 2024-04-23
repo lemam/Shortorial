@@ -1,5 +1,16 @@
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import MainPage from "./pages/MainPage";
+import LearnPage from "./pages/LearnPage";
+
 function App() {
-  return <div>지금 잠들지 않으면 우린 춤을 출 거예요.</div>;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/learn" element={<LearnPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
