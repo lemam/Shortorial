@@ -1,2 +1,4 @@
-package com.sleep.sleep.shorts.service;public class ShortsService {
+package com.sleep.sleep.shorts.service;
+
+public class ShortsService {
 }

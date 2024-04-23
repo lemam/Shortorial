@@ -1,2 +1,4 @@
-package com.sleep.sleep.shorts.controller;public class ShortsController {
+package com.sleep.sleep.shorts.controller;
+
+public class ShortsController {
 }
