@@ -1,14 +1,21 @@
 package com.sleep.sleep.shorts.entity;
 
+import com.sleep.sleep.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
+@Table(name = "upload_shorts")
+@Entity
 public class UploadShorts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int upload_no;
+    private  int uploadNo;
     @ManyToMany
-    public int member_no;
+    private Member memberNo;
     @ManyToMany
-    public int sns_no;
-    public String upload_url;
+    private UploadSns snsNo;
+    private String uploadUrl;
 }

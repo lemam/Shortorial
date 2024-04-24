@@ -14,17 +14,19 @@ public class Shorts {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int shortsNo;
+    private int shortsNo;
 
-    public String shorts_url;
+    private String shortsUrl;
 
-    public double shorts_time;
+    private double shortsTime;
 
-    public String shorts_title;
+    private String shortsTitle;
 
-    public String shorts_director;
+    private String shortsDirector;
 
-    public int shorts_challengers;
+    private int shortsChallengers;
 
-    public int shorts_challengers_complete;
+    private int shortsChallengersComplete;
+
+
 }

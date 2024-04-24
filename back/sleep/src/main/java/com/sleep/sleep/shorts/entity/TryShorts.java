@@ -1,18 +1,25 @@
 package com.sleep.sleep.shorts.entity;
 
+import com.sleep.sleep.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
+@Table(name = "try_shorts")
+@Entity
 public class TryShorts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int try_no;
+    private int tryNo;
     @ManyToOne
-    public int shorts_no;
+    private Shorts shortsNo;
     @ManyToMany
-    public int member_no;
-    public int try_count;
-    public int try_complete;
-    public int try_max_time;
-    public int try_current_time;
+    private Member memberNo;
+    private int tryCount;
+    private int tryComplete;
+    private int tryMaxTime;
+    private int tryCurrentTime;
 
 }
