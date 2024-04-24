@@ -3,12 +3,12 @@ import styled from "styled-components";
 import danceVideo from "../assets/sample.mp4";
 
 export default function LearnPage() {
-  const cameraRef = useRef();
+  const cameraRef = useRef<HTMLVideoElement>(null);
 
   // 카메라 생성
   const setCamera = useCallback(() => {
     // 미디어 설정
-    const constraints = {
+    const constraints: MediaStreamConstraints = {
       video: {
         aspectRatio: 9 / 16,
         facingMode: "user", // 전면 카메라 사용
@@ -19,10 +19,10 @@ export default function LearnPage() {
     // 카메라 권한 요청
     navigator.mediaDevices
       .getUserMedia(constraints)
-      .then((stream) => {
+      .then((stream: MediaStream) => {
         if (cameraRef.current) cameraRef.current.srcObject = stream;
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         alert("카메라 권한을 찾을 수 없습니다.");
         console.error("Media device access error:", error);
       });
