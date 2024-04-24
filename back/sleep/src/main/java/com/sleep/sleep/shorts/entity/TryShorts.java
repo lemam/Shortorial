@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @Table(name = "try_shorts")
@@ -14,8 +16,10 @@ public class TryShorts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int tryNo;
     @ManyToOne
+    @JoinColumn(name = "shorts_no")
     private Shorts shortsNo;
-    @ManyToMany
+    @ManyToOne
+    @JoinColumn(name = "member_no")
     private Member memberNo;
     private int tryCount;
     private int tryComplete;
