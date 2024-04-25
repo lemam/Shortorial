@@ -1,5 +1,7 @@
 package com.sleep.sleep.member.entity;
 
+import com.sleep.sleep.shorts.entity.TryShorts;
+import com.sleep.sleep.shorts.entity.UploadShorts;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Builder
@@ -71,4 +74,10 @@ public class Member implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    private String  memberTiktokLink;
+    @OneToMany(mappedBy="tryNo")
+    private List<TryShorts> tryShorts;
+    @OneToMany(mappedBy = "uploadNo")
+    private List<UploadShorts> uploadShorts;
 }

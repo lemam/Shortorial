@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @Table(name = "upload_sns")
@@ -13,4 +15,7 @@ public class UploadSns {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int snsNo;
     private String snsName;
+    @OneToMany(mappedBy = "uploadNo")
+
+    private List<UploadShorts> uploadNo;
 }

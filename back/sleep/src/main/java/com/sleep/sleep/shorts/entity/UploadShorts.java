@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @Table(name = "upload_shorts")
@@ -12,10 +14,12 @@ import lombok.NoArgsConstructor;
 public class UploadShorts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  int uploadNo;
-    @ManyToMany
+    private int uploadNo;
+    @ManyToOne
+    @JoinColumn(name = "member_no")
     private Member memberNo;
-    @ManyToMany
+    @ManyToOne
+    @JoinColumn(name = "sns_no")
     private UploadSns snsNo;
     private String uploadUrl;
 }

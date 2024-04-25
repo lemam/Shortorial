@@ -7,10 +7,17 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 public class ShortsDto {
-    public String member_id;
-    public String  member_password;
-    public String  member_nickname;
-    public String  refresh_token;
-    public String member_profile;
-    public String  member_tiktok_link;
+    private int shortsNo;
+
+    private String shortsUrl;
+
+    private double shortsTime;
+
+    private String shortsTitle;
+
+    private String shortsDirector;
+
+    private int shortsChallengers;
+
+    private int shortsChallengersComplete;
 }
