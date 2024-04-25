@@ -33,62 +33,62 @@ export default function LearnPage() {
   }, [setCamera]);
 
   return (
-    <LearnContainer>
+    <Container>
       <VideoContainer>
-        <video src={danceVideo} controls></video>
+        <Video src={danceVideo} controls></Video>
       </VideoContainer>
-      <CameraContainer>
-        <video id="userCamera" ref={cameraRef} autoPlay playsInline></video>
-      </CameraContainer>
-    </LearnContainer>
+      <VideoContainer>
+        <Camera id="userCamera" ref={cameraRef} autoPlay playsInline></Camera>
+      </VideoContainer>
+    </Container>
   );
 }
 
-const LearnContainer = styled.div`
+const Container = styled.div`
   position: relative;
-  height: 100vh;
-  overflow: hidden;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
 
-  @media (orientation: portrait) {
-    display: block;
-    background-color: red;
+  @media screen and (orientation: portrait) {
+    flex-direction: column;
   }
 
-  @media (orientation: landscape) {
-    display: flex;
+  @media screen and (orientation: landscape) {
+    flex-direction: row;
     justify-content: center;
-    background-color: blue;
   }
 `;
 
 const VideoContainer = styled.div`
-  position: relative;
-  height: 100%;
-
-  @media (orientation: portrait) {
-    video {
-      width: 100%;
-    }
+  @media screen and (orientation: portrait) {
+    width: 100%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
   }
 
-  @media (orientation: landscape) {
-    video {
-      height: 100%;
-    }
+  @media screen and (orientation: landscape) {
+    height: 100%;
   }
 `;
 
-const CameraContainer = styled.div`
-  position: relative;
+const Video = styled.video`
+  width: 100%;
   height: 100%;
+`;
 
-  @media (orientation: portrait) {
+const Camera = styled.video`
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1); // 좌우반전
+
+  @media screen and (orientation: portrait) {
     display: none;
   }
 
-  @media (orientation: landscape) {
-    video {
-      height: 100%;
-    }
+  @media screen and (orientation: landscape) {
+    display: block;
   }
 `;
