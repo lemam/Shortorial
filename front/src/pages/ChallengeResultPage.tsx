@@ -1,14 +1,31 @@
+import { useState } from "react";
+import { uploadShorts } from "../apis/shorts";
 import useChallengeStore from "../store/useChallengeStore";
 import styled from "styled-components";
 
 const ChallengeResultPage = () => {
+  const [uploadURL, setuploadURL] = useState<string>("");
   const { downloadURL } = useChallengeStore();
   console.log(downloadURL);
+  console.log("uploadURL", uploadURL);
+
+  async function uploadVideo() {
+    const data = await uploadShorts(downloadURL, "test");
+    setuploadURL(data);
+  }
 
   return (
     <div>
-      <VideoContainer controls autoPlay src={downloadURL}></VideoContainer>
-      <DownloadLink href={downloadURL} download="jjajeung.mp4">
+      <VideoContainer
+        controls
+        autoPlay
+        src={downloadURL}
+      ></VideoContainer>
+      <DownloadLink
+        href={downloadURL}
+        download="jjajeung.mp4"
+        onClick={uploadVideo}
+      >
         Download Video
       </DownloadLink>
     </div>
