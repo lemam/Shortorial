@@ -1,6 +1,7 @@
 package com.sleep.sleep.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,10 @@ public class S3Service {
         return amazonS3.getUrl(bucketName, fileName).toString();
     }
 
+    public void deleteFile(String fileName) {
+        amazonS3.deleteObject(new DeleteObjectRequest(bucketName,fileName));
+    }
+
     private File convertMultiPartFileToFile(MultipartFile multipartFile) throws IOException {
         File file = new File(multipartFile.getOriginalFilename());
         try (FileOutputStream fos = new FileOutputStream(file)) {
@@ -37,5 +42,6 @@ public class S3Service {
         }
         return file;
     }
+
 
 }
