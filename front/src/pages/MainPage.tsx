@@ -41,7 +41,6 @@ export default function MainPage() {
           <video src={danceVideo}></video>
         </VideoBox>
       </div>
-      <Link to={"/learn"}>쇼츠를 눌러주세용</Link>
     </>
   );
 }

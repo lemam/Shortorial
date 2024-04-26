@@ -3,6 +3,9 @@ import styled from "styled-components";
 import danceVideo from "../assets/sample.mp4";
 import { useNavigate } from "react-router-dom";
 import useChallengeStore from "../store/useChallengeStore";
+import learnMode from "../assets/learnmode.png";
+import stop from "../assets/stop.png";
+import start from "../assets/start.png";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -11,7 +14,6 @@ const ChallengePage = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
-  const [videoURL, setVideoURL] = useState<string>("");
 
   const setCamera = useCallback(async () => {
     const constraints: MediaStreamConstraints = {
@@ -35,7 +37,7 @@ const ChallengePage = () => {
   const startRecording = () => {
     const constraints: MediaStreamConstraints = {
       video: true,
-      audio: true,
+      //audio: true,
     };
 
     navigator.mediaDevices
@@ -48,7 +50,7 @@ const ChallengePage = () => {
         recorder.onstop = () => {
           const blob = new Blob(chunks, { type: "video/mp4" });
           const url = URL.createObjectURL(blob);
-          setVideoURL(url);
+          // downloadurl store에 저장
           setDownloadURL(url);
           stream.getTracks().forEach((track) => track.stop());
           navigate("/challenge/result");
@@ -65,22 +67,37 @@ const ChallengePage = () => {
     mediaRecorder?.stop();
   };
 
+  const goToLearnMode = () => {
+    navigate("/learn");
+  };
+
   return (
     <ChallengeContainer>
       <VideoContainer src={danceVideo} controls></VideoContainer>
-      <VideoContainer ref={videoRef} autoPlay playsInline></VideoContainer>
+      <PracticeModeButton
+        src={learnMode}
+        onClick={goToLearnMode}
+      ></PracticeModeButton>
+      <UserVideoContainer
+        ref={videoRef}
+        autoPlay
+        playsInline
+      ></UserVideoContainer>
       <RecordButtonContainer>
-        <RecordButton onClick={startRecording}>Start Recording</RecordButton>
+        {mediaRecorder && (
+          <RecordButton onClick={stopRecording}>
+            <img src={stop} width="40px" height="40px"></img>
+          </RecordButton>
+        )}
+        {!mediaRecorder && (
+          <RecordButton onClick={startRecording}>
+            <img src={start} width="80px" height="80px"></img>
+          </RecordButton>
+        )}
+        {/* <RecordButton onClick={startRecording}>Start</RecordButton>
         <RecordButton onClick={stopRecording} disabled={!mediaRecorder}>
-          Stop Recording
-        </RecordButton>
-        <RecordButton>
-          {videoURL && (
-            <a href={videoURL} download="recorded_video.mp4">
-              Download Video
-            </a>
-          )}
-        </RecordButton>
+          Stop
+        </RecordButton> */}
       </RecordButtonContainer>
     </ChallengeContainer>
   );
@@ -90,6 +107,13 @@ const VideoContainer = styled.video`
   height: 100vh;
   aspect-ratio: 9 / 16;
   object-fit: cover;
+`;
+
+const UserVideoContainer = styled.video`
+  height: 100vh;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  transform: scaleX(-1);
 `;
 
 const ChallengeContainer = styled.div`
@@ -108,6 +132,17 @@ const RecordButton = styled.button`
   width: 100px;
   height: 100px;
   border-radius: 50%;
+  background-color: white;
+`;
+
+const PracticeModeButton = styled.img`
+  width: 32px;
+  height: 32px;
+  background-color: white;
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin-left: -65px;
+  z-index: 10;
 `;
 
 export default ChallengePage;
