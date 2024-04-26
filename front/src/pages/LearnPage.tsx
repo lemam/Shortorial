@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 import danceVideo from "../assets/sample.mp4";
+import IconButton from "../components/IconButton";
+import VideocamIcon from "@mui/icons-material/Videocam";
 
 export default function LearnPage() {
   const cameraRef = useRef<HTMLVideoElement>(null);
@@ -34,15 +36,52 @@ export default function LearnPage() {
 
   return (
     <Container>
+      <div style={{ width: "20%" }}></div>
       <VideoContainer>
-        <Video src={danceVideo} controls></Video>
+        <VideoBox className="video">
+          <Video src={danceVideo}></Video>
+          <IconGroup>
+            <IconButton
+              link="/challenge"
+              icon={<VideocamIcon />}
+              text="촬영하기"
+            />
+          </IconGroup>
+        </VideoBox>
+        <VideoBox className="camera">
+          <Camera id="userCamera" ref={cameraRef} autoPlay playsInline></Camera>
+        </VideoBox>
       </VideoContainer>
-      <VideoContainer>
-        <Camera id="userCamera" ref={cameraRef} autoPlay playsInline></Camera>
-      </VideoContainer>
+      <div style={{ position: "relative", width: "20%" }}></div>
     </Container>
   );
 }
+
+const VideoContainer = styled.div`
+  position: relative;
+  display: flex;
+  @media screen and (orientation: portrait) {
+    justify-content: center;
+    height: 80%;
+  }
+
+  @media screen and (orientation: landscape) {
+    height: 100%;
+  }
+`;
+
+const IconGroup = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin: 4px;
+`;
 
 const Container = styled.div`
   position: relative;
@@ -61,16 +100,21 @@ const Container = styled.div`
   }
 `;
 
-const VideoContainer = styled.div`
+const VideoBox = styled.div`
+  position: relative;
+
   @media screen and (orientation: portrait) {
-    width: 100%;
-    height: 80%;
-    display: flex;
-    justify-content: center;
+    &.camera {
+      display: none;
+    }
   }
 
   @media screen and (orientation: landscape) {
     height: 100%;
+
+    &.camera {
+      display: block;
+    }
   }
 `;
 
@@ -83,12 +127,4 @@ const Camera = styled.video`
   width: 100%;
   height: 100%;
   transform: scaleX(-1); // 좌우반전
-
-  @media screen and (orientation: portrait) {
-    display: none;
-  }
-
-  @media screen and (orientation: landscape) {
-    display: block;
-  }
 `;
