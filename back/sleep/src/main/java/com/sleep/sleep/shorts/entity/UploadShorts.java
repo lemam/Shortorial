@@ -17,7 +17,7 @@ public class UploadShorts {
     private int uploadNo;
     @ManyToOne
     @JoinColumn(name = "member_no")
-    private Member memberNo;
+    private Member memberIndex;
     @ManyToOne
     @JoinColumn(name = "sns_no")
     private UploadSns snsNo;
