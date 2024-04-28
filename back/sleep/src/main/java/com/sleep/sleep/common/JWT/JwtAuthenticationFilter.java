@@ -7,7 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -31,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             checkLogout(accessToken);
             String username = jwtTokenUtil.getUsername(accessToken);
             if(username != null){
-                UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
                 equalsUsernameFromTokenAndUserDetails(userDetails.getUsername(), username);
                 validateAccessToken(accessToken, userDetails);
                 processSecurity(request, userDetails);
@@ -55,6 +58,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    private void equalsUsernameFromTokenAndUserDetails(String userDetailsUsername, String tokenUsername) {
+        if (!userDetailsUsername.equals(tokenUsername)) {
+            throw new IllegalArgumentException("username이 토큰과 맞지 않습니다.");
+        }
+    }
+
+    private void validateAccessToken(String accessToken, UserDetails userDetails) {
+        if (!jwtTokenUtil.validateToken(accessToken, userDetails)) {
+            throw new IllegalArgumentException("토큰 검증 실패");
+        }
+    }
+
+    private void processSecurity(HttpServletRequest request, UserDetails userDetails) {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
+        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+    }
 
 
 }

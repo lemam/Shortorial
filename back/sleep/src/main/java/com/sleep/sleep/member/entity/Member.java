@@ -35,6 +35,17 @@ public class Member implements UserDetails {
     private String memberProfile;
     private MemberRole memberRole;
 
+
+    public static UserDetails of(Member member){
+        return Member.builder()
+                .memberId(member.getMemberId())
+                .memberPass(member.getMemberPass())
+                .memberNickname(member.getMemberNickname())
+                .memberProfile(member.getMemberProfile())
+                .memberRole(member.getMemberRole())
+                .build();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         ArrayList<GrantedAuthority> authorities = new ArrayList<>();

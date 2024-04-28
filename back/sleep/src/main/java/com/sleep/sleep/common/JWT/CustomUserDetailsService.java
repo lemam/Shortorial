@@ -1,5 +1,6 @@
 package com.sleep.sleep.common.JWT;
 
+import com.sleep.sleep.common.redis.entity.CacheKey;
 import com.sleep.sleep.member.entity.Member;
 import com.sleep.sleep.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByUsernameWithAuthority(username)
                 .orElseThrow(() -> new NoSuchElementException("없는 회원입니다."));
-        return CustomUserDetails.of(member);
+        return Member.of(member);
     }
 }
