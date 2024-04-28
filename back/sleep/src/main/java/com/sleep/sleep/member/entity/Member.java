@@ -29,8 +29,10 @@ public class Member implements UserDetails {
     @Column(name = "member_no", updatable = false)
     private int memberIndex;
 
+    @Column(unique = true)
     private String memberId;
     private String memberPass;
+    @Column(unique = true)
     private String memberNickname;
     private String memberProfile;
     private MemberRole memberRole;
