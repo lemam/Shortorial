@@ -88,6 +88,8 @@ const LearnPage = () => {
 const Container = styled.div`
   display: flex;
   height: 100%;
+  justify-content: center;
+  background-color: #000;
 `;
 
 const VideoContainer = styled.div`
