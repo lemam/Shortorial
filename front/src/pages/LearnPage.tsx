@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import danceVideo from "/src/assets/sample.mp4";
 import styled from "styled-components";
-import IconButton from "../components/IconButton";
+import IconButton from "../components/button/IconButton";
 import { Videocam } from "@mui/icons-material";
 
 const LearnPage = () => {
