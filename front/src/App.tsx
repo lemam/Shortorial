@@ -4,6 +4,7 @@ import LearnPage from "./pages/LearnPage";
 import GlobalStyle from "./GlobalStyle";
 import ChallengePage from "./pages/ChallengePage";
 import ChallengeResultPage from "./pages/ChallengeResultPage";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   return (

@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import danceVideo from "../assets/sample.mp4";
 import styled from "styled-components";
+import ModalComponent from "../components/ModalComponent";
 
 export default function MainPage() {
+  const [showModal, setShowModal] = useState(false);
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
   return (
     <>
       <h1>Let's DANCE</h1>
@@ -33,10 +39,22 @@ export default function MainPage() {
             </div>
           </VideoBox>
         </Link>
+        <div>
+          <VideoBox onClick={handleShowModal}>
+            <video src={danceVideo}></video>
+          </VideoBox>
+          <ModalComponent
+            title="아픈 건 딱 질색이니까"
+            body={
+              <VideoBox>
+                <video src={danceVideo} autoPlay loop></video>
+              </VideoBox>
+            }
+            showModal={showModal}
+            handleCloseModal={handleCloseModal}
+          />
+        </div>
 
-        <VideoBox>
-          <video src={danceVideo}></video>
-        </VideoBox>
         <VideoBox>
           <video src={danceVideo}></video>
         </VideoBox>
