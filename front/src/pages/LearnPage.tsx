@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import danceVideo from "/src/assets/sample.mp4";
 import styled from "styled-components";
+import IconButton from "../components/IconButton";
+import { Videocam } from "@mui/icons-material";
 
 const LearnPage = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
@@ -84,6 +86,7 @@ const LearnPage = () => {
       </VideoContainer>
       <CameraContainer>
         <Camera ref={cameraRef} autoPlay></Camera>
+        <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
       </CameraContainer>
     </Container>
   );
