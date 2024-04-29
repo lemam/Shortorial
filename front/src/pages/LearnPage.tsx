@@ -52,11 +52,7 @@ const LearnPage = () => {
 
   useEffect(() => {
     initCamera();
-    initVideoSize(videoRef);
-    initVideoSize(cameraRef);
-  }, [initCamera]);
 
-  useEffect(() => {
     (() => {
       // 화면 크기가 바뀔 때 영상과 카메라 크기도 재설정
       window.addEventListener("orientationchange", () => {
@@ -75,7 +71,7 @@ const LearnPage = () => {
         initVideoSize(cameraRef)
       );
     };
-  }, []);
+  }, [initCamera]);
 
   return (
     <Container>
@@ -83,7 +79,7 @@ const LearnPage = () => {
         <video src={danceVideo} ref={videoRef} controls></video>
       </VideoContainer>
       <CameraContainer>
-        <Camera ref={cameraRef} autoPlay></Camera>
+        <video ref={cameraRef} autoPlay></video>
       </CameraContainer>
     </Container>
   );
@@ -111,10 +107,6 @@ const CameraContainer = styled.div`
   @media screen and (orientation: landscape) {
     display: flex;
   }
-`;
-
-const Camera = styled.video`
-  transform: scaleX(-1);
 `;
 
 export default LearnPage;
