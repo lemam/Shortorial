@@ -83,7 +83,7 @@ const LearnPage = () => {
         <video src={danceVideo} ref={videoRef} controls></video>
       </VideoContainer>
       <CameraContainer>
-        <video ref={cameraRef} autoPlay></video>
+        <Camera ref={cameraRef} autoPlay></Camera>
       </CameraContainer>
     </Container>
   );
@@ -111,6 +111,10 @@ const CameraContainer = styled.div`
   @media screen and (orientation: landscape) {
     display: flex;
   }
+`;
+
+const Camera = styled.video`
+  transform: scaleX(-1);
 `;
 
 export default LearnPage;
