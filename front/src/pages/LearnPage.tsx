@@ -59,7 +59,7 @@ const LearnPage = () => {
     initVideoSize(cameraRef);
 
     (() => {
-      // 화면 크기가 바뀔 때 영상과 카메라 크기도 재설정
+      // 화면 방향이 바뀔 때 영상과 카메라 크기도 재설정
       window.addEventListener("orientationchange", () => {
         setTimeout(() => initVideoSize(videoRef), 200);
       });
@@ -92,20 +92,6 @@ const LearnPage = () => {
     </Container>
   );
 };
-
-const SectionList = styled.div`
-  display: flex;
-  overflow: hidden;
-
-  & > * {
-    margin: 8px;
-  }
-
-  @media screen and (min-width: 1024), screen and (orientation: landscape) {
-    display: flex;
-    flex-direction: column;
-  }
-`;
 
 const Container = styled.div`
   display: flex;
@@ -141,6 +127,20 @@ const CameraContainer = styled.div`
 
 const Camera = styled.video`
   transform: scaleX(-1);
+`;
+
+const SectionList = styled.div`
+  display: flex;
+  overflow: hidden;
+
+  & > * {
+    margin: 8px;
+  }
+
+  @media screen and (min-width: 1024), screen and (orientation: landscape) {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 export default LearnPage;
