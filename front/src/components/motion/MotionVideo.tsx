@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import {
   PoseLandmarker,
@@ -8,7 +8,12 @@ import {
 
 import sampleVideo from "../../assets/sample.mp4";
 
-export default function MotionVideo() {
+interface VideoType {
+  width: number;
+  height: number;
+}
+
+export default function MotionVideo({ width, height }: VideoType) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -102,8 +107,21 @@ export default function MotionVideo() {
 
   return (
     <Container>
-      <video id="video" ref={videoRef} src={sampleVideo} controls></video>
-      <canvas id="output_canvas"></canvas>
+      <video
+        id="video"
+        width={width}
+        height={height}
+        style={{ objectFit: "cover" }}
+        ref={videoRef}
+        src={sampleVideo}
+        controls
+      ></video>
+      <canvas
+        id="output_canvas"
+        width={width}
+        height={height}
+        style={{ objectFit: "cover" }}
+      ></canvas>
     </Container>
   );
 }

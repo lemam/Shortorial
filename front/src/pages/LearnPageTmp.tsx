@@ -1,6 +1,4 @@
-import React from "react";
 import styled from "styled-components";
-import danceVideo from "../assets/sample.mp4";
 import MotionCamera from "../components/motion/MotionCamera";
 import MotionVideo from "../components/motion/MotionVideo";
 
@@ -8,10 +6,10 @@ export default function LearnPage() {
   return (
     <Container>
       <VideoContainer>
-        <MotionVideo />
+        <MotionVideo width={500} height={700} />
       </VideoContainer>
       <MotionCameraContainer>
-        <MotionCamera />
+        <MotionCamera width={500} height={700} />
       </MotionCameraContainer>
     </Container>
   );
@@ -45,11 +43,6 @@ const VideoContainer = styled.div`
   @media screen and (orientation: landscape) {
     height: 100%;
   }
-`;
-
-const Video = styled.video`
-  width: 100%;
-  height: 100%;
 `;
 
 const MotionCameraContainer = styled.div`

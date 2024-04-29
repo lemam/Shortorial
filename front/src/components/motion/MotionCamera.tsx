@@ -5,7 +5,12 @@ import {
 } from "@mediapipe/tasks-vision";
 import { useEffect } from "react";
 
-export default function MotionCamera() {
+interface MotionCameraType {
+  width: number;
+  height: number;
+}
+
+export default function MotionCamera({ width, height }: MotionCameraType) {
   useEffect(() => {
     // moiton을 그릴 HTML
     const motionSection = document.getElementById(
@@ -135,8 +140,20 @@ export default function MotionCamera() {
 
   return (
     <div id="motion" className="invisible">
-      <video id="webcam" autoPlay playsInline></video>
-      <canvas id="output_canvas"></canvas>
+      <video
+        id="webcam"
+        width={width}
+        height={height}
+        style={{ objectFit: "cover" }}
+        autoPlay
+        playsInline
+      ></video>
+      <canvas
+        id="output_canvas"
+        width={width}
+        height={height}
+        style={{ objectFit: "cover" }}
+      ></canvas>
       <button
         id="webcamButton"
         style={{ backgroundColor: "white", color: "black" }}
