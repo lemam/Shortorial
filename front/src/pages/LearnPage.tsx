@@ -3,6 +3,7 @@ import danceVideo from "/src/assets/sample.mp4";
 import styled from "styled-components";
 import IconButton from "../components/button/IconButton";
 import { Videocam } from "@mui/icons-material";
+import SectionButton from "../components/button/SectionButton";
 
 const LearnPage = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
@@ -43,7 +44,7 @@ const LearnPage = () => {
         videoRef.current.height = window.innerHeight;
       }
       // 세로 화면일 때 height 설정
-      else if (window.screen.orientation.angle === 0) {
+      else if (window.screen.orientation.angle === 0 || window.screen.orientation.angle === 180) {
         videoRef.current.height = window.innerHeight * 0.8;
       }
 
@@ -54,6 +55,8 @@ const LearnPage = () => {
 
   useEffect(() => {
     initCamera();
+    initVideoSize(videoRef);
+    initVideoSize(cameraRef);
 
     (() => {
       // 화면 크기가 바뀔 때 영상과 카메라 크기도 재설정
@@ -80,15 +83,41 @@ const LearnPage = () => {
         <Camera ref={cameraRef} autoPlay></Camera>
         <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
       </CameraContainer>
+      <SectionList>
+        <SectionButton text="0:00" isDone={true} />
+        <SectionButton text="0:03" isCurrent={true} />
+        <SectionButton text="0:06" />
+        <SectionButton text="0:09" />
+      </SectionList>
     </Container>
   );
 };
 
+const SectionList = styled.div`
+  display: flex;
+  overflow: hidden;
+
+  & > * {
+    margin: 8px;
+  }
+
+  @media screen and (min-width: 1024), screen and (orientation: landscape) {
+    display: flex;
+    flex-direction: column;
+  }
+`;
+
 const Container = styled.div`
   display: flex;
   height: 100%;
-  justify-content: center;
+  flex-direction: column;
   background-color: #000;
+
+  @media screen and (min-width: 1024), screen and (orientation: landscape) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 `;
 
 const VideoContainer = styled.div`
