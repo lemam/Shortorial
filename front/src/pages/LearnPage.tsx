@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import danceVideo from "/src/assets/sample.mp4";
 import styled from "styled-components";
+import IconButton from "../components/IconButton";
+import { Videocam } from "@mui/icons-material";
 
 const LearnPage = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
@@ -64,12 +66,8 @@ const LearnPage = () => {
     })();
 
     return () => {
-      window.removeEventListener("orientationchange", () =>
-        initVideoSize(videoRef)
-      );
-      window.removeEventListener("orientationchange", () =>
-        initVideoSize(cameraRef)
-      );
+      window.removeEventListener("orientationchange", () => initVideoSize(videoRef));
+      window.removeEventListener("orientationchange", () => initVideoSize(cameraRef));
     };
   }, [initCamera]);
 
@@ -79,7 +77,8 @@ const LearnPage = () => {
         <video src={danceVideo} ref={videoRef} controls></video>
       </VideoContainer>
       <CameraContainer>
-        <video ref={cameraRef} autoPlay></video>
+        <Camera ref={cameraRef} autoPlay></Camera>
+        <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
       </CameraContainer>
     </Container>
   );
@@ -109,6 +108,10 @@ const CameraContainer = styled.div`
   @media screen and (orientation: landscape) {
     display: flex;
   }
+`;
+
+const Camera = styled.video`
+  transform: scaleX(-1);
 `;
 
 export default LearnPage;
