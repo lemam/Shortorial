@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useRef } from "react";
+import danceVideo from "/src/assets/sample.mp4";
 import styled from "styled-components";
-import danceVideo from "../assets/sample.mp4";
-import IconButton from "../components/IconButton";
-import VideocamIcon from "@mui/icons-material/Videocam";
 
-export default function LearnPage() {
+const LearnPage = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // 카메라 생성
-  const setCamera = useCallback(() => {
+  // 카메라 설정 초기화
+  const initCamera = useCallback(() => {
     // 미디어 설정
     const constraints: MediaStreamConstraints = {
       video: {
@@ -30,101 +29,92 @@ export default function LearnPage() {
       });
   }, []);
 
+  // 비디오 크기 초기화
+  const initVideoSize = (videoRef: React.RefObject<HTMLVideoElement>) => {
+    if (videoRef.current) {
+      // 가로 화면 또는 desktop일 때 height 설정
+      if (
+        window.screen.orientation.angle === 90 ||
+        window.screen.orientation.angle === 270 ||
+        window.innerWidth >= 1024
+      ) {
+        videoRef.current.height = window.innerHeight;
+      }
+      // 세로 화면일 때 height 설정
+      else if (window.screen.orientation.angle === 0) {
+        videoRef.current.height = window.innerHeight * 0.8;
+      }
+
+      // width 설정
+      videoRef.current.width = Math.floor((videoRef.current.height * 9) / 16);
+    }
+  };
+
   useEffect(() => {
-    setCamera();
-  }, [setCamera]);
+    initCamera();
+    initVideoSize(videoRef);
+    initVideoSize(cameraRef);
+  }, [initCamera]);
+
+  useEffect(() => {
+    (() => {
+      // 화면 크기가 바뀔 때 영상과 카메라 크기도 재설정
+      window.addEventListener("orientationchange", () => {
+        setTimeout(() => initVideoSize(videoRef), 200);
+      });
+      window.addEventListener("orientationchange", () => {
+        setTimeout(() => initVideoSize(cameraRef), 200);
+      });
+    })();
+
+    return () => {
+      window.removeEventListener("orientationchange", () =>
+        initVideoSize(videoRef)
+      );
+      window.removeEventListener("orientationchange", () =>
+        initVideoSize(cameraRef)
+      );
+    };
+  }, []);
 
   return (
     <Container>
-      <div style={{ width: "20%" }}></div>
       <VideoContainer>
-        <VideoBox className="video">
-          <Video src={danceVideo}></Video>
-          <IconGroup>
-            <IconButton
-              link="/challenge"
-              icon={<VideocamIcon />}
-              text="촬영하기"
-            />
-          </IconGroup>
-        </VideoBox>
-        <VideoBox className="camera">
-          <Camera id="userCamera" ref={cameraRef} autoPlay playsInline></Camera>
-        </VideoBox>
+        <video src={danceVideo} ref={videoRef} controls></video>
       </VideoContainer>
-      <div style={{ position: "relative", width: "20%" }}></div>
+      <CameraContainer>
+        <Camera ref={cameraRef} autoPlay></Camera>
+      </CameraContainer>
     </Container>
   );
-}
+};
+
+const Container = styled.div`
+  display: flex;
+  height: 100%;
+`;
 
 const VideoContainer = styled.div`
   position: relative;
   display: flex;
-  @media screen and (orientation: portrait) {
-    justify-content: center;
-    height: 80%;
-  }
-
-  @media screen and (orientation: landscape) {
-    height: 100%;
-  }
+  justify-content: center;
 `;
 
-const IconGroup = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 6px;
-  padding: 4px 8px;
-  margin: 4px;
-`;
-
-const Container = styled.div`
+const CameraContainer = styled.div`
   position: relative;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  background-color: #000;
+  display: none;
 
-  @media screen and (orientation: portrait) {
-    flex-direction: column;
+  @media screen and (min-width: 1024) {
+    display: flex;
   }
 
   @media screen and (orientation: landscape) {
-    flex-direction: row;
-    justify-content: center;
+    display: flex;
   }
-`;
-
-const VideoBox = styled.div`
-  position: relative;
-
-  @media screen and (orientation: portrait) {
-    &.camera {
-      display: none;
-    }
-  }
-
-  @media screen and (orientation: landscape) {
-    height: 100%;
-
-    &.camera {
-      display: block;
-    }
-  }
-`;
-
-const Video = styled.video`
-  width: 100%;
-  height: 100%;
 `;
 
 const Camera = styled.video`
-  width: 100%;
-  height: 100%;
-  transform: scaleX(-1); // 좌우반전
+  transform: scaleX(-1);
 `;
+
+export default LearnPage;
