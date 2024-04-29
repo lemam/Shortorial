@@ -15,9 +15,7 @@ const ChallengePage = () => {
   const { setDownloadURL } = useChallengeStore();
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
   const setInit = useCallback(async () => {
@@ -28,9 +26,7 @@ const ChallengePage = () => {
 
     try {
       // 카메라 불러오기
-      const mediaStream = await navigator.mediaDevices.getUserMedia(
-        constraints
-      );
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       // userVideoRef를 참조하고 있는 DOM에 넣기
       if (userVideoRef.current) userVideoRef.current.srcObject = mediaStream;
       setStream(mediaStream);
@@ -40,9 +36,34 @@ const ChallengePage = () => {
     }
   }, []);
 
+  // 비디오 크기 초기화
+  const initVideoSize = (videoRef: React.RefObject<HTMLVideoElement>) => {
+    if (videoRef.current) {
+      videoRef.current.height = window.innerHeight;
+      videoRef.current.width = Math.floor((videoRef.current.height * 9) / 16);
+    }
+  };
+
   useEffect(() => {
     setInit(); // 카메라 초기화
-  }, [setInit]);
+    initVideoSize(danceVideoRef);
+    initVideoSize(userVideoRef);
+
+    (() => {
+      // 화면 크기가 바뀔 때 영상과 카메라 크기도 재설정
+      window.addEventListener("orientationchange", () => {
+        setTimeout(() => initVideoSize(danceVideoRef), 200);
+      });
+      window.addEventListener("orientationchange", () => {
+        setTimeout(() => initVideoSize(userVideoRef), 200);
+      });
+    })();
+
+    return () => {
+      window.removeEventListener("orientationchange", () => initVideoSize(userVideoRef));
+      window.removeEventListener("orientationchange", () => initVideoSize(danceVideoRef));
+    };
+  }, []);
 
   const startRecording = () => {
     if (!stream) {
@@ -67,7 +88,7 @@ const ChallengePage = () => {
       danceVideoRef.current?.play(); // 댄스 비디오도 시작
     } catch (error) {
       console.log(error);
-      alert("녹화를 다시 진행해 주세요.");
+      alert("녹화를 다시 시작해 주세요.");
     }
   };
 
@@ -133,15 +154,8 @@ const ChallengePage = () => {
         playsInline
         onEnded={stopRecording}
       ></VideoContainer>
-      <PracticeModeButton
-        src={learnMode}
-        onClick={goToLearnMode}
-      ></PracticeModeButton>
-      <UserVideoContainer
-        ref={userVideoRef}
-        autoPlay
-        playsInline
-      ></UserVideoContainer>
+      <PracticeModeButton src={learnMode} onClick={goToLearnMode}></PracticeModeButton>
+      <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
       <RecordButtonContainer>
         {mediaRecorder && (
           <RecordButton onClick={stopRecording}>
@@ -159,22 +173,30 @@ const ChallengePage = () => {
 };
 
 const VideoContainer = styled.video`
-  height: 100vh;
-  aspect-ratio: 9 / 16;
-  object-fit: cover;
+  position: relative;
+  display: flex;
 `;
 
 const UserVideoContainer = styled.video`
-  height: 100vh;
-  aspect-ratio: 9 / 16;
+  position: relative;
+  display: none;
+
+  @media screen and (min-width: 1024) {
+    display: flex;
+  }
+
+  @media screen and (orientation: landscape) {
+    display: flex;
+  }
+
   object-fit: cover;
   transform: scaleX(-1);
 `;
 
 const ChallengeContainer = styled.div`
   display: flex;
-  justify-content: center;
   background-color: black;
+  justify-content: center;
 `;
 
 const RecordButtonContainer = styled.div`
@@ -196,8 +218,9 @@ const PracticeModeButton = styled.img`
   background-color: white;
   border-radius: 6px;
   padding: 4px 8px;
-  margin-left: -65px;
+  margin-left: -140px;
   z-index: 10;
+  position: absolute;
 `;
 
 export default ChallengePage;
