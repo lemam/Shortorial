@@ -38,6 +38,7 @@ services:
     environment:
       TZ: Asia/Seoul
       MYSQL_HOST: letsdance_mysql
+      MYSQL_DATABASE: letsdance
       MYSQL_PORT: 3306
       MYSQL_ROOT_PASSWORD: b1234
     restart: always
