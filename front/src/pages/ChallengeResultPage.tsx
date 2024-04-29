@@ -16,7 +16,12 @@ const ChallengeResultPage = () => {
 
   return (
     <ResultContainer>
-      <VideoContainer autoPlay src={downloadURL}></VideoContainer>
+      <VideoContainer
+        autoPlay
+        playsInline
+        loop
+        src={downloadURL}
+      ></VideoContainer>
       <ControlBoxContainer>
         <ControlBox>
           <div>촬영이 완료되었습니다.</div>
