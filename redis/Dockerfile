@@ -1,4 +1,1 @@
-FROM ubuntu:latest
-LABEL authors="SSAFY"
-
-ENTRYPOINT ["top", "-b"]
+FROM redis:latest

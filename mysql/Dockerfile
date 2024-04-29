@@ -1,4 +1,6 @@
-FROM ubuntu:latest
-LABEL authors="SSAFY"
+FROM mysql:latest
 
-ENTRYPOINT ["top", "-b"]
+ENV MYSQL_ROOT_PASSWORD=b1234
+ENV MYSQL_DATABASE=letsdance
+ENV MYSQL_USER=b305
+ENV MYSQL_PASSWORD=b1234
