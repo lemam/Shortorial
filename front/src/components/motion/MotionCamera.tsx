@@ -35,7 +35,7 @@ export default function MotionCamera() {
 
     createPoseLandmarker();
     // camera가 있을 HTML
-    const video = document.getElementById("webcam") as HTMLVideoElement | null;
+    const webcam = document.getElementById("webcam") as HTMLVideoElement | null;
     // 최종 그림이 나갈 HTML
     const canvasElement = document.getElementById(
       "output_canvas"
@@ -82,22 +82,22 @@ export default function MotionCamera() {
 
       // Activate the webcam stream.
       navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-        if (video) {
-          video.srcObject = stream;
-          video.addEventListener("loadeddata", predictWebcam);
+        if (webcam) {
+          webcam.srcObject = stream;
+          webcam.addEventListener("loadeddata", predictWebcam);
         }
       });
     }
 
-    let lastVideoTime = -1;
+    let lastWebcamTime = -1;
     async function predictWebcam() {
-      if (!canvasElement || !video || !poseLandmarker) return null;
+      if (!canvasElement || !webcam || !poseLandmarker) return null;
 
       // Now let's start detecting the stream.
       let startTimeMs = performance.now();
-      if (lastVideoTime !== video.currentTime) {
-        lastVideoTime = video.currentTime;
-        poseLandmarker.detectForVideo(video, startTimeMs, (result) => {
+      if (lastWebcamTime !== webcam.currentTime) {
+        lastWebcamTime = webcam.currentTime;
+        poseLandmarker.detectForVideo(webcam, startTimeMs, (result) => {
           if (!canvasCtx || !drawingUtils) return null;
           canvasCtx.save();
           canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -117,17 +117,17 @@ export default function MotionCamera() {
 
       // Call this function again to keep predicting when the browser is ready.
       if (webcamRunning === true) {
-        video.style.display = "block";
+        webcam.style.display = "block";
         canvasElement.style.display = "block";
         window.requestAnimationFrame(predictWebcam);
       } else {
-        video.pause();
-        const stream = video.srcObject as MediaStream;
+        webcam.pause();
+        const stream = webcam.srcObject as MediaStream;
         if (stream) {
           const tracks = stream.getTracks();
           tracks.forEach((track) => track.stop());
         }
-        video.style.display = "none";
+        webcam.style.display = "none";
         canvasElement.style.display = "none";
       }
     }
