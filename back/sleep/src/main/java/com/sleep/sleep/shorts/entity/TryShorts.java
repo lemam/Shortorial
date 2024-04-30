@@ -20,7 +20,7 @@ public class TryShorts {
     private Shorts shortsNo;
     @ManyToOne
     @JoinColumn(name = "member_no")
-    private Member memberNo;
+    private Member memberIndex;
     private int tryCount;
     private int tryComplete;
     private int tryMaxTime;

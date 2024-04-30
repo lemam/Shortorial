@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { uploadShorts } from "../apis/shorts";
 import useChallengeStore from "../store/useChallengeStore";
 import styled from "styled-components";
 import axios from "axios";
 
 const ChallengeResultPage = () => {
+  const [uploadURL, setuploadURL] = useState<string>("");
   const { downloadURL } = useChallengeStore();
   console.log(downloadURL);
 
@@ -16,7 +18,9 @@ const ChallengeResultPage = () => {
 
   const s3Upload = (url: string, title: string) => {
     axios.get(url, { responseType: "blob" }).then((response) => {
-      const file = new File([response.data], `${title}.mp4`, { type: "video/mp4" }); // url 파일 변환
+      const file = new File([response.data], `${title}.mp4`, {
+        type: "video/mp4",
+      }); // url 파일 변환
       const formData = new FormData();
       formData.append("file", file); // 파일 매개변수
       formData.append("fileName", title); // 파일 이름 매개변수
@@ -35,7 +39,12 @@ const ChallengeResultPage = () => {
 
   return (
     <ResultContainer>
-      <VideoContainer autoPlay playsInline loop src={downloadURL}></VideoContainer>
+      <VideoContainer
+        autoPlay
+        playsInline
+        loop
+        src={downloadURL}
+      ></VideoContainer>
       <ControlBoxContainer>
         <ControlBox>
           <div>촬영이 완료되었습니다.</div>
@@ -45,7 +54,10 @@ const ChallengeResultPage = () => {
             onChange={saveTitle}
             placeholder="제목을 입력하세요."
           ></input>
-          <a href={downloadURL} download={title}>
+          <a
+            href={downloadURL}
+            download={title}
+          >
             로컬저장
           </a>
           <button onClick={() => s3Upload(downloadURL, title)}>s3저장</button>
