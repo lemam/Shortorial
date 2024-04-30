@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import danceVideo from "/src/assets/sample.mp4";
 import styled from "styled-components";
+import IconButton from "../components/IconButton";
+import { Videocam } from "@mui/icons-material";
 
 const LearnPage = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
@@ -52,11 +54,7 @@ const LearnPage = () => {
 
   useEffect(() => {
     initCamera();
-    initVideoSize(videoRef);
-    initVideoSize(cameraRef);
-  }, [initCamera]);
 
-  useEffect(() => {
     (() => {
       // 화면 크기가 바뀔 때 영상과 카메라 크기도 재설정
       window.addEventListener("orientationchange", () => {
@@ -68,14 +66,10 @@ const LearnPage = () => {
     })();
 
     return () => {
-      window.removeEventListener("orientationchange", () =>
-        initVideoSize(videoRef)
-      );
-      window.removeEventListener("orientationchange", () =>
-        initVideoSize(cameraRef)
-      );
+      window.removeEventListener("orientationchange", () => initVideoSize(videoRef));
+      window.removeEventListener("orientationchange", () => initVideoSize(cameraRef));
     };
-  }, []);
+  }, [initCamera]);
 
   return (
     <Container>
@@ -83,7 +77,8 @@ const LearnPage = () => {
         <video src={danceVideo} ref={videoRef} controls></video>
       </VideoContainer>
       <CameraContainer>
-        <video ref={cameraRef} autoPlay></video>
+        <Camera ref={cameraRef} autoPlay></Camera>
+        <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
       </CameraContainer>
     </Container>
   );
@@ -92,6 +87,8 @@ const LearnPage = () => {
 const Container = styled.div`
   display: flex;
   height: 100%;
+  justify-content: center;
+  background-color: #000;
 `;
 
 const VideoContainer = styled.div`
@@ -111,6 +108,10 @@ const CameraContainer = styled.div`
   @media screen and (orientation: landscape) {
     display: flex;
   }
+`;
+
+const Camera = styled.video`
+  transform: scaleX(-1);
 `;
 
 export default LearnPage;

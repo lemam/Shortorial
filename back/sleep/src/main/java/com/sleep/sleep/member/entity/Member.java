@@ -32,11 +32,24 @@ public class Member implements UserDetails {
     @Column(name = "member_no", updatable = false)
     private int memberIndex;
 
+    @Column(unique = true)
     private String memberId;
     private String memberPass;
+    @Column(unique = true)
     private String memberNickname;
     private String memberProfile;
     private MemberRole memberRole;
+
+
+    public static UserDetails of(Member member){
+        return Member.builder()
+                .memberId(member.getMemberId())
+                .memberPass(member.getMemberPass())
+                .memberNickname(member.getMemberNickname())
+                .memberProfile(member.getMemberProfile())
+                .memberRole(member.getMemberRole())
+                .build();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
