@@ -26,7 +26,7 @@ import java.util.List;
 @DynamicInsert
 @DynamicUpdate
 public class Member implements UserDetails {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_no", updatable = false)
