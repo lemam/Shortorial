@@ -1,5 +1,6 @@
 package com.sleep.sleep.s3;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.io.IOException;
 public class S3Controller {
     private final S3Service s3Service;
 
+    @Operation(summary = "동영상 다운로드", description ="추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
     @GetMapping("/s3/download/{fileName}")
     public ResponseEntity<?> downloadFile(@PathVariable String fileName) {
         try {
@@ -24,6 +26,7 @@ public class S3Controller {
 
     }
 
+    @Operation(summary = "동영상 업로드", description ="추후 사용자별 업로드로 수정 예정; param: 업로드할 파일이름")
     @PostMapping("/s3/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("fileName") String fileName) {
         try {
@@ -35,6 +38,8 @@ public class S3Controller {
             return new ResponseEntity<String>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Operation(summary = "동영상 삭제", description ="추후 사용자별 다운로드로 수정 예정; param: 삭제할 파일이름")
     @DeleteMapping("/s3/delete/{fileName}")
     public ResponseEntity<?> deleteFile(@PathVariable String fileName){
         try {
