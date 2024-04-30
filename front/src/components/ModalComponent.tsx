@@ -1,5 +1,4 @@
 import { Modal, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import React from "react";
 
 interface ModalType {
@@ -7,18 +6,18 @@ interface ModalType {
   body: React.ReactNode;
   showModal: boolean;
   handleCloseModal: () => void;
+  goToLearnMode: () => void;
+  goToChallengeMode: () => void;
 }
 
-const ModalComponent = ({ title, body, showModal, handleCloseModal }: ModalType) => {
-  const navigate = useNavigate();
-
-  const goToLearnMode = () => {
-    navigate("/learn");
-  };
-  const goToChallengeMode = () => {
-    navigate("/challenge");
-  };
-
+const ModalComponent = ({
+  title,
+  body,
+  showModal,
+  handleCloseModal,
+  goToLearnMode,
+  goToChallengeMode,
+}: ModalType) => {
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
       <Modal.Header closeButton>

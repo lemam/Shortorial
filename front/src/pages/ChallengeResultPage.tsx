@@ -8,8 +8,6 @@ import axios from "axios";
 const ChallengeResultPage = () => {
   const [uploadURL, setuploadURL] = useState<string>("");
   const { downloadURL } = useChallengeStore();
-  console.log(downloadURL);
-
   const [title, setTitle] = useState<string>("");
 
   const saveTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,9 +38,9 @@ const ChallengeResultPage = () => {
   return (
     <ResultContainer>
       <VideoContainer
-        autoPlay
+        //autoPlay
         playsInline
-        loop
+        //loop
         src={downloadURL}
       ></VideoContainer>
       <ControlBoxContainer>
@@ -54,10 +52,7 @@ const ChallengeResultPage = () => {
             onChange={saveTitle}
             placeholder="제목을 입력하세요."
           ></input>
-          <a
-            href={downloadURL}
-            download={title}
-          >
+          <a href={downloadURL} download={title}>
             로컬저장
           </a>
           <button onClick={() => s3Upload(downloadURL, title)}>s3저장</button>
@@ -82,7 +77,7 @@ const VideoContainer = styled.video`
   object-fit: cover;
   padding: 30px;
   box-sizing: border-box;
-  transform: scaleX(-1);
+  //transform: scaleX(-1);
 `;
 
 const ControlBoxContainer = styled.div`

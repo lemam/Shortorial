@@ -1,13 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import danceVideo from "../assets/sample.mp4";
 import styled from "styled-components";
 import ModalComponent from "../components/ModalComponent";
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+
+  const goToLearnMode = () => {
+    navigate("/learn");
+  };
+
+  const goToChallengeMode = () => {
+    navigate("/challenge");
+  };
 
   return (
     <>
@@ -52,6 +61,8 @@ export default function MainPage() {
             }
             showModal={showModal}
             handleCloseModal={handleCloseModal}
+            goToLearnMode={goToLearnMode}
+            goToChallengeMode={goToChallengeMode}
           />
         </div>
 

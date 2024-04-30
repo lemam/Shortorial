@@ -7,10 +7,11 @@ import learnMode from "../assets/learnmode.png";
 import stop from "../assets/stop.png";
 import start from "../assets/start.png";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+//import ffmpeg from "fluent-ffmpeg";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
-  const ffmpeg = createFFmpeg({ log: false });
+  const ffmpeg = createFFmpeg({ log: true });
 
   const { setDownloadURL } = useChallengeStore();
   const userVideoRef = useRef<HTMLVideoElement>(null);
@@ -20,7 +21,9 @@ const ChallengePage = () => {
 
   const setInit = useCallback(async () => {
     const constraints: MediaStreamConstraints = {
-      video: true,
+      video: {
+        aspectRatio: 9 / 16,
+      },
       audio: false,
     };
 
@@ -117,23 +120,25 @@ const ChallengePage = () => {
         ffmpeg.FS("writeFile", "userVideo.mp4", uint8Array); // 사용자 비디오 가상 파일 만들기
 
         await ffmpeg.run(
-          "-i", // 입력 파일 지정
+          "-i",
           "userVideo.mp4",
           "-i",
           "dance_audio.mp3",
-          "-c:v", // 코덱 처리 방식 지정
-          "copy",
+          // "-c:v",
+          // "copy",
           "-map",
-          "0:v:0", // 첫번째 입력파일의 첫번째 비디오 스트림
+          "0:v:0",
           "-map",
-          "1:a:0", // 두번째 입력파일의 첫번째 오디오 스트림
-          "-shortest", // 두 파일 중 짧은 길이에 맞춤
-          "finalUserVideo.mp4" // 오디오 추가된 파일 생성
+          "1:a:0",
+          "-shortest",
+          "-vf",
+          "hflip",
+          "finalUserVideo.mp4"
         );
 
-        const userVideoFinal = ffmpeg.FS("readFile", "finalUserVideo.mp4"); // 최종 파일 읽기
+        const userVideoFlipFinal = ffmpeg.FS("readFile", "finalUserVideo.mp4");
         // 최종 파일 Blob 변환
-        const userVideoFinalBlob = new Blob([userVideoFinal.buffer], {
+        const userVideoFinalBlob = new Blob([userVideoFlipFinal.buffer], {
           type: "video/mp4",
         });
 
