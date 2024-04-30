@@ -65,20 +65,20 @@ services:
       - /usr/bin/docker:/usr/bin/docker
       - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
       - /var/run/docker.sock:/var/run/docker.sock
-  # letsdance_frontend:
-  #   image: letsdance-frontend
-  #   container_name: letsdance-frontend-container
-  #   restart: always
-  #   environment:
-  #     - TZ=Asia/Seoul
-  # letsdance_backend:
-  #   image: letsdance-backend
-  #   container_name: letsdance-backend-container
-  #   restart: always
-  #   ports:
-  #     - "8089:8089"
-  #   environment:
-  #     - TZ=Asia/Seoul
+  letsdance_frontend:
+    image: letsdance-frontend
+    container_name: letsdance-frontend-container
+    restart: always
+    environment:
+      - TZ=Asia/Seoul
+  letsdance_backend:
+    image: letsdance-backend
+    container_name: letsdance-backend-container
+    restart: always
+    ports:
+      - "8089:8089"
+    environment:
+      - TZ=Asia/Seoul
   letsdance_sonarqube:
     image: sonarqube:lts-community
     ports:
