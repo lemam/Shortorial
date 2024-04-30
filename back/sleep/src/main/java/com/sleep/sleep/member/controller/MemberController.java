@@ -72,8 +72,11 @@ public class MemberController {
         HttpStatus status = HttpStatus.OK;
         MemberInfoDto memberInfoDto = null;
         try {
+            System.out.println(accessToken.toString());
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+            System.out.println("username : "+ username);
             memberInfoDto = memberService.getMemberInfo(username);
+            System.out.println("memberInfo : "+ memberInfoDto.getMemberNickname());
             resultMap.put("memberInfo", memberInfoDto);
         } catch (Exception e) {
             log.info(e.getMessage());
@@ -123,6 +126,7 @@ public class MemberController {
 
 
     private String resolveToken(String accessToken) {
+        log.info("resolveToken, AccessToken: "+ accessToken.toString());
         return accessToken.substring(7);
     }
 }

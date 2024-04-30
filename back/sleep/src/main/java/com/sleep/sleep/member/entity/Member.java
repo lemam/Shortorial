@@ -34,10 +34,14 @@ public class Member implements UserDetails {
 
     @Column(unique = true)
     private String memberId;
+    @Column(nullable = false)
     private String memberPass;
     @Column(unique = true)
     private String memberNickname;
+    @Column(nullable = false)
     private String memberProfile;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
 
