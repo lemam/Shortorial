@@ -16,9 +16,7 @@ public class MyPageController {
     private MyPageService myPageService;
 
     @GetMapping("/info")
-    public ResponseEntity<?> getMyInfo(Htt
-
-                                                   pServletRequest request){
+    public ResponseEntity<?> getMyInfo(HttpServletRequest request){
         try{
             //사용자 찾기
 //            int accessMemberIndex = (int)request.getAttribute("accessMemberIndex");

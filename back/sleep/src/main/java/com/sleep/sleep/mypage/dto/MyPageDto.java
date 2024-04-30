@@ -7,12 +7,12 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MyPageDto {
     private String memberNickname ;
-    private String memberProfile;
+    private int memberProfile;
     private int tryCount;
     private int completeCount;
 
     @Builder
-    public MyPageDto(String memberNickname,String memberProfile,int tryCount, int completeCount){
+    public MyPageDto(String memberNickname,int memberProfile,int tryCount, int completeCount){
         this.memberNickname=memberNickname;
         this.memberProfile=memberProfile;
         this.tryCount=tryCount;
