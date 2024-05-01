@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useRef } from "react";
-import danceVideo from "/src/assets/sample.mp4";
+// import { useCallback, useEffect, useRef } from "react";
+// import danceVideo from "/src/assets/sample.mp4";
 import styled from "styled-components";
-import IconButton from "../components/IconButton";
-import { Videocam } from "@mui/icons-material";
+// import IconButton from "../components/IconButton";
+// import { Videocam } from "@mui/icons-material";
 
 const VideoEditPage = () => {
-  
-  console.log("VideoEditPage")
-  
+  console.log("VideoEditPage");
+
   return (
     <Container>
       <h1> Video Edit Page</h1>
