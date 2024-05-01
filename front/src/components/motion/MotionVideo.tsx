@@ -14,7 +14,7 @@ interface VideoType {
   height: number;
 }
 
-const MAX_COUNT: number = 4;
+const MAX_COUNT: number = 2;
 
 export default function MotionVideo({ width, height }: VideoType) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -62,7 +62,7 @@ export default function MotionVideo({ width, height }: VideoType) {
 
     const video = document.getElementById("video") as HTMLVideoElement | null;
     const canvasElement = document.getElementById(
-      "output_canvas"
+      "video_canvas"
     ) as HTMLCanvasElement | null;
     let canvasCtx: CanvasRenderingContext2D | null = null;
     let drawingUtils: DrawingUtils | null = null;
@@ -143,9 +143,9 @@ export default function MotionVideo({ width, height }: VideoType) {
 
       if (videoRunning === true) {
         if (cnt > MAX_COUNT) {
-          console.log(cnt);
-          console.log(sumLandmark);
-          console.log("============================");
+          // console.log(cnt);
+          // console.log(sumLandmark);
+          // console.log("============================");
           cnt = 0;
         } else {
           cnt++;
@@ -174,7 +174,7 @@ export default function MotionVideo({ width, height }: VideoType) {
         controls
       ></video>
       <canvas
-        id="output_canvas"
+        id="video_canvas"
         width={width}
         height={height}
         style={{ objectFit: "cover" }}

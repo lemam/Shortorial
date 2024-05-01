@@ -2,6 +2,7 @@ import {
   PoseLandmarker,
   FilesetResolver,
   DrawingUtils,
+  NormalizedLandmark,
 } from "@mediapipe/tasks-vision";
 import { useEffect } from "react";
 
@@ -52,6 +53,16 @@ export default function MotionCamera({ width, height }: MotionCameraType) {
     if (canvasElement) canvasCtx = canvasElement.getContext("2d");
     if (canvasCtx) drawingUtils = new DrawingUtils(canvasCtx);
 
+    let canvasElementTest2 = document.getElementById(
+      "test2_canvas"
+    ) as HTMLCanvasElement | null;
+    let canvasCtxTest2: CanvasRenderingContext2D | null = null;
+    let drawingUtilsTest2: DrawingUtils | null = null;
+
+    if (canvasElementTest2)
+      canvasCtxTest2 = canvasElementTest2.getContext("2d");
+    if (canvasCtxTest2) drawingUtilsTest2 = new DrawingUtils(canvasCtxTest2);
+
     // 카메라가 있는지 확인
     const isGetUserMedia = () => !!navigator.mediaDevices?.getUserMedia;
 
@@ -93,6 +104,9 @@ export default function MotionCamera({ width, height }: MotionCameraType) {
         }
       });
     }
+    let sumLandmark2: NormalizedLandmark[] | null = null;
+    let cnt = 0;
+    const MAX_COUNT: number = 2;
 
     let lastWebcamTime = -1;
     async function predictWebcam() {
@@ -104,9 +118,46 @@ export default function MotionCamera({ width, height }: MotionCameraType) {
         lastWebcamTime = webcam.currentTime;
         poseLandmarker.detectForVideo(webcam, startTimeMs, (result) => {
           if (!canvasCtx || !drawingUtils) return null;
+          if (!canvasCtxTest2 || !drawingUtilsTest2 || !canvasElementTest2)
+            return null;
+
           canvasCtx.save();
           canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
           for (const landmark of result.landmarks) {
+            if (cnt == 0) {
+              sumLandmark2 = [...landmark];
+            } else {
+              if (sumLandmark2) {
+                for (let idx = 0; idx < landmark.length; idx++) {
+                  sumLandmark2[idx].x += landmark[idx].x;
+                  sumLandmark2[idx].y += landmark[idx].y;
+                  sumLandmark2[idx].z += landmark[idx].z;
+                }
+              }
+            }
+            if (cnt === MAX_COUNT && sumLandmark2) {
+              canvasCtxTest2.clearRect(
+                0,
+                0,
+                canvasElementTest2.width,
+                canvasElementTest2.height
+              );
+              for (const landmark of sumLandmark2) {
+                landmark.x /= cnt + 1; // 랜드마크의 개수로 나누어 평균을 계산
+                landmark.y /= cnt + 1;
+                landmark.z /= cnt + 1;
+              }
+              drawingUtilsTest2.drawLandmarks(sumLandmark2, {
+                radius: (data: any) =>
+                  DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
+              });
+              drawingUtilsTest2.drawConnectors(
+                sumLandmark2,
+                PoseLandmarker.POSE_CONNECTIONS
+              );
+              canvasCtxTest2.restore();
+            }
+
             drawingUtils.drawLandmarks(landmark, {
               radius: (data: any) =>
                 DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
@@ -122,6 +173,14 @@ export default function MotionCamera({ width, height }: MotionCameraType) {
 
       // Call this function again to keep predicting when the browser is ready.
       if (webcamRunning === true) {
+        if (cnt > MAX_COUNT) {
+          // console.log(cnt);
+          // console.log(sumLandmark2);
+          // console.log("============================");
+          cnt = 0;
+        } else {
+          cnt++;
+        }
         webcam.style.display = "block";
         canvasElement.style.display = "block";
         window.requestAnimationFrame(predictWebcam);
@@ -150,6 +209,12 @@ export default function MotionCamera({ width, height }: MotionCameraType) {
       ></video>
       <canvas
         id="output_canvas"
+        width={width}
+        height={height}
+        style={{ objectFit: "cover" }}
+      ></canvas>
+      <canvas
+        id="test2_canvas"
         width={width}
         height={height}
         style={{ objectFit: "cover" }}
