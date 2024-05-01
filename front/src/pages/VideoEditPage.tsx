@@ -28,27 +28,4 @@ const Container = styled.div`
   background-color: #000;
 `;
 
-const VideoContainer = styled.div`
-  position: relative;
-  display: flex;
-  justify-content: center;
-`;
-
-const CameraContainer = styled.div`
-  position: relative;
-  display: none;
-
-  @media screen and (min-width: 1024) {
-    display: flex;
-  }
-
-  @media screen and (orientation: landscape) {
-    display: flex;
-  }
-`;
-
-const Camera = styled.video`
-  transform: scaleX(-1);
-`;
-
 export default VideoEditPage;
