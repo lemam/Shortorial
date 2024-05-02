@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useRef } from "react";
-import danceVideo from "/src/assets/sample.mp4";
+// import { useCallback, useEffect, useRef } from "react";
+// import danceVideo from "/src/assets/sample.mp4";
 import styled from "styled-components";
-import IconButton from "../components/IconButton";
-import { Videocam } from "@mui/icons-material";
+// import IconButton from "../components/IconButton";
+// import { Videocam } from "@mui/icons-material";
 
 const VideoEditPage = () => {
-  
-  console.log("VideoEditPage")
-  
+  console.log("VideoEditPage");
+
   return (
     <Container>
       <h1> Video Edit Page</h1>
@@ -27,29 +26,6 @@ const Container = styled.div`
   height: 100%;
   justify-content: center;
   background-color: #000;
-`;
-
-const VideoContainer = styled.div`
-  position: relative;
-  display: flex;
-  justify-content: center;
-`;
-
-const CameraContainer = styled.div`
-  position: relative;
-  display: none;
-
-  @media screen and (min-width: 1024) {
-    display: flex;
-  }
-
-  @media screen and (orientation: landscape) {
-    display: flex;
-  }
-`;
-
-const Camera = styled.video`
-  transform: scaleX(-1);
 `;
 
 export default VideoEditPage;

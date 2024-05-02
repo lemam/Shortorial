@@ -6,7 +6,9 @@ import useChallengeStore from "../store/useChallengeStore";
 import learnMode from "../assets/learnmode.png";
 import stop from "../assets/stop.png";
 import start from "../assets/start.png";
+import load from "../assets/loading.gif";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+import ModalComponent from "../components/ModalComponent";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -17,10 +19,16 @@ const ChallengePage = () => {
   const danceVideoRef = useRef<HTMLVideoElement>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleShowModal = () => setLoading(true);
+  const handleCloseModal = () => setLoading(false);
 
   const setInit = useCallback(async () => {
     const constraints: MediaStreamConstraints = {
-      video: true,
+      video: {
+        aspectRatio: 9 / 16,
+      },
       audio: false,
     };
 
@@ -77,11 +85,28 @@ const ChallengePage = () => {
       recorder.ondataavailable = (e) => chunks.push(e.data); // 스트림 조각이 어느 정도 커지면 push하기
 
       recorder.onstop = async () => {
-        const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // 현재 chunk배열에 있는 조각을 blob으로 만들기
-        await ffmpeg.load();
+        handleShowModal();
+        console.log("로딩 시작:", new Date().toLocaleTimeString()); // 로딩 시작 시간 로그
+
+        const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // Blob 생성
+
+        // 댄스 비디오 오디오 추출
+        const danceVideoBlob = await fetchFile(danceVideo); // 링크된 댄스 비디오를 Blob으로 변환
+        ffmpeg.FS("writeFile", "danceVideo.mp4", danceVideoBlob); // Blob을 가상 파일로 변환
+        await ffmpeg.run(
+          "-i",
+          "danceVideo.mp4",
+          "-vn", // 비디오 무시
+          "-c:a",
+          "copy", // aac 코덱 복사
+          "dance_audio.m4a" // 오디오 파일 생성
+        );
+
+        // 비디오에 오디오 추가
         await addAudio(userVideoBlob);
       };
 
+      ffmpeg.load(); // ffmpeg 로드
       recorder.start(); // 녹화 시작
       setMediaRecorder(recorder);
 
@@ -95,19 +120,18 @@ const ChallengePage = () => {
   const stopRecording = () => {
     mediaRecorder?.stop(); // recorder.onstop() 실행
     stream?.getTracks().forEach((track) => track.stop());
-    navigate("/challenge/result"); // 결과 페이지 가기
   };
 
   const goToLearnMode = () => {
     navigate("/learn"); // 연습 페이지 가기
   };
 
+  const goToChallengeMode = () => {
+    navigate("/challenge"); // 다시 찍기
+  };
+
   const addAudio = async (userVideoBlob: Blob) => {
     try {
-      const danceVideoBlob = await fetchFile(danceVideo); // 링크된 댄스 비디오를 Blob으로 변환
-      ffmpeg.FS("writeFile", "danceVideo.mp4", danceVideoBlob); // Blob을 가상 파일로 변환
-      await ffmpeg.run("-i", "danceVideo.mp4", "dance_audio.mp3"); // 댄스 비디오 오디오 추출
-
       const reader = new FileReader();
       reader.readAsArrayBuffer(userVideoBlob);
       // 파일 읽기가 완료 되면
@@ -117,32 +141,54 @@ const ChallengePage = () => {
         ffmpeg.FS("writeFile", "userVideo.mp4", uint8Array); // 사용자 비디오 가상 파일 만들기
 
         await ffmpeg.run(
-          "-i", // 입력 파일 지정
-          "userVideo.mp4",
           "-i",
-          "dance_audio.mp3",
-          "-c:v", // 코덱 처리 방식 지정
-          "copy",
+          "userVideo.mp4", // 사용자 영상
+          "-i",
+          "dance_audio.m4a", // 원본 오디오
           "-map",
-          "0:v:0", // 첫번째 입력파일의 첫번째 비디오 스트림
+          "0:v:0", // 첫번째 파일(사용자 영상)의 0번째 스트림
           "-map",
-          "1:a:0", // 두번째 입력파일의 첫번째 오디오 스트림
-          "-shortest", // 두 파일 중 짧은 길이에 맞춤
-          "finalUserVideo.mp4" // 오디오 추가된 파일 생성
+          "1:a:0", // 두번째 파일(원본 오디오)의 0번째 스트림
+          "-c:v",
+          "copy", // 비디오 인코딩 복사
+          "-c:a",
+          "copy", // 오디오 인코딩 복사
+          "-shortest", // 두 개 파일 중 짧은 쪽에 맞춤
+          "finalUserVideo.mp4" // 파일 생성
         );
 
-        const userVideoFinal = ffmpeg.FS("readFile", "finalUserVideo.mp4"); // 최종 파일 읽기
+        await ffmpeg.run(
+          "-i",
+          "finalUserVideo.mp4",
+          "-vf", // 비디오 필터
+          "hflip", // 좌우반전
+          "finalUserVideoFlip.mp4"
+        );
+
+        const userVideoFlipFinal = ffmpeg.FS("readFile", "finalUserVideoFlip.mp4");
         // 최종 파일 Blob 변환
-        const userVideoFinalBlob = new Blob([userVideoFinal.buffer], {
+        const userVideoFinalBlob = new Blob([userVideoFlipFinal.buffer], {
           type: "video/mp4",
         });
 
-        // 다운로드 링크 설정
-        setDownloadURL(URL.createObjectURL(userVideoFinalBlob));
+        // 최종파일 url 전달
+        makeDownloadURL(userVideoFinalBlob);
       };
     } catch (error) {
       console.log(error);
       alert("오디오를 추가할 수 없습니다.");
+    }
+  };
+
+  const makeDownloadURL = (userVideoFinalBlob: Blob) => {
+    try {
+      setDownloadURL(URL.createObjectURL(userVideoFinalBlob));
+    } catch (error) {
+      console.log("비디오가 생성되지 않았습니다:", error);
+    } finally {
+      handleCloseModal();
+      console.log("로딩 시작:", new Date().toLocaleTimeString()); // 로딩 시작 시간 로그
+      navigate("/challenge/result"); // 결과 페이지 가기
     }
   };
 
@@ -168,6 +214,14 @@ const ChallengePage = () => {
           </RecordButton>
         )}
       </RecordButtonContainer>
+      <ModalComponent
+        title="아픈 건 딱 질색이니까"
+        body={<img src={load} width="300px" height="300px"></img>}
+        showModal={loading}
+        handleCloseModal={handleCloseModal}
+        goToLearnMode={goToLearnMode}
+        goToChallengeMode={goToChallengeMode}
+      ></ModalComponent>
     </ChallengeContainer>
   );
 };

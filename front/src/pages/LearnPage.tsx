@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import danceVideo from "/src/assets/sample.mp4";
 import styled from "styled-components";
-import IconButton from "../components/IconButton";
+import IconButton from "../components/button/IconButton";
 import { Videocam } from "@mui/icons-material";
+import SectionButton from "../components/button/SectionButton";
 
 const LearnPage = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
@@ -43,7 +44,7 @@ const LearnPage = () => {
         videoRef.current.height = window.innerHeight;
       }
       // 세로 화면일 때 height 설정
-      else if (window.screen.orientation.angle === 0) {
+      else if (window.screen.orientation.angle === 0 || window.screen.orientation.angle === 180) {
         videoRef.current.height = window.innerHeight * 0.8;
       }
 
@@ -54,9 +55,11 @@ const LearnPage = () => {
 
   useEffect(() => {
     initCamera();
+    initVideoSize(videoRef);
+    initVideoSize(cameraRef);
 
     (() => {
-      // 화면 크기가 바뀔 때 영상과 카메라 크기도 재설정
+      // 화면 방향이 바뀔 때 영상과 카메라 크기도 재설정
       window.addEventListener("orientationchange", () => {
         setTimeout(() => initVideoSize(videoRef), 200);
       });
@@ -71,14 +74,30 @@ const LearnPage = () => {
     };
   }, [initCamera]);
 
+  // 해당 시간으로 비디오 시간 이동
+  const moveToTime = (time: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = time;
+    }
+  };
+
   return (
     <Container>
+      <SectionList>
+        <SectionButton text="0:00" isDone={true} onClick={() => moveToTime(0)} />
+        <SectionButton text="0:03" isCurrent={true} onClick={() => moveToTime(3)} />
+        <SectionButton text="0:06" onClick={() => moveToTime(6)} />
+        <SectionButton text="0:09" onClick={() => moveToTime(9)} />
+        <SectionButton text="0:12" onClick={() => moveToTime(12)} />
+      </SectionList>
       <VideoContainer>
         <video src={danceVideo} ref={videoRef} controls></video>
       </VideoContainer>
       <CameraContainer>
         <Camera ref={cameraRef} autoPlay></Camera>
-        <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
+        <div style={{ position: "absolute", top: 0, right: 0 }}>
+          <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
+        </div>
       </CameraContainer>
     </Container>
   );
@@ -87,8 +106,15 @@ const LearnPage = () => {
 const Container = styled.div`
   display: flex;
   height: 100%;
+  flex-direction: column;
   justify-content: center;
   background-color: #000;
+
+  @media screen and (min-width: 1024), screen and (orientation: landscape) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 `;
 
 const VideoContainer = styled.div`
@@ -112,6 +138,20 @@ const CameraContainer = styled.div`
 
 const Camera = styled.video`
   transform: scaleX(-1);
+`;
+
+const SectionList = styled.div`
+  display: flex;
+  overflow: hidden;
+
+  & > * {
+    margin: 8px;
+  }
+
+  @media screen and (min-width: 1024), screen and (orientation: landscape) {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 export default LearnPage;

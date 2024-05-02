@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { uploadShorts } from "../apis/shorts";
+// import { uploadShorts } from "../apis/shorts";
 import useChallengeStore from "../store/useChallengeStore";
 import styled from "styled-components";
 import axios from "axios";
 
 const ChallengeResultPage = () => {
-  const [uploadURL, setuploadURL] = useState<string>("");
+  // const [uploadURL, setuploadURL] = useState<string>("");
   const { downloadURL } = useChallengeStore();
   console.log(downloadURL);
 
@@ -39,12 +39,7 @@ const ChallengeResultPage = () => {
 
   return (
     <ResultContainer>
-      <VideoContainer
-        autoPlay
-        playsInline
-        loop
-        src={downloadURL}
-      ></VideoContainer>
+      <VideoContainer autoPlay playsInline loop src={downloadURL}></VideoContainer>
       <ControlBoxContainer>
         <ControlBox>
           <div>촬영이 완료되었습니다.</div>
@@ -54,10 +49,7 @@ const ChallengeResultPage = () => {
             onChange={saveTitle}
             placeholder="제목을 입력하세요."
           ></input>
-          <a
-            href={downloadURL}
-            download={title}
-          >
+          <a href={downloadURL} download={title}>
             로컬저장
           </a>
           <button onClick={() => s3Upload(downloadURL, title)}>s3저장</button>
@@ -82,7 +74,7 @@ const VideoContainer = styled.video`
   object-fit: cover;
   padding: 30px;
   box-sizing: border-box;
-  transform: scaleX(-1);
+  //transform: scaleX(-1);
 `;
 
 const ControlBoxContainer = styled.div`
