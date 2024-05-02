@@ -17,7 +17,6 @@ services:
   letsdance_nginx_proxy_manager:
     container_name: letsdance-nginx-proxy-manager-container
     image: 'jc21/nginx-proxy-manager:2.11.1'
-    restart: always
     ports:
       - "80:80"
       - "443:443"
