@@ -19,7 +19,7 @@ services:
     image: 'jc21/nginx-proxy-manager:2.11.1'
     restart: always
     ports:
-      - "80:80"
+      # - "80:80"
       - "443:443"
       - "8009:81"
     volumes:
