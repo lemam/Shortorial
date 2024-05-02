@@ -3,32 +3,21 @@ import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 export function Acc(
   videoLandmark: NormalizedLandmark[],
   camLandmark: NormalizedLandmark[]
-) {
-  const angleDifferences: number[] = [];
+): number {
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+
   for (let i = 0; i < videoLandmark.length; i++) {
-    const angleDiff = calculateDistance(videoLandmark[i], camLandmark[i]);
-    angleDifferences.push(angleDiff);
+    const video = videoLandmark[i];
+    const cam = camLandmark[i];
+
+    dotProduct += video.x * cam.x + video.y * cam.y + video.z * cam.z;
+    normA += Math.sqrt(video.x ** 2 + video.y ** 2 + video.z ** 2);
+    normB += Math.sqrt(cam.x ** 2 + cam.y ** 2 + cam.z ** 2);
   }
 
-  // 각 동작의 각도 차이를 종합하여 유사도를 계산합니다.
-  // 여기서는 각 동작의 각도 차이의 평균을 사용합니다.
-  const meanAngleDifference =
-    angleDifferences.reduce((acc, curr) => acc + curr, 0) /
-    angleDifferences.length;
-
-  // 유사도는 1에서 평균 각도 차이를 뺀 값으로 정의합니다.
-  // 더 낮은 각도 차이는 더 높은 유사도를 나타냅니다.
-  const similarity = 1 - meanAngleDifference;
-
+  const similarity = dotProduct / (normA * normB);
+  console.log(similarity);
   return similarity;
-}
-
-function calculateDistance(
-  video: NormalizedLandmark,
-  cam: NormalizedLandmark
-): number {
-  const dx = video.x - cam.x;
-  const dy = video.y - cam.y;
-  const dz = video.z - cam.z;
-  return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
