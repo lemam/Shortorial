@@ -83,19 +83,22 @@ const LearnPage = () => {
 
   return (
     <Container>
-      <VideoContainer>
-        <video src={danceVideo} ref={videoRef} controls></video>
-      </VideoContainer>
-      <CameraContainer>
-        <Camera ref={cameraRef} autoPlay></Camera>
-        <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
-      </CameraContainer>
       <SectionList>
         <SectionButton text="0:00" isDone={true} onClick={() => moveToTime(0)} />
         <SectionButton text="0:03" isCurrent={true} onClick={() => moveToTime(3)} />
         <SectionButton text="0:06" onClick={() => moveToTime(6)} />
         <SectionButton text="0:09" onClick={() => moveToTime(9)} />
+        <SectionButton text="0:12" onClick={() => moveToTime(12)} />
       </SectionList>
+      <VideoContainer>
+        <video src={danceVideo} ref={videoRef} controls></video>
+      </VideoContainer>
+      <CameraContainer>
+        <Camera ref={cameraRef} autoPlay></Camera>
+        <div style={{ position: "absolute", top: 0, right: 0 }}>
+          <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
+        </div>
+      </CameraContainer>
     </Container>
   );
 };
