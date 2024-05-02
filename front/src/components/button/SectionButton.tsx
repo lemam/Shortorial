@@ -1,10 +1,12 @@
 import { Check } from "@mui/icons-material";
+import { MouseEvent } from "react";
 import styled from "styled-components";
 
 interface SectionType {
   text: string;
   isCurrent?: boolean;
   isDone?: boolean;
+  onClick?: (event: MouseEvent) => void;
 }
 
 interface StyleType {
@@ -21,11 +23,11 @@ const style: StyleType = {
   },
 };
 
-const SectionButton = ({ text, isCurrent = false, isDone = false }: SectionType) => {
+const SectionButton = ({ text, isCurrent = false, isDone = false, onClick }: SectionType) => {
   const styleKey = isCurrent ? "current" : "default";
 
   return (
-    <Button style={style[styleKey]}>
+    <Button style={style[styleKey]} onClick={onClick}>
       <div>{text}</div>
       <CheckIcon $isDone={isDone}>
         <Check fontSize="small" />

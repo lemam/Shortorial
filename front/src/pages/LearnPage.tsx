@@ -74,6 +74,13 @@ const LearnPage = () => {
     };
   }, [initCamera]);
 
+  // 해당 시간으로 비디오 시간 이동
+  const moveToTime = (time: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = time;
+    }
+  };
+
   return (
     <Container>
       <VideoContainer>
@@ -84,10 +91,10 @@ const LearnPage = () => {
         <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
       </CameraContainer>
       <SectionList>
-        <SectionButton text="0:00" isDone={true} />
-        <SectionButton text="0:03" isCurrent={true} />
-        <SectionButton text="0:06" />
-        <SectionButton text="0:09" />
+        <SectionButton text="0:00" isDone={true} onClick={() => moveToTime(0)} />
+        <SectionButton text="0:03" isCurrent={true} onClick={() => moveToTime(3)} />
+        <SectionButton text="0:06" onClick={() => moveToTime(6)} />
+        <SectionButton text="0:09" onClick={() => moveToTime(9)} />
       </SectionList>
     </Container>
   );
