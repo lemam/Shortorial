@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { uploadShorts } from "../apis/shorts";
+// import { uploadShorts } from "../apis/shorts";
 import useChallengeStore from "../store/useChallengeStore";
 import styled from "styled-components";
 import axios from "axios";
 
 const ChallengeResultPage = () => {
-  const [uploadURL, setuploadURL] = useState<string>("");
+  // const [uploadURL, setuploadURL] = useState<string>("");
   const { downloadURL } = useChallengeStore();
   console.log(downloadURL);
 
