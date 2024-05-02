@@ -69,6 +69,8 @@ services:
     image: letsdance-frontend
     container_name: letsdance-frontend-container
     restart: always
+    ports:
+      - "3000:3000"
     environment:
       - TZ=Asia/Seoul
   letsdance_backend:
