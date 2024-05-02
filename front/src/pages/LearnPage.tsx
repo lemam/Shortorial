@@ -76,19 +76,21 @@ const LearnPage = () => {
 
   return (
     <Container>
-      <VideoContainer>
-        <video src={danceVideo} ref={videoRef} controls></video>
-      </VideoContainer>
-      <CameraContainer>
-        <Camera ref={cameraRef} autoPlay></Camera>
-        <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
-      </CameraContainer>
       <SectionList>
         <SectionButton text="0:00" isDone={true} />
         <SectionButton text="0:03" isCurrent={true} />
         <SectionButton text="0:06" />
         <SectionButton text="0:09" />
       </SectionList>
+      <VideoContainer>
+        <video src={danceVideo} ref={videoRef} controls></video>
+      </VideoContainer>
+      <CameraContainer>
+        <Camera ref={cameraRef} autoPlay></Camera>
+        <div style={{ position: "absolute", top: 0, right: 0 }}>
+          <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
+        </div>
+      </CameraContainer>
     </Container>
   );
 };
@@ -98,6 +100,7 @@ const Container = styled.div`
   height: 100%;
   flex-direction: column;
   background-color: #000;
+  justify-content: center;
 
   @media screen and (min-width: 1024), screen and (orientation: landscape) {
     display: flex;
