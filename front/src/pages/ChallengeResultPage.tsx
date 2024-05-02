@@ -8,6 +8,8 @@ import axios from "axios";
 const ChallengeResultPage = () => {
   const [uploadURL, setuploadURL] = useState<string>("");
   const { downloadURL } = useChallengeStore();
+  console.log(downloadURL);
+
   const [title, setTitle] = useState<string>("");
 
   const saveTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,12 +39,7 @@ const ChallengeResultPage = () => {
 
   return (
     <ResultContainer>
-      <VideoContainer
-        //autoPlay
-        playsInline
-        //loop
-        src={downloadURL}
-      ></VideoContainer>
+      <VideoContainer autoPlay playsInline loop src={downloadURL}></VideoContainer>
       <ControlBoxContainer>
         <ControlBox>
           <div>촬영이 완료되었습니다.</div>
