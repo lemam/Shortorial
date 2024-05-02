@@ -107,6 +107,7 @@ const Container = styled.div`
   display: flex;
   height: 100%;
   flex-direction: column;
+  justify-content: center;
   background-color: #000;
 
   @media screen and (min-width: 1024), screen and (orientation: landscape) {
