@@ -100,8 +100,8 @@ public class Member implements UserDetails {
     }
 
     private String  memberTiktokLink;
-    @OneToMany(mappedBy="tryNo")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy="tryNo")
     private List<TryShorts> tryShorts;
-    @OneToMany(mappedBy = "uploadNo")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "uploadNo")
     private List<UploadShorts> uploadShorts;
 }
