@@ -31,9 +31,9 @@ export default function LearnPage() {
 
   useEffect(() => {
     if (videoLandmark && camLandmark) {
-      console.log("??");
       const accValue = Acc(videoLandmark, camLandmark);
       setAccValue(accValue);
+      console.log(accValue);
     }
   }, [videoLandmark, camLandmark]);
   return (
@@ -41,9 +41,9 @@ export default function LearnPage() {
       <VideoContainer>
         <MotionVideo width={500} height={700} getLandmark={getVideoLandmark} />
       </VideoContainer>
-      <MotionCameraContainer>
+      <VideoContainer>
         <MotionVideo2 width={500} height={700} getLandmark={getCamLandmark} />
-      </MotionCameraContainer>
+      </VideoContainer>
       {/* <MotionCameraContainer>
         <MotionCamera width={500} height={700} />
       </MotionCameraContainer> */}
