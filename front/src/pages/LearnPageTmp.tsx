@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import MotionCamera from "../components/motion/MotionCamera";
+// import MotionCamera from "../components/motion/MotionCamera";
 import MotionVideo from "../components/motion/MotionVideo";
 import MotionVideo2 from "../components/motion/MotionVideo copy";
-import { Acc } from "../components/motion/Acc";
+import { Acc } from "../modules/Acc";
 import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { useEffect, useState } from "react";
-import { text } from "stream/consumers";
+// import { text } from "stream/consumers";
 
 export default function LearnPage() {
   const [videoLandmark, setVideoLandmark] = useState<
@@ -84,17 +84,17 @@ const VideoContainer = styled.div`
   }
 `;
 
-const MotionCameraContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
+// const MotionCameraContainer = styled.div`
+//   position: relative;
+//   width: 100%;
+//   height: 100%;
 
-  @media screen and (orientation: portrait) {
-    display: block;
-  }
+//   @media screen and (orientation: portrait) {
+//     display: block;
+//   }
 
-  @media screen and (orientation: landscape) {
-    display: block;
-    transform: scaleX(-1); // 수평으로 뒤집기
-  }
-`;
+//   @media screen and (orientation: landscape) {
+//     display: block;
+//     transform: scaleX(-1); // 수평으로 뒤집기
+//   }
+// `;
