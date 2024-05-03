@@ -1,6 +1,7 @@
 package com.sleep.sleep.member.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sleep.sleep.shorts.entity.TryShorts;
 import com.sleep.sleep.shorts.entity.UploadShorts;
 import jakarta.persistence.*;
@@ -26,6 +27,7 @@ import java.util.List;
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
+@JsonIgnoreProperties(ignoreUnknown =true)
 public class Member implements UserDetails {
     
     @Id
@@ -75,25 +77,21 @@ public class Member implements UserDetails {
         return getMemberId();
     }
 
-    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;
