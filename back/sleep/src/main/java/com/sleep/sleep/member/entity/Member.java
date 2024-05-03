@@ -63,13 +63,13 @@ public class Member implements UserDetails {
         return authorities;
     }
 
-    @JsonIgnore
+
     @Override
     public String getPassword() {
         return getMemberPass();
     }
 
-    @JsonIgnore
+
     @Override
     public String getUsername() {
         return getMemberId();
