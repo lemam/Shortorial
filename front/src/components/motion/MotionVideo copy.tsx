@@ -29,12 +29,12 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
     const handlePlay = () => {
       videoRunning = true;
       if (canvasElement) canvasElement.style.display = "block";
-      if (canvasElementTest) canvasElementTest.style.display = "block";
+      if (canvasElementTest) canvasElementTest.style.display = "none";
       predictVideo();
     };
 
     const handlePause = () => {
-      if (canvasElement) canvasElement.style.display = "none";
+      // if (canvasElement) canvasElement.style.display = "none";
       videoRunning = false;
     };
 
@@ -84,8 +84,8 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
     let lastVideoTime = -1;
 
     predictVideo();
+
     async function predictVideo() {
-      console.log("시작");
       if (!canvasElement || !video || !poseLandmarker) return null;
 
       let startTimeMs = performance.now();
@@ -124,7 +124,7 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
                 landmark.z /= cnt + 1;
               }
 
-              getLandmark(sumLandmark);
+              // getLandmark(sumLandmark);
 
               drawingUtilsTest.drawLandmarks(sumLandmark, {
                 radius: (data: any) =>
@@ -136,6 +136,8 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
               );
               canvasCtxTest.restore();
             }
+
+            getLandmark(landmark);
             drawingUtils.drawLandmarks(landmark, {
               radius: (data: any) =>
                 DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
@@ -164,6 +166,12 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
       }
     }
     predictVideo();
+
+    setTimeout(() => {
+      // videoRef.current 여기가 비디오 객체입니다.
+      videoRef.current?.play();
+    }, 3000);
+
     return () => {
       // 컴포넌트가 언마운트될 때 이벤트 리스너를 제거
       videoRef.current?.removeEventListener("play", handlePlay);
@@ -180,7 +188,7 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
         style={{ objectFit: "cover" }}
         ref={videoRef}
         src={sampleVideo}
-        autoPlay
+        // autoPlay
         playsInline
       ></video>
       <canvas
@@ -193,7 +201,7 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
         id="test_canvas2"
         width={width}
         height={height}
-        style={{ objectFit: "cover", background: "grey" }}
+        style={{ objectFit: "cover", background: "grey", display: "none" }}
       ></canvas>
     </Container>
   );
