@@ -27,7 +27,6 @@ import java.util.List;
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@JsonIgnoreProperties(ignoreUnknown =true)
 public class Member implements UserDetails {
     
     @Id
@@ -58,6 +57,7 @@ public class Member implements UserDetails {
                 .build();
     }
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         ArrayList<GrantedAuthority> authorities = new ArrayList<>();
@@ -65,33 +65,37 @@ public class Member implements UserDetails {
         return authorities;
     }
 
-
+    @JsonIgnore
     @Override
     public String getPassword() {
         return getMemberPass();
     }
 
-
+    @JsonIgnore
     @Override
     public String getUsername() {
         return getMemberId();
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;
