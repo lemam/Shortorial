@@ -1,13 +1,17 @@
-import { useCallback, useEffect, useRef } from "react";
-import danceVideo from "/src/assets/sample.mp4";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import IconButton from "../components/button/IconButton";
 import { Videocam } from "@mui/icons-material";
-import SectionButton from "../components/button/SectionButton";
 
-const LearnPage = () => {
+const LearnPageTest = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [leftSectionWidth, setLeftSectionWidth] = useState<number>(0);
+
+  // 카메라 크기
+  const [cameraSize, setCameraSize] = useState({
+    width: 0,
+    height: 0,
+  });
 
   // 카메라 설정 초기화
   const initCamera = useCallback(() => {
@@ -32,118 +36,198 @@ const LearnPage = () => {
       });
   }, []);
 
-  // 비디오 크기 초기화
-  const initVideoSize = (videoRef: React.RefObject<HTMLVideoElement>) => {
-    if (videoRef.current) {
-      // 가로 화면 또는 desktop일 때 height 설정
-      if (
-        window.screen.orientation.angle === 90 ||
-        window.screen.orientation.angle === 270 ||
-        window.innerWidth >= 1024
-      ) {
-        videoRef.current.height = window.innerHeight;
-      }
-      // 세로 화면일 때 height 설정
-      else if (window.screen.orientation.angle === 0 || window.screen.orientation.angle === 180) {
-        videoRef.current.height = window.innerHeight * 0.8;
-      }
+  // 카메라 크기 초기화
+  const initVideoSize = () => {
+    let height = 0;
+    let width = 0;
 
-      // width 설정
-      videoRef.current.width = Math.floor((videoRef.current.height * 9) / 16);
+    // 모바일 세로인 경우
+    if (window.innerWidth < 480) {
+      height = window.innerHeight * 0.8;
+      width = Math.floor((height * 9) / 16);
     }
+    // 모바일 가로 또는 가로 길이 480 이상인 경우
+    else {
+      height = window.innerHeight - 1;
+      width = Math.floor((height * 9) / 16);
+    }
+
+    setCameraSize({ width, height });
   };
 
+  // LeftSection 요소의 너비 저장
+  const measuredRef = useCallback((node: HTMLElement | null) => {
+    if (node) {
+      setLeftSectionWidth(node.getBoundingClientRect().width);
+    } else {
+      setLeftSectionWidth(0);
+    }
+  }, []);
+
+  // 카메라 설정과 크기를 초기화한다.
   useEffect(() => {
     initCamera();
-    initVideoSize(videoRef);
-    initVideoSize(cameraRef);
+    initVideoSize();
+  }, [initCamera]);
 
-    (() => {
-      // 화면 방향이 바뀔 때 영상과 카메라 크기도 재설정
-      window.addEventListener("orientationchange", () => {
-        setTimeout(() => initVideoSize(videoRef), 200);
-      });
-      window.addEventListener("orientationchange", () => {
-        setTimeout(() => initVideoSize(cameraRef), 200);
-      });
-    })();
+  // 화면 크기가 바뀔 때마다 영상과 카메라 크기를 초기화한다.
+  // resize 이벤트 추가, 삭제
+  useEffect(() => {
+    window.addEventListener("resize", initVideoSize);
 
     return () => {
-      window.removeEventListener("orientationchange", () => initVideoSize(videoRef));
-      window.removeEventListener("orientationchange", () => initVideoSize(cameraRef));
+      window.removeEventListener("resize", initVideoSize);
     };
-  }, [initCamera]);
+  }, []);
 
   return (
     <Container>
-      <SectionList>
-        <SectionButton text="0:00" isDone={true} />
-        <SectionButton text="0:03" isCurrent={true} />
-        <SectionButton text="0:06" />
-        <SectionButton text="0:09" />
-      </SectionList>
-      <VideoContainer>
-        <video src={danceVideo} ref={videoRef} controls></video>
-      </VideoContainer>
-      <CameraContainer>
-        <Camera ref={cameraRef} autoPlay></Camera>
-        <div style={{ position: "absolute", top: 0, right: 0 }}>
-          <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
-        </div>
-      </CameraContainer>
+      <LeftSection ref={(el) => measuredRef(el)}>
+        <SectionButtonList>
+          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
+          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
+          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
+          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
+        </SectionButtonList>
+      </LeftSection>
+      <CenterSection>
+        <VideoContainer>
+          <video
+            width={cameraSize.width}
+            height={cameraSize.height}
+            src="src/assets/sample.mp4"
+            controls
+          ></video>
+        </VideoContainer>
+        <VideoContainer>
+          <video
+            width={cameraSize.width}
+            height={cameraSize.height}
+            ref={cameraRef}
+            className="camera"
+            autoPlay
+          ></video>
+          <IconButtonList>
+            <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
+          </IconButtonList>
+        </VideoContainer>
+      </CenterSection>
+      <RightSection></RightSection>
     </Container>
   );
 };
 
-const Container = styled.div`
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  background-color: #000;
-  justify-content: center;
+const IconButtonList = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px;
+`;
 
-  @media screen and (min-width: 1024), screen and (orientation: landscape) {
-    display: flex;
+const SectionButtonList = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  button {
+    margin: 8px 0;
+  }
+
+  @media screen and (max-width: 479px) {
     flex-direction: row;
-    align-items: center;
+    justify-content: start;
+    align-items: flex-start;
+    overflow: scroll;
+    height: auto;
+    padding: 16px 0;
+
+    button {
+      min-width: 120px;
+      margin: 0 8px;
+    }
+  }
+`;
+
+const SectionButton = styled.button`
+  width: 100%;
+  max-width: 140px;
+  height: 40px;
+  font-size: 16px;
+  color: inherit;
+  background-color: #353535;
+  border: 1px solid #808080;
+  border-radius: 4px;
+
+  &.small {
+    width: 40px;
+    border-radius: 50%;
   }
 `;
 
 const VideoContainer = styled.div`
+  display: flex;
+  height: 100%;
+
+  video {
+    object-fit: cover;
+  }
+
+  @media screen and (max-width: 479px) {
+    .camera {
+      display: none;
+    }
+  }
+`;
+
+const RightSection = styled.section`
+  flex: 1;
+  position: relative;
+  margin: 8px;
+
+  @media screen and (max-width: 479px) {
+    display: none;
+  }
+`;
+
+const CenterSection = styled.section`
+  flex: 1;
   position: relative;
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 `;
 
-const CameraContainer = styled.div`
+const LeftSection = styled.section`
+  flex: 1;
   position: relative;
-  display: none;
-
-  @media screen and (min-width: 1024) {
-    display: flex;
-  }
-
-  @media screen and (orientation: landscape) {
-    display: flex;
-  }
-`;
-
-const Camera = styled.video`
-  transform: scaleX(-1);
-`;
-
-const SectionList = styled.div`
   display: flex;
-  overflow: hidden;
+  justify-content: flex-end;
+  align-items: center;
+  color: #fff;
+  margin: 8px;
 
-  & > * {
-    margin: 8px;
-  }
-
-  @media screen and (min-width: 1024), screen and (orientation: landscape) {
-    display: flex;
-    flex-direction: column;
+  @media screen and (max-width: 479px) {
+    align-items: start;
   }
 `;
 
-export default LearnPage;
+const Container = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  background-color: #000;
+
+  @media screen and (max-width: 479px) {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+`;
+
+export default LearnPageTest;
