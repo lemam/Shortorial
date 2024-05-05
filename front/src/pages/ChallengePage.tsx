@@ -3,12 +3,10 @@ import styled from "styled-components";
 import danceVideo from "../assets/sample.mp4";
 import { useNavigate } from "react-router-dom";
 import useChallengeStore from "../store/useChallengeStore";
-import learnMode from "../assets/learnmode.png";
-import stop from "../assets/stop.png";
-import start from "../assets/start.png";
 import load from "../assets/loading.gif";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import ModalComponent from "../components/ModalComponent";
+import VideoButton from "../components/button/VideoButton";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -20,9 +18,19 @@ const ChallengePage = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [timer, setTimer] = useState(3);
+  const [timerPath, setTimerPath] = useState(`src/assets/challenge/${timer}sec.svg`);
 
   const handleShowModal = () => setLoading(true);
   const handleCloseModal = () => setLoading(false);
+  const showVideoButtonContainer = () => setIsVisible(!isVisible);
+
+  const changeTimer = () => {
+    const nextTimer = timer === 3 ? 5 : timer === 5 ? 10 : 3;
+    setTimer(nextTimer);
+    setTimerPath(`src/assets/challenge/${nextTimer}sec.svg`);
+  };
 
   const setInit = useCallback(async () => {
     const constraints: MediaStreamConstraints = {
@@ -80,13 +88,13 @@ const ChallengePage = () => {
     }
 
     try {
+      ffmpeg.load(); // ffmpeg 로드
       const recorder = new MediaRecorder(stream); // 녹화형으로 변환
       const chunks: BlobPart[] = []; // 스트림 조각을 넣을 배열
       recorder.ondataavailable = (e) => chunks.push(e.data); // 스트림 조각이 어느 정도 커지면 push하기
 
       recorder.onstop = async () => {
-        handleShowModal();
-        console.log("로딩 시작:", new Date().toLocaleTimeString()); // 로딩 시작 시간 로그
+        handleShowModal(); // 로딩창 띄우기
 
         const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // Blob 생성
 
@@ -106,11 +114,12 @@ const ChallengePage = () => {
         await addAudio(userVideoBlob);
       };
 
-      ffmpeg.load(); // ffmpeg 로드
-      recorder.start(); // 녹화 시작
-      setMediaRecorder(recorder);
+      setTimeout(() => {
+        recorder.start(); // 녹화 시작
+        setMediaRecorder(recorder);
 
-      danceVideoRef.current?.play(); // 댄스 비디오도 시작
+        danceVideoRef.current?.play(); // 댄스 비디오 시작
+      }, timer * 1000);
     } catch (error) {
       console.log(error);
       alert("녹화를 다시 시작해 주세요.");
@@ -120,6 +129,10 @@ const ChallengePage = () => {
   const stopRecording = () => {
     mediaRecorder?.stop(); // recorder.onstop() 실행
     stream?.getTracks().forEach((track) => track.stop());
+  };
+
+  const goToList = () => {
+    navigate("/");
   };
 
   const goToLearnMode = () => {
@@ -186,9 +199,8 @@ const ChallengePage = () => {
     } catch (error) {
       console.log("비디오가 생성되지 않았습니다:", error);
     } finally {
-      handleCloseModal();
-      console.log("로딩 시작:", new Date().toLocaleTimeString()); // 로딩 시작 시간 로그
-      navigate("/challenge/result"); // 결과 페이지 가기
+      handleCloseModal(); // 모달 닫기
+      //avigate("/challenge/result"); // 결과 페이지 가기
     }
   };
 
@@ -200,20 +212,64 @@ const ChallengePage = () => {
         playsInline
         onEnded={stopRecording}
       ></VideoContainer>
-      <PracticeModeButton src={learnMode} onClick={goToLearnMode}></PracticeModeButton>
-      <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
-      <RecordButtonContainer>
-        {mediaRecorder && (
-          <RecordButton onClick={stopRecording}>
-            <img src={stop} width="40px" height="40px"></img>
-          </RecordButton>
-        )}
-        {!mediaRecorder && (
-          <RecordButton onClick={startRecording}>
-            <img src={start} width="80px" height="80px"></img>
-          </RecordButton>
-        )}
-      </RecordButtonContainer>
+      <div style={{ position: "relative" }}>
+        <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
+        <VideoToggleContainer>
+          <VideoButton
+            path="src/assets/challenge/open.svg"
+            text="감추기"
+            onClick={showVideoButtonContainer}
+            isVisible={isVisible}
+          ></VideoButton>
+          <VideoButton
+            path="src/assets/challenge/close.svg"
+            text="보기"
+            onClick={showVideoButtonContainer}
+            isVisible={!isVisible}
+          ></VideoButton>
+        </VideoToggleContainer>
+        <VideoButtonContainer>
+          <VideoButton
+            path={timerPath}
+            text="타이머"
+            isVisible={isVisible}
+            onClick={changeTimer}
+          ></VideoButton>
+          {mediaRecorder && (
+            <VideoButton
+              path="src/assets/challenge/stop.svg"
+              text="취소"
+              onClick={stopRecording}
+              isVisible={isVisible}
+            ></VideoButton>
+          )}
+          {!mediaRecorder && (
+            <VideoButton
+              path="src/assets/challenge/record.svg"
+              text="녹화"
+              onClick={startRecording}
+              isVisible={isVisible}
+            ></VideoButton>
+          )}
+          <VideoButton
+            path="src/assets/challenge/save.svg"
+            text="임시저장"
+            isVisible={isVisible}
+          ></VideoButton>
+          <VideoButton
+            path="src/assets/challenge/learn.svg"
+            text="연습모드"
+            onClick={goToLearnMode}
+            isVisible={isVisible}
+          ></VideoButton>
+          <VideoButton
+            path="src/assets/challenge/exit.svg"
+            text="나가기"
+            onClick={goToList}
+            isVisible={isVisible}
+          ></VideoButton>
+        </VideoButtonContainer>
+      </div>
       <ModalComponent
         title="아픈 건 딱 질색이니까"
         body={<img src={load} width="300px" height="300px"></img>}
@@ -242,7 +298,6 @@ const UserVideoContainer = styled.video`
   @media screen and (orientation: landscape) {
     display: flex;
   }
-
   object-fit: cover;
   transform: scaleX(-1);
 `;
@@ -253,28 +308,26 @@ const ChallengeContainer = styled.div`
   justify-content: center;
 `;
 
-const RecordButtonContainer = styled.div`
+const VideoToggleContainer = styled.div`
+  position: absolute !important;
+  right: 0 !important;
+  top: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  z-index: 1;
+  min-width: 120px;
 `;
 
-const RecordButton = styled.button`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background-color: white;
-`;
-
-const PracticeModeButton = styled.img`
-  width: 32px;
-  height: 32px;
-  background-color: white;
-  border-radius: 6px;
-  padding: 4px 8px;
-  margin-left: -140px;
-  z-index: 10;
-  position: absolute;
+const VideoButtonContainer = styled.div`
+  position: absolute !important;
+  right: 0 !important;
+  top: 115px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 100;
+  min-width: 120px;
 `;
 
 export default ChallengePage;
