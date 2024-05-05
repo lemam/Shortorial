@@ -5,6 +5,7 @@ import { Videocam } from "@mui/icons-material";
 
 const LearnPageTest = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
+  const [leftSectionWidth, setLeftSectionWidth] = useState<number>(0);
 
   // 카메라 크기
   const [cameraSize, setCameraSize] = useState({
@@ -54,6 +55,15 @@ const LearnPageTest = () => {
     setCameraSize({ width, height });
   };
 
+  // LeftSection 요소의 너비 저장
+  const measuredRef = useCallback((node: HTMLElement | null) => {
+    if (node) {
+      setLeftSectionWidth(node.getBoundingClientRect().width);
+    } else {
+      setLeftSectionWidth(0);
+    }
+  }, []);
+
   // 카메라 설정과 크기를 초기화한다.
   useEffect(() => {
     initCamera();
@@ -63,25 +73,21 @@ const LearnPageTest = () => {
   // 화면 크기가 바뀔 때마다 영상과 카메라 크기를 초기화한다.
   // resize 이벤트 추가, 삭제
   useEffect(() => {
-    (() => {
-      window.addEventListener("resize", () => {
-        setTimeout(() => initVideoSize(), 200);
-      });
-    })();
+    window.addEventListener("resize", initVideoSize);
 
     return () => {
-      window.removeEventListener("resize", () => initVideoSize());
+      window.removeEventListener("resize", initVideoSize);
     };
   }, []);
 
   return (
     <Container>
-      <LeftSection>
+      <LeftSection ref={(el) => measuredRef(el)}>
         <SectionButtonList>
-          <SectionButton className="">0:00</SectionButton>
-          <SectionButton className="">0:00</SectionButton>
-          <SectionButton className="">0:00</SectionButton>
-          <SectionButton className="">0:00</SectionButton>
+          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
+          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
+          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
+          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
         </SectionButtonList>
       </LeftSection>
       <CenterSection>
