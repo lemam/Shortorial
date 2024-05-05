@@ -11,6 +11,7 @@ import LearnPage2 from "./pages/LearnPage/LearnPage2";
 import LearnPage3 from "./pages/LearnPage/LearnPage3";
 import LearnPage4 from "./pages/LearnPage/LearnPage4";
 import LearnPage5 from "./pages/LearnPage/LearnPage5";
+import LearnPageTest from "./pages/LearnPageTest";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/learn" element={<LearnPage />} />
+          <Route path="/test" element={<LearnPageTest />} />
           <Route path="/learn1" element={<LearnPage1 />} />
           <Route path="/learn2" element={<LearnPage2 />} />
           <Route path="/learn3" element={<LearnPage3 />} />
