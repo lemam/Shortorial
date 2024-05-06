@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import IconButton from "../components/button/IconButton";
 import { Videocam } from "@mui/icons-material";
+import IconButton from "../components/button/IconButton";
+import SectionButton from "../components/button/SectionButton";
+
+const timeData = [0, 3, 6, 9, 12, 64];
 
 const LearnPageTest = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
@@ -84,10 +87,9 @@ const LearnPageTest = () => {
     <Container>
       <LeftSection ref={(el) => measuredRef(el)}>
         <SectionButtonList>
-          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
-          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
-          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
-          <SectionButton className={leftSectionWidth < 100 ? "small" : ""}>0:00</SectionButton>
+          {timeData.map((time, index) => (
+            <SectionButton key={index} time={time} isSmall={leftSectionWidth < 100}></SectionButton>
+          ))}
         </SectionButtonList>
       </LeftSection>
       <CenterSection>
@@ -149,22 +151,6 @@ const SectionButtonList = styled.div`
       min-width: 120px;
       margin: 0 8px;
     }
-  }
-`;
-
-const SectionButton = styled.button`
-  width: 100%;
-  max-width: 140px;
-  height: 40px;
-  font-size: 16px;
-  color: inherit;
-  background-color: #353535;
-  border: 1px solid #808080;
-  border-radius: 4px;
-
-  &.small {
-    width: 40px;
-    border-radius: 50%;
   }
 `;
 
