@@ -2,35 +2,243 @@ import { useCallback, useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import danceVideo from "../assets/sample.mp4";
 import { useNavigate } from "react-router-dom";
-import useChallengeStore from "../store/useChallengeStore";
-import load from "../assets/loading.gif";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
-import ModalComponent from "../components/ModalComponent";
+import LoadingModalComponent from "../components/modal/LoadingModalComponent";
 import VideoButton from "../components/button/VideoButton";
+import axios from "axios";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
   const ffmpeg = createFFmpeg({ log: false });
-
-  const { setDownloadURL } = useChallengeStore();
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [timer, setTimer] = useState(3);
+  const [show, setShow] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // 토글
+  const [recording, setRecording] = useState(false); // 녹화 진행
+  const initialTimer = parseInt(localStorage.getItem("timer") || "3");
+  const [timer, setTimer] = useState<number>(initialTimer);
   const [timerPath, setTimerPath] = useState(`src/assets/challenge/${timer}sec.svg`);
+  const [ffmpegLog, setFfmpegLog] = useState("");
 
-  const handleShowModal = () => setLoading(true);
-  const handleCloseModal = () => setLoading(false);
+  const handleShowModal = () => {
+    setShow(true);
+    stopRecording();
+  };
+  const handleCloseModal = () => setShow(false);
+
   const showVideoButtonContainer = () => setIsVisible(!isVisible);
+  const showRecordButton = () => setRecording(false);
+  const showCancleButton = () => setRecording(true);
+
+  const goToLearnMode = () => {
+    stream?.getTracks().forEach((track) => track.stop());
+    navigate("/learn");
+  };
+  const goToResult = () => {
+    stream?.getTracks().forEach((track) => track.stop());
+    navigate("/challenge/result");
+  };
 
   const changeTimer = () => {
-    const nextTimer = timer === 3 ? 5 : timer === 5 ? 10 : 3;
+    var nextTimer = timer == 3 ? 5 : timer == 5 ? 10 : 3;
+
+    localStorage.setItem("timer", nextTimer.toString());
     setTimer(nextTimer);
     setTimerPath(`src/assets/challenge/${nextTimer}sec.svg`);
   };
+
+  const cancelRecording = () => {
+    showRecordButton();
+    if (danceVideoRef.current) {
+      danceVideoRef.current.pause();
+      danceVideoRef.current.currentTime = 0;
+    }
+  };
+
+  const stopRecording = () => {
+    cancelRecording();
+    mediaRecorder?.stop(); // recorder.onstop() 실행
+  };
+
+  const startRecording = () => {
+    if (!stream) {
+      alert("카메라 접근을 허용해주세요.");
+      return;
+    }
+
+    try {
+      const recorder = new MediaRecorder(stream); // 녹화형으로 변환
+      const chunks: BlobPart[] = []; // 스트림 조각을 넣을 배열
+      recorder.ondataavailable = (e) => chunks.push(e.data); // 스트림 조각이 어느 정도 커지면 push하기
+
+      recorder.onstop = async () => {
+        //handleShowModal(); // 로딩창 띄우기
+        //setDownload(true);
+
+        if (!ffmpeg.isLoaded()) {
+          await ffmpeg.load(); // ffmpeg 로드
+        }
+
+        const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // Blob 생성
+
+        // 댄스 비디오 오디오 추출
+        const danceVideoBlob = await fetchFile(danceVideo); // 링크된 댄스 비디오를 Blob으로 변환
+        ffmpeg.FS("writeFile", "danceVideo.mp4", danceVideoBlob); // Blob을 가상 파일로 변환
+
+        ffmpeg.setProgress(({ ratio }) => {
+          if (ratio > 0) {
+            setFfmpegLog(`노래 추출 중 : ${Math.round(ratio * 100)}%\n`);
+          }
+        });
+
+        await ffmpeg.run(
+          "-i",
+          "danceVideo.mp4",
+          "-vn", // 비디오 무시
+          "-c:a",
+          "copy", // aac 코덱 복사
+          "dance_audio.m4a" // 오디오 파일 생성
+        );
+
+        // 비디오에 오디오 추가
+        await addAudio(userVideoBlob);
+      };
+
+      recorder.start(); // 녹화 시작
+      setMediaRecorder(recorder);
+      danceVideoRef.current?.play(); // 댄스 비디오 시작
+    } catch (error) {
+      console.log(error);
+      alert("녹화를 다시 시작해 주세요.");
+    }
+  };
+
+  const addAudio = async (userVideoBlob: Blob) => {
+    try {
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(userVideoBlob);
+      // 파일 읽기가 완료 되면
+      reader.onloadend = async () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        const uint8Array = new Uint8Array(arrayBuffer); // ffmpeg가 읽을 수 있는 8비트 정수 배열로 변환
+        ffmpeg.FS("writeFile", "userVideo.mp4", uint8Array); // 사용자 비디오 가상 파일 만들기
+
+        ffmpeg.setProgress(({ ratio }) => {
+          if (ratio > 0) {
+            setFfmpegLog(`노래 삽입 중 : ${Math.round(ratio * 100)}%\n`);
+          }
+        });
+
+        await ffmpeg.run(
+          "-i",
+          "userVideo.mp4", // 사용자 영상
+          "-i",
+          "dance_audio.m4a", // 원본 오디오
+          "-map",
+          "0:v:0", // 첫번째 파일(사용자 영상)의 0번째 스트림
+          "-map",
+          "1:a:0", // 두번째 파일(원본 오디오)의 0번째 스트림
+          "-c:v",
+          "copy", // 비디오 인코딩 복사
+          "-c:a",
+          "copy", // 오디오 인코딩 복사
+          "-shortest", // 두 개 파일 중 짧은 쪽에 맞춤
+          "finalUserVideo.mp4" // 파일 생성
+        );
+
+        ffmpeg.setProgress(({ ratio }) => {
+          if (ratio > 0) {
+            setFfmpegLog(`비디오 반환 전환 중 : ${Math.round(ratio * 100)}%\n`);
+          }
+        });
+
+        await ffmpeg.run(
+          "-i",
+          "finalUserVideo.mp4",
+          "-vf", // 비디오 필터
+          "hflip", // 좌우반전
+          "finalUserVideoFlip.mp4"
+        );
+
+        const userVideoFlipFinal = ffmpeg.FS("readFile", "finalUserVideoFlip.mp4");
+        // 최종 파일 Blob 변환
+        const userVideoFinalBlob = new Blob([userVideoFlipFinal.buffer], {
+          type: "video/mp4",
+        });
+
+        // 최종파일 url 전달
+        makeDownloadURL(userVideoFinalBlob);
+      };
+    } catch (error) {
+      console.log(error);
+      alert("오디오를 추가할 수 없습니다.");
+    }
+  };
+
+  const makeDownloadURL = (userVideoFinalBlob: Blob) => {
+    try {
+      s3Upload(URL.createObjectURL(userVideoFinalBlob), new Date());
+    } catch (error) {
+      console.log("비디오가 생성되지 않았습니다:", error);
+    } finally {
+      setTimeout(() => {
+        handleCloseModal();
+      }, 2000);
+    }
+  };
+
+  const s3Upload = (url: string, title: Date) => {
+    const titleString = "안녕";
+    //const titleString = title.toISOString();
+    axios.get(url, { responseType: "blob" }).then((response) => {
+      const file = new File([response.data], `${titleString}.mp4`, {
+        type: "video/mp4",
+      }); // url 파일 변환
+      const formData = new FormData();
+      formData.append("file", file); // 파일 매개변수
+      formData.append("fileName", titleString); // 파일 이름 매개변수
+
+      axios
+        .post("http://localhost:8080/s3/upload", formData, {
+          // formData 보내기
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNDk5OTM3NiwiZXhwIjoxNzE1MDAxMTc2fQ.qP5ZOZBKzt2HiwZRJA5bzuaXWQ6ynI0gWtAQr47S-gg",
+          },
+        })
+        .then((response) => {
+          setFfmpegLog("저장 완료");
+          console.log("s3 upload success", response.data);
+        })
+        .catch((error) => {
+          console.error("s3 upload fail", error);
+        });
+    });
+  };
+
+  // 타이머
+  useEffect(() => {
+    if (recording) {
+      // 녹화 시작 버튼을 눌렀을 때
+      const intervalId = setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer <= 1) {
+            clearInterval(intervalId); // 인터벌 종료
+            startRecording(); // 녹화 시작
+            return initialTimer; // 로컬스토리지에 저장된 타이머값으로 초기화
+          }
+          return prevTimer - 1; // timer에 저장된 값에서 1을 뺌
+        });
+      }, 1000); // 1초에 한번씩
+
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
+  }, [recording]);
 
   const setInit = useCallback(async () => {
     const constraints: MediaStreamConstraints = {
@@ -81,136 +289,14 @@ const ChallengePage = () => {
     };
   }, []);
 
-  const startRecording = () => {
-    if (!stream) {
-      alert("카메라 접근을 허용해주세요.");
-      return;
-    }
-
-    try {
-      ffmpeg.load(); // ffmpeg 로드
-      const recorder = new MediaRecorder(stream); // 녹화형으로 변환
-      const chunks: BlobPart[] = []; // 스트림 조각을 넣을 배열
-      recorder.ondataavailable = (e) => chunks.push(e.data); // 스트림 조각이 어느 정도 커지면 push하기
-
-      recorder.onstop = async () => {
-        handleShowModal(); // 로딩창 띄우기
-
-        const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // Blob 생성
-
-        // 댄스 비디오 오디오 추출
-        const danceVideoBlob = await fetchFile(danceVideo); // 링크된 댄스 비디오를 Blob으로 변환
-        ffmpeg.FS("writeFile", "danceVideo.mp4", danceVideoBlob); // Blob을 가상 파일로 변환
-        await ffmpeg.run(
-          "-i",
-          "danceVideo.mp4",
-          "-vn", // 비디오 무시
-          "-c:a",
-          "copy", // aac 코덱 복사
-          "dance_audio.m4a" // 오디오 파일 생성
-        );
-
-        // 비디오에 오디오 추가
-        await addAudio(userVideoBlob);
-      };
-
-      setTimeout(() => {
-        recorder.start(); // 녹화 시작
-        setMediaRecorder(recorder);
-
-        danceVideoRef.current?.play(); // 댄스 비디오 시작
-      }, timer * 1000);
-    } catch (error) {
-      console.log(error);
-      alert("녹화를 다시 시작해 주세요.");
-    }
-  };
-
-  const stopRecording = () => {
-    mediaRecorder?.stop(); // recorder.onstop() 실행
-    stream?.getTracks().forEach((track) => track.stop());
-  };
-
-  const goToList = () => {
-    navigate("/");
-  };
-
-  const goToLearnMode = () => {
-    navigate("/learn"); // 연습 페이지 가기
-  };
-
-  const goToChallengeMode = () => {
-    navigate("/challenge"); // 다시 찍기
-  };
-
-  const addAudio = async (userVideoBlob: Blob) => {
-    try {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(userVideoBlob);
-      // 파일 읽기가 완료 되면
-      reader.onloadend = async () => {
-        const arrayBuffer = reader.result as ArrayBuffer;
-        const uint8Array = new Uint8Array(arrayBuffer); // ffmpeg가 읽을 수 있는 8비트 정수 배열로 변환
-        ffmpeg.FS("writeFile", "userVideo.mp4", uint8Array); // 사용자 비디오 가상 파일 만들기
-
-        await ffmpeg.run(
-          "-i",
-          "userVideo.mp4", // 사용자 영상
-          "-i",
-          "dance_audio.m4a", // 원본 오디오
-          "-map",
-          "0:v:0", // 첫번째 파일(사용자 영상)의 0번째 스트림
-          "-map",
-          "1:a:0", // 두번째 파일(원본 오디오)의 0번째 스트림
-          "-c:v",
-          "copy", // 비디오 인코딩 복사
-          "-c:a",
-          "copy", // 오디오 인코딩 복사
-          "-shortest", // 두 개 파일 중 짧은 쪽에 맞춤
-          "finalUserVideo.mp4" // 파일 생성
-        );
-
-        await ffmpeg.run(
-          "-i",
-          "finalUserVideo.mp4",
-          "-vf", // 비디오 필터
-          "hflip", // 좌우반전
-          "finalUserVideoFlip.mp4"
-        );
-
-        const userVideoFlipFinal = ffmpeg.FS("readFile", "finalUserVideoFlip.mp4");
-        // 최종 파일 Blob 변환
-        const userVideoFinalBlob = new Blob([userVideoFlipFinal.buffer], {
-          type: "video/mp4",
-        });
-
-        // 최종파일 url 전달
-        makeDownloadURL(userVideoFinalBlob);
-      };
-    } catch (error) {
-      console.log(error);
-      alert("오디오를 추가할 수 없습니다.");
-    }
-  };
-
-  const makeDownloadURL = (userVideoFinalBlob: Blob) => {
-    try {
-      setDownloadURL(URL.createObjectURL(userVideoFinalBlob));
-    } catch (error) {
-      console.log("비디오가 생성되지 않았습니다:", error);
-    } finally {
-      handleCloseModal(); // 모달 닫기
-      //avigate("/challenge/result"); // 결과 페이지 가기
-    }
-  };
-
   return (
     <ChallengeContainer>
       <VideoContainer
         ref={danceVideoRef}
         src={danceVideo}
         playsInline
-        onEnded={stopRecording}
+        controls
+        onEnded={handleShowModal}
       ></VideoContainer>
       <div style={{ position: "relative" }}>
         <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
@@ -228,6 +314,7 @@ const ChallengePage = () => {
             isVisible={!isVisible}
           ></VideoButton>
         </VideoToggleContainer>
+        <Timer>{timer}</Timer>
         <VideoButtonContainer>
           <VideoButton
             path={timerPath}
@@ -235,26 +322,23 @@ const ChallengePage = () => {
             isVisible={isVisible}
             onClick={changeTimer}
           ></VideoButton>
-          {mediaRecorder && (
-            <VideoButton
-              path="src/assets/challenge/stop.svg"
-              text="취소"
-              onClick={stopRecording}
-              isVisible={isVisible}
-            ></VideoButton>
-          )}
-          {!mediaRecorder && (
-            <VideoButton
-              path="src/assets/challenge/record.svg"
-              text="녹화"
-              onClick={startRecording}
-              isVisible={isVisible}
-            ></VideoButton>
-          )}
+          <VideoButton
+            path="src/assets/challenge/stop.svg"
+            text="취소"
+            onClick={cancelRecording}
+            isVisible={isVisible && recording} // isVisible, recording 일 때 보임
+          ></VideoButton>
+          <VideoButton
+            path="src/assets/challenge/record.svg"
+            text="녹화"
+            onClick={showCancleButton}
+            isVisible={isVisible && !recording} // isVisible, not recording 일 때 보임
+          ></VideoButton>
           <VideoButton
             path="src/assets/challenge/save.svg"
-            text="임시저장"
+            text="저장"
             isVisible={isVisible}
+            onClick={handleShowModal}
           ></VideoButton>
           <VideoButton
             path="src/assets/challenge/learn.svg"
@@ -263,21 +347,18 @@ const ChallengePage = () => {
             isVisible={isVisible}
           ></VideoButton>
           <VideoButton
-            path="src/assets/challenge/exit.svg"
-            text="나가기"
-            onClick={goToList}
+            path="src/assets/challenge/mine.svg"
+            text="마이페이지"
+            onClick={goToResult}
             isVisible={isVisible}
           ></VideoButton>
         </VideoButtonContainer>
       </div>
-      <ModalComponent
-        title="아픈 건 딱 질색이니까"
-        body={<img src={load} width="300px" height="300px"></img>}
-        showModal={loading}
+      <LoadingModalComponent
+        progress={ffmpegLog}
+        showModal={show}
         handleCloseModal={handleCloseModal}
-        goToLearnMode={goToLearnMode}
-        goToChallengeMode={goToChallengeMode}
-      ></ModalComponent>
+      ></LoadingModalComponent>
     </ChallengeContainer>
   );
 };
@@ -322,12 +403,21 @@ const VideoToggleContainer = styled.div`
 const VideoButtonContainer = styled.div`
   position: absolute !important;
   right: 0 !important;
-  top: 115px;
+  top: 90px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  z-index: 100;
+  z-index: 1;
   min-width: 120px;
+`;
+
+const Timer = styled.div`
+  position: absolute !important;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  font-size: 50px;
 `;
 
 export default ChallengePage;

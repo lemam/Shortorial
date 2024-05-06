@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import danceVideo from "../assets/sample.mp4";
 import styled from "styled-components";
-import ModalComponent from "../components/ModalComponent";
+import ModalComponent from "../components/modal/ModalComponent";
 
 export default function MainPage() {
   const navigate = useNavigate();

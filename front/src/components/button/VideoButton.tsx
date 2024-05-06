@@ -27,14 +27,14 @@ const ButtonContainer = styled.div<{ isVisible: boolean }>`
 `;
 
 const Button = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 32px;
+  height: 32px;
   margin-bottom: 5px;
   cursor: pointer;
 `;
 
 const ButtonText = styled.div`
-  font-size: 20px;
+  font-size: 14px;
   color: white;
   cursor: pointer;
 `;
