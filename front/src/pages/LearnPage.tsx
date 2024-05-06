@@ -3,30 +3,36 @@ import styled from "styled-components";
 import { Videocam } from "@mui/icons-material";
 import IconButton from "../components/button/IconButton";
 import SectionButton from "../components/button/SectionButton";
-
-// 각 구간의 [시작, 끝) 시간 더미 데이터
-// TODO: API로 가져올 것
-const timeData = [
-  [0, 3],
-  [3, 6],
-  [6, 9],
-  [9, 12],
-  [12, 15],
-  [15, 18],
-];
+import {
+  useVideoRef,
+  useSectionList,
+  useIsLoop,
+  useLearnVideoFetch,
+  useLearnVideoComputed,
+  useLearnVideoActions,
+} from "../store/useLearnVideoStore";
+import { VideoSection } from "../constants/types";
 
 const LearnPageTest = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
   const [leftSectionWidth, setLeftSectionWidth] = useState<number>(0);
-  const [currentTime, setCurrentTime] = useState<number>(0);
 
-  // 카메라 크기
   const [cameraSize, setCameraSize] = useState({
     width: 0,
     height: 0,
   });
+
+  // NOTE: 섹션 버튼의 active가 바뀌지 않는 문제 발생 (재랜더링 안됨)
+  // 아래와 같이 store 전체를 구독하면 잘 됨...
+  // const store = useLearnVideoStore();
+
+  const videoRef = useVideoRef();
+  const sectionList = useSectionList();
+  const isLoop = useIsLoop();
+  const { fetchSectionList } = useLearnVideoFetch();
+  const { currentSection } = useLearnVideoComputed();
+  const { setCurrentTime, moveVideoTime, setIsLoop, loopVideoSetion, setLoopSection } =
+    useLearnVideoActions();
 
   // 카메라 설정 초기화
   const initCamera = useCallback(() => {
@@ -79,61 +85,73 @@ const LearnPageTest = () => {
     }
   }, []);
 
-  // 카메라 설정과 크기를 초기화한다.
+  // 동영상의 현재 시간이 변경될 때 발생하는 이벤트 리스너
+  const handleTimeUpdate = useCallback(() => {
+    // 동영상의 현재 시간을 업데이트한다.
+    if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
+
+    // 구간 반복
+    if (isLoop) loopVideoSetion();
+  }, [isLoop, videoRef, loopVideoSetion, setCurrentTime]);
+
+  // Section Button 클릭 이벤트 리스너
+  const handleClickSectionButton = (section: VideoSection) => {
+    moveVideoTime(section.start);
+    setCurrentTime(section.start);
+    if (isLoop) setLoopSection(section);
+  };
+
+  // Loop Button 클릭 이벤트 리스너
+  const handleClickLoopButton = () => {
+    const doLooping = !isLoop;
+
+    if (doLooping) setLoopSection(currentSection());
+    else setLoopSection(null);
+
+    setIsLoop(doLooping);
+  };
+
+  // 상태 초기화
   useEffect(() => {
     initCamera();
     initVideoSize();
-  }, [initCamera]);
+    fetchSectionList();
+  }, [fetchSectionList, initCamera]);
 
-  // 화면 크기가 바뀔 때마다 영상과 카메라 크기를 초기화한다. (resize 이벤트 추가, 삭제)
-  // 동영상의 재생시간이 업데이트 될 때마다 현재 시간을 저장한다. (timeupdate 이벤트 추가, 삭제)
+  // window에 resize event 추가
+  // 동영상에 timeupdate event 추가
   useEffect(() => {
     window.addEventListener("resize", initVideoSize);
 
-    const videoElement = videoRef.current;
-    if (videoElement) {
-      videoElement.addEventListener("timeupdate", handleTimeUpdate);
+    const video = videoRef.current;
+    if (video) {
+      video.addEventListener("timeupdate", handleTimeUpdate);
     }
 
     return () => {
       window.removeEventListener("resize", initVideoSize);
 
-      if (videoElement) {
-        videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+      if (video) {
+        video.removeEventListener("timeupdate", handleTimeUpdate);
       }
     };
-  }, []);
-
-  // 동영상의 시간이 변경될 때마다 현재 시간을 업데이트한다.
-  const handleTimeUpdate = (e: Event) => {
-    setCurrentTime((e.target as HTMLVideoElement).currentTime);
-  };
-
-  // 동영상의 시간을 이동한다.
-  const handleClickSectionButton = (time: number) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = time;
-    }
-  };
-
-  // 동영상의 시간이 현재 구간의 시간과 일치하는지 여부를 반환한다.
-  const getIsCurrentSection = (start: number, end: number) => {
-    return currentTime >= start && currentTime < end;
-  };
+  }, [handleTimeUpdate, videoRef]);
 
   return (
     <Container>
       <LeftSection ref={(el) => measuredRef(el)}>
         <SectionButtonList>
-          {timeData.map((time, index) => (
-            <SectionButton
-              key={index}
-              time={time[0]}
-              isSmall={leftSectionWidth < 100}
-              active={getIsCurrentSection(time[0], time[1])}
-              onClick={() => handleClickSectionButton(time[0])}
-            ></SectionButton>
-          ))}
+          {sectionList?.map((section) => {
+            return (
+              <SectionButton
+                key={section.id}
+                time={section.start}
+                isSmall={leftSectionWidth < 100}
+                active={section.id === currentSection().id}
+                onClick={() => handleClickSectionButton(section)}
+              ></SectionButton>
+            );
+          })}
         </SectionButtonList>
       </LeftSection>
       <CenterSection>
@@ -156,6 +174,9 @@ const LearnPageTest = () => {
           ></video>
           <IconButtonList>
             <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
+            <button style={{ background: "#fff" }} onClick={handleClickLoopButton}>
+              {isLoop ? "루프 중" : "루프 안하는 중"}
+            </button>
           </IconButtonList>
         </VideoContainer>
       </CenterSection>
