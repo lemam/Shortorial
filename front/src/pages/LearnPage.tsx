@@ -5,6 +5,7 @@ import IconButton from "../components/button/IconButton";
 import SectionButton from "../components/button/SectionButton";
 
 // 각 구간의 [시작, 끝) 시간 더미 데이터
+// TODO: API로 가져올 것
 const timeData = [
   [0, 3],
   [3, 6],
