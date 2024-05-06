@@ -4,11 +4,22 @@ import { Videocam } from "@mui/icons-material";
 import IconButton from "../components/button/IconButton";
 import SectionButton from "../components/button/SectionButton";
 
-const timeData = [0, 3, 6, 9, 12, 64];
+// 각 구간의 [시작, 끝) 시간 더미 데이터
+const timeData = [
+  [0, 3],
+  [3, 6],
+  [6, 9],
+  [9, 12],
+  [12, 15],
+  [15, 18],
+];
 
 const LearnPageTest = () => {
   const cameraRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const [leftSectionWidth, setLeftSectionWidth] = useState<number>(0);
+  const [currentTime, setCurrentTime] = useState<number>(0);
 
   // 카메라 크기
   const [cameraSize, setCameraSize] = useState({
@@ -73,22 +84,54 @@ const LearnPageTest = () => {
     initVideoSize();
   }, [initCamera]);
 
-  // 화면 크기가 바뀔 때마다 영상과 카메라 크기를 초기화한다.
-  // resize 이벤트 추가, 삭제
+  // 화면 크기가 바뀔 때마다 영상과 카메라 크기를 초기화한다. (resize 이벤트 추가, 삭제)
+  // 동영상의 재생시간이 업데이트 될 때마다 현재 시간을 저장한다. (timeupdate 이벤트 추가, 삭제)
   useEffect(() => {
     window.addEventListener("resize", initVideoSize);
 
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      videoElement.addEventListener("timeupdate", handleTimeUpdate);
+    }
+
     return () => {
       window.removeEventListener("resize", initVideoSize);
+
+      if (videoElement) {
+        videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+      }
     };
   }, []);
+
+  // 동영상의 시간이 변경될 때마다 현재 시간을 업데이트한다.
+  const handleTimeUpdate = (e: Event) => {
+    setCurrentTime((e.target as HTMLVideoElement).currentTime);
+  };
+
+  // 동영상의 시간을 이동한다.
+  const handleClickSectionButton = (time: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = time;
+    }
+  };
+
+  // 동영상의 시간이 현재 구간의 시간과 일치하는지 여부를 반환한다.
+  const getIsCurrentSection = (start: number, end: number) => {
+    return currentTime >= start && currentTime < end;
+  };
 
   return (
     <Container>
       <LeftSection ref={(el) => measuredRef(el)}>
         <SectionButtonList>
           {timeData.map((time, index) => (
-            <SectionButton key={index} time={time} isSmall={leftSectionWidth < 100}></SectionButton>
+            <SectionButton
+              key={index}
+              time={time[0]}
+              isSmall={leftSectionWidth < 100}
+              active={getIsCurrentSection(time[0], time[1])}
+              onClick={() => handleClickSectionButton(time[0])}
+            ></SectionButton>
           ))}
         </SectionButtonList>
       </LeftSection>
@@ -98,6 +141,7 @@ const LearnPageTest = () => {
             width={cameraSize.width}
             height={cameraSize.height}
             src="src/assets/sample.mp4"
+            ref={videoRef}
             controls
           ></video>
         </VideoContainer>
