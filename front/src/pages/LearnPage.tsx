@@ -3,10 +3,7 @@ import styled from "styled-components";
 import { Videocam } from "@mui/icons-material";
 import IconButton from "../components/button/IconButton";
 import SectionButton from "../components/button/SectionButton";
-import {
-  useVideoRef,
-  useSectionList,
-  useIsLoop,
+import useLearnVideoStore, {
   useLearnVideoFetch,
   useLearnVideoComputed,
   useLearnVideoActions,
@@ -22,13 +19,7 @@ const LearnPageTest = () => {
     height: 0,
   });
 
-  // NOTE: 섹션 버튼의 active가 바뀌지 않는 문제 발생 (재랜더링 안됨)
-  // 아래와 같이 store 전체를 구독하면 잘 됨...
-  // const store = useLearnVideoStore();
-
-  const videoRef = useVideoRef();
-  const sectionList = useSectionList();
-  const isLoop = useIsLoop();
+  const { videoRef, sectionList, isLoop } = useLearnVideoStore();
   const { fetchSectionList } = useLearnVideoFetch();
   const { currentSection } = useLearnVideoComputed();
   const { setCurrentTime, moveVideoTime, setIsLoop, loopVideoSetion, setLoopSection } =
