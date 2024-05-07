@@ -6,10 +6,10 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "shorts")
-@Entity
 public class Shorts {
 
     @Id
