@@ -150,7 +150,7 @@ const ChallengePage = () => {
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setFfmpegLog(`비디오 반환 전환 중 : ${Math.round(ratio * 100)}%\n`);
+            setFfmpegLog(`비디오 방향 전환 중 : ${Math.round(ratio * 100)}%\n`);
           }
         });
 
@@ -177,46 +177,36 @@ const ChallengePage = () => {
     }
   };
 
-  const makeDownloadURL = (userVideoFinalBlob: Blob) => {
+  const makeDownloadURL = async (userVideoFinalBlob: Blob) => {
     try {
-      s3Upload(URL.createObjectURL(userVideoFinalBlob), new Date());
+      await s3Upload(URL.createObjectURL(userVideoFinalBlob), new Date());
+      setTimeout(handleCloseModal, 2000);
     } catch (error) {
-      console.log("비디오가 생성되지 않았습니다:", error);
-    } finally {
-      setTimeout(() => {
-        handleCloseModal();
-      }, 2000);
+      console.error("비디오 저장 중 오류 발생:", error);
     }
   };
 
-  const s3Upload = (url: string, title: Date) => {
-    const titleString = "안녕";
-    //const titleString = title.toISOString();
-    axios.get(url, { responseType: "blob" }).then((response) => {
-      const file = new File([response.data], `${titleString}.mp4`, {
-        type: "video/mp4",
-      }); // url 파일 변환
+  const s3Upload = async (url: string, title: Date) => {
+    try {
+      const response = await axios.get(url, { responseType: "blob" });
+      const file = new File([response.data], `${title.toISOString()}.mp4`, { type: "video/mp4" });
       const formData = new FormData();
-      formData.append("file", file); // 파일 매개변수
-      formData.append("fileName", titleString); // 파일 이름 매개변수
+      formData.append("file", file);
+      formData.append("fileName", title.toISOString());
 
-      axios
-        .post("http://localhost:8080/s3/upload", formData, {
-          // formData 보내기
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNDk5OTM3NiwiZXhwIjoxNzE1MDAxMTc2fQ.qP5ZOZBKzt2HiwZRJA5bzuaXWQ6ynI0gWtAQr47S-gg",
-          },
-        })
-        .then((response) => {
-          setFfmpegLog("저장 완료");
-          console.log("s3 upload success", response.data);
-        })
-        .catch((error) => {
-          console.error("s3 upload fail", error);
-        });
-    });
+      const uploadResponse = await axios.post("http://localhost:8080/s3/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization:
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTAwNjIyMiwiZXhwIjoxNzE1MDA4MDIyfQ.x1MaVyGOu5IBQyXAlod8OH50I07kmHL_IpSQfDnL8x0",
+        },
+      });
+      setFfmpegLog("저장 완료");
+      console.log("s3 upload success", uploadResponse.data);
+    } catch (error) {
+      setFfmpegLog("저장 실패");
+      console.error("s3 upload fail", error);
+    }
   };
 
   // 타이머
@@ -348,7 +338,7 @@ const ChallengePage = () => {
           ></VideoButton>
           <VideoButton
             path="src/assets/challenge/mine.svg"
-            text="마이페이지"
+            text="나의 챌린지"
             onClick={goToResult}
             isVisible={isVisible}
           ></VideoButton>
