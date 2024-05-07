@@ -5,8 +5,7 @@ import {
   DrawingUtils,
 } from "@mediapipe/tasks-vision";
 import { useEffect } from "react";
-import { btn_with_landmark } from "../../modules/MotionBtn";
-import { action_with_landmark } from "../../modules/MotionAction";
+import { btn_with_landmark, action_with_landmark } from "../../modules/Motion";
 interface MotionCameraType {
   width: number;
   height: number;
@@ -77,11 +76,9 @@ export default function MotionCamera({ width, height }: MotionCameraType) {
 
     // 모션인식 코드
     let lastWebcamTime = -1;
-    let cnt: number = 0;
     let before_handmarker: NormalizedLandmark | null = null;
     let curr_handmarker: NormalizedLandmark | null = null;
 
-    let count = 0;
     async function predictWebcam() {
       if (!webcam || !poseLandmarker) return null;
 
@@ -96,13 +93,6 @@ export default function MotionCamera({ width, height }: MotionCameraType) {
           canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
           for (const landmark of result.landmarks) {
-            if (count == 0) {
-              // console.log(landmark);
-              count++;
-            } else {
-              count++;
-              if (count == 50) count = 0;
-            }
             // 오른손이 우측 상단에 가면 알려주는 함수
             btn_with_landmark(landmark[18]);
             if (!before_handmarker) {
@@ -128,6 +118,8 @@ export default function MotionCamera({ width, height }: MotionCameraType) {
           canvasCtx.restore();
         });
       }
+
+      // 모션인식 계속 진행
       window.requestAnimationFrame(predictWebcam);
       // 뒤로 가기 하면 webcam 멈추기
       // window.addEventListener("popstate", () => {

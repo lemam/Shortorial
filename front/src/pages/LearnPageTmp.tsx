@@ -1,5 +1,5 @@
 import styled from "styled-components";
-// import MotionCamera from "../components/motion/MotionCamera";
+import MotionCamera from "../components/motion/MotionCamera";
 import MotionVideo from "../components/motion/MotionVideo";
 import MotionVideo2 from "../components/motion/MotionVideo copy";
 import { Acc } from "../modules/Acc";
@@ -33,7 +33,7 @@ export default function LearnPage() {
     if (videoLandmark && camLandmark) {
       const accValue = Acc(videoLandmark, camLandmark);
       setAccValue(accValue);
-      console.log(accValue);
+      // console.log(accValue);
     }
   }, [videoLandmark, camLandmark]);
   return (
@@ -41,12 +41,12 @@ export default function LearnPage() {
       <VideoContainer>
         <MotionVideo width={500} height={700} getLandmark={getVideoLandmark} />
       </VideoContainer>
-      <VideoContainer>
+      {/* <VideoContainer>
         <MotionVideo2 width={500} height={700} getLandmark={getCamLandmark} />
-      </VideoContainer>
-      {/* <MotionCameraContainer>
+      </VideoContainer> */}
+      <MotionCameraContainer>
         <MotionCamera width={500} height={700} />
-      </MotionCameraContainer> */}
+      </MotionCameraContainer>
       <div id="Acc" style={{ background: "white", width: "100%" }}>
         Acc: {accValue}
       </div>
@@ -84,17 +84,17 @@ const VideoContainer = styled.div`
   }
 `;
 
-// const MotionCameraContainer = styled.div`
-//   position: relative;
-//   width: 100%;
-//   height: 100%;
+const MotionCameraContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
 
-//   @media screen and (orientation: portrait) {
-//     display: block;
-//   }
+  @media screen and (orientation: portrait) {
+    display: block;
+  }
 
-//   @media screen and (orientation: landscape) {
-//     display: block;
-//     transform: scaleX(-1); // 수평으로 뒤집기
-//   }
-// `;
+  @media screen and (orientation: landscape) {
+    display: block;
+    transform: scaleX(-1); // 수평으로 뒤집기
+  }
+`;
