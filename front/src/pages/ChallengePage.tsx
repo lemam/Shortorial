@@ -6,20 +6,27 @@ import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import LoadingModalComponent from "../components/modal/LoadingModalComponent";
 import VideoButton from "../components/button/VideoButton";
 import axios from "axios";
+import { predictWebcam } from "../modules/Motion";
+import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
+import { useVisibleStore, useTimerStore } from "../store/useMotionStore";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
   const ffmpeg = createFFmpeg({ log: false });
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [show, setShow] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // 토글
   const [recording, setRecording] = useState(false); // 녹화 진행
   const initialTimer = parseInt(localStorage.getItem("timer") || "3");
   const [timer, setTimer] = useState<number>(initialTimer);
-  const [timerPath, setTimerPath] = useState(`src/assets/challenge/${timer}sec.svg`);
+  const [timerPath, setTimerPath] = useState(
+    `src/assets/challenge/${timer}sec.svg`
+  );
   const [ffmpegLog, setFfmpegLog] = useState("");
 
   const handleShowModal = () => {
@@ -162,7 +169,10 @@ const ChallengePage = () => {
           "finalUserVideoFlip.mp4"
         );
 
-        const userVideoFlipFinal = ffmpeg.FS("readFile", "finalUserVideoFlip.mp4");
+        const userVideoFlipFinal = ffmpeg.FS(
+          "readFile",
+          "finalUserVideoFlip.mp4"
+        );
         // 최종 파일 Blob 변환
         const userVideoFinalBlob = new Blob([userVideoFlipFinal.buffer], {
           type: "video/mp4",
@@ -189,18 +199,24 @@ const ChallengePage = () => {
   const s3Upload = async (url: string, title: Date) => {
     try {
       const response = await axios.get(url, { responseType: "blob" });
-      const file = new File([response.data], `${title.toISOString()}.mp4`, { type: "video/mp4" });
+      const file = new File([response.data], `${title.toISOString()}.mp4`, {
+        type: "video/mp4",
+      });
       const formData = new FormData();
       formData.append("file", file);
       formData.append("fileName", title.toISOString());
 
-      const uploadResponse = await axios.post("http://localhost:8080/s3/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTAwNjIyMiwiZXhwIjoxNzE1MDA4MDIyfQ.x1MaVyGOu5IBQyXAlod8OH50I07kmHL_IpSQfDnL8x0",
-        },
-      });
+      const uploadResponse = await axios.post(
+        "http://localhost:8080/s3/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTAwNjIyMiwiZXhwIjoxNzE1MDA4MDIyfQ.x1MaVyGOu5IBQyXAlod8OH50I07kmHL_IpSQfDnL8x0",
+          },
+        }
+      );
       setFfmpegLog("저장 완료");
       console.log("s3 upload success", uploadResponse.data);
     } catch (error) {
@@ -230,6 +246,21 @@ const ChallengePage = () => {
     }
   }, [recording]);
 
+  const canvasElement = document.getElementById(
+    "output_canvas"
+  ) as HTMLCanvasElement | null;
+  let canvasCtx: CanvasRenderingContext2D | null = null;
+  // 그리기 도구
+  let drawingUtils: DrawingUtils | null = null;
+
+  if (canvasElement) canvasCtx = canvasElement.getContext("2d");
+  if (canvasCtx) drawingUtils = new DrawingUtils(canvasCtx);
+
+  let lastWebcamTime = -1;
+  let before_handmarker: NormalizedLandmark | null = null;
+  let curr_handmarker: NormalizedLandmark | null = null;
+
+  // camera가 있을 HTML
   const setInit = useCallback(async () => {
     const constraints: MediaStreamConstraints = {
       video: {
@@ -240,14 +271,34 @@ const ChallengePage = () => {
 
     try {
       // 카메라 불러오기
-      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      const mediaStream = await navigator.mediaDevices.getUserMedia(
+        constraints
+      );
       // userVideoRef를 참조하고 있는 DOM에 넣기
-      if (userVideoRef.current) userVideoRef.current.srcObject = mediaStream;
-      setStream(mediaStream);
+      if (userVideoRef.current) {
+        userVideoRef.current.srcObject = mediaStream;
+        setStream(mediaStream);
+        userVideoRef.current.addEventListener("loadeddata", () => {
+          console.log("이벤트 삽입 완");
+          predictWebcam(
+            userVideoRef.current,
+            canvasCtx,
+            canvasElement,
+            drawingUtils,
+            lastWebcamTime,
+            before_handmarker,
+            curr_handmarker,
+            setVisibleBtn,
+            setTimerBtn
+          );
+        });
+      }
     } catch (error) {
       alert("카메라 접근을 허용해주세요.");
       console.log(error);
     }
+
+    // setInit();
   }, []);
 
   // 비디오 크기 초기화
@@ -274,10 +325,28 @@ const ChallengePage = () => {
     })();
 
     return () => {
-      window.removeEventListener("orientationchange", () => initVideoSize(userVideoRef));
-      window.removeEventListener("orientationchange", () => initVideoSize(danceVideoRef));
+      window.removeEventListener("orientationchange", () =>
+        initVideoSize(userVideoRef)
+      );
+      window.removeEventListener("orientationchange", () =>
+        initVideoSize(danceVideoRef)
+      );
     };
   }, []);
+
+  const { visibleBtn, setVisibleBtn } = useVisibleStore();
+  const { timerBtn, setTimerBtn } = useTimerStore();
+  useEffect(() => {
+    showVideoButtonContainer();
+  }, [visibleBtn]);
+
+  useEffect(() => {
+    if (isVisible) {
+      changeTimer();
+    } else {
+      setTimerBtn(!timerBtn);
+    }
+  }, [timerBtn]);
 
   return (
     <ChallengeContainer>
@@ -289,7 +358,17 @@ const ChallengePage = () => {
         onEnded={handleShowModal}
       ></VideoContainer>
       <div style={{ position: "relative" }}>
-        <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
+        <UserVideoContainer
+          ref={userVideoRef}
+          autoPlay
+          playsInline
+        ></UserVideoContainer>
+        {/* <canvas
+          id="output_canvas"
+          width={500}
+          height={700}
+          style={{ objectFit: "cover" }}
+        ></canvas> */}
         <VideoToggleContainer>
           <VideoButton
             path="src/assets/challenge/open.svg"
