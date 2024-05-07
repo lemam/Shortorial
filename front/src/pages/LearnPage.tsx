@@ -23,10 +23,15 @@ const LearnPageTest = () => {
   });
 
   const { videoRef, sectionList, isLoop } = useLearnVideoStore();
-  const { fetchSectionList } = useLearnVideoStore((state) => state.fetch);
   const { currentSection } = useLearnVideoStore((state) => state.computed);
-  const { setCurrentTime, moveVideoTime, setIsLoop, loopVideoSetion, setLoopSection } =
-    useLearnVideoStore((state) => state.action);
+  const {
+    setCurrentTime,
+    moveVideoTime,
+    setIsLoop,
+    loopVideoSetion,
+    setLoopSection,
+    loadSectionList,
+  } = useLearnVideoStore((state) => state.action);
 
   // 카메라 설정 초기화
   const initCamera = useCallback(() => {
@@ -109,8 +114,8 @@ const LearnPageTest = () => {
   useEffect(() => {
     initCamera();
     initVideoSize();
-    fetchSectionList();
-  }, [fetchSectionList, initCamera]);
+    loadSectionList();
+  }, [loadSectionList, initCamera]);
 
   // window에 resize event 추가
   // 동영상에 timeupdate event 추가

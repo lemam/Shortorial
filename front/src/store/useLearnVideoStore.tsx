@@ -9,10 +9,6 @@ interface LearnVideoStoreState {
   isLoop: boolean;
   loopSection: VideoSection | null;
 
-  fetch: {
-    fetchSectionList: () => Promise<VideoSection[]>;
-  };
-
   computed: {
     currentSection: () => VideoSection;
   };
@@ -22,6 +18,8 @@ interface LearnVideoStoreState {
     setCurrentTime: (time: number) => void;
     setIsLoop: (isLoop: boolean) => void;
     setLoopSection: (section: VideoSection | null) => void;
+
+    loadSectionList: () => VideoSection[];
     moveVideoTime: (time: number) => void;
     loopVideoSetion: () => void;
   };
@@ -33,24 +31,6 @@ const useLearnVideoStore = create<LearnVideoStoreState>((set, get) => ({
   currentTime: 0,
   isLoop: false,
   loopSection: null,
-
-  fetch: {
-    fetchSectionList: async () => {
-      // TODO: API 요청 코드
-      const data = [
-        { id: 0, start: 0, end: 3 },
-        { id: 1, start: 3, end: 6 },
-        { id: 2, start: 6, end: 9 },
-        { id: 3, start: 9, end: 12 },
-        { id: 4, start: 12, end: 15 },
-        { id: 5, start: 15, end: 18 },
-      ];
-
-      get().action.setSectionList(data);
-
-      return data;
-    },
-  },
 
   computed: {
     // 현재 동영상의 구간을 반환한다.
@@ -69,6 +49,28 @@ const useLearnVideoStore = create<LearnVideoStoreState>((set, get) => ({
     setCurrentTime: (newTime: number) => set({ currentTime: newTime }),
     setIsLoop: (isLoop: boolean) => set({ isLoop }),
     setLoopSection: (newSection: VideoSection | null) => set({ loopSection: newSection }),
+
+    // 동영상의 구간 리스트를 반환한다. 구간은 3초를 기준으로 나눈다.
+    loadSectionList: () => {
+      const video = get().videoRef.current;
+      const result: VideoSection[] = [];
+
+      if (video) {
+        const secondsPerSection = 3;
+        const numberOfSections = video.duration / 3;
+
+        for (let i = 0; i < numberOfSections; i++) {
+          result.push({
+            id: i,
+            start: i * secondsPerSection,
+            end: (i + 1) * secondsPerSection,
+          });
+        }
+
+        get().action.setSectionList(result);
+      }
+      return result;
+    },
 
     // 동영상의 시간을 (time)초로 이동한다.
     moveVideoTime: (time: number) => {
