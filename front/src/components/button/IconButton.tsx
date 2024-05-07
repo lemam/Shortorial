@@ -5,30 +5,29 @@ import styled from "styled-components";
 interface IconButtonType {
   text: string;
   link?: string;
-  style?: React.CSSProperties;
   icon: JSX.Element;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-const IconButton = ({
-  link = "",
-  text,
-  style = {},
-  icon,
-  onClick,
-}: IconButtonType) => {
+const IconButton = ({ link = "", icon, onClick }: IconButtonType) => {
   return (
-    <LinkContainer to={link} style={style}>
+    <LinkContainer to={link}>
       <Button onClick={onClick}>
         <div className="icon">{icon}</div>
-        <span className="text">{text}</span>
+        {/* <span className="text">{text}</span> */}
       </Button>
     </LinkContainer>
   );
 };
 
 const LinkContainer = styled(Link)`
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  word-break: keep-all;
+  padding: 8px;
+  border-radius: 50%;
+  background-color: #35353580;
 `;
 
 const Button = styled.button`
@@ -47,10 +46,12 @@ const Button = styled.button`
   .icon svg {
     width: 32px;
     height: 32px;
+    color: #fff;
   }
 
   .text {
-    font-size: 14px;
+    font-size: 12px;
+    padding: 4px 0;
   }
 `;
 
