@@ -350,6 +350,10 @@ const ChallengePage = () => {
           else showCancleButton();
         }
         break;
+      case "save":
+        if (isVisible) {
+          handleShowModal();
+        }
     }
     setBtn("none");
   }, [btn]);

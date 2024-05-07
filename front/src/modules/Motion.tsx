@@ -9,6 +9,7 @@ import {
 let visible_count = 0;
 let timer_count = 0;
 let record_count = 0;
+let save_count = 0;
 
 // 좌우 모션 인식에 활용되는 변수
 let left_count = 0;
@@ -32,14 +33,14 @@ export function btn_with_landmark(
       } else {
         visible_count++;
       }
-    } else if (handLandmarker.y > 0.18 && handLandmarker.y < 0.3) {
+    } else if (handLandmarker.y > 0.17 && handLandmarker.y < 0.3) {
       if (timer_count >= TIMER_COUNT) {
         setBtn("timer");
         timer_count = 0;
       } else {
         timer_count++;
       }
-    } else if (handLandmarker.y > 0.32 && handLandmarker.y < 0.5) {
+    } else if (handLandmarker.y > 0.32 && handLandmarker.y < 0.45) {
       if (record_count >= RECORD_COUNT) {
         console.log("re");
         setBtn("record");
@@ -47,6 +48,12 @@ export function btn_with_landmark(
       } else {
         record_count++;
       }
+    } else if (handLandmarker.y > 0.47 && handLandmarker.y < 0.6) {
+      if (save_count >= RECORD_COUNT) {
+        console.log("save");
+        setBtn("save");
+        save_count = 0;
+      } else save_count++;
     }
   }
 }
