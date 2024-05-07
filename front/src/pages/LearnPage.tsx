@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import {
   LoopOutlined,
-  PlayCircleOutline,
+  PlayArrow,
   SpeedOutlined,
   ToggleOnOutlined,
   VideocamOutlined,
@@ -22,15 +22,17 @@ const LearnPageTest = () => {
     height: 0,
   });
 
-  const { videoRef, sectionList, isLoop } = useLearnVideoStore();
+  const { videoRef, sectionList, isLoop, videoDuration } = useLearnVideoStore();
   const { currentSection } = useLearnVideoStore((state) => state.computed);
   const {
+    setSectionList,
     setCurrentTime,
     moveVideoTime,
     setIsLoop,
     loopVideoSetion,
     setLoopSection,
     loadSectionList,
+    setVideoDuration,
   } = useLearnVideoStore((state) => state.action);
 
   // 카메라 설정 초기화
@@ -114,17 +116,23 @@ const LearnPageTest = () => {
   useEffect(() => {
     initCamera();
     initVideoSize();
+  }, [initCamera, setSectionList]);
+
+  // SectionList 초기화
+  useEffect(() => {
     loadSectionList();
-  }, [loadSectionList, initCamera]);
+  }, [loadSectionList, videoDuration]);
 
   // window에 resize event 추가
   // 동영상에 timeupdate event 추가
+  // 동영상에 loadedmetadata event 추가 - 동영상 길이 가져오기
   useEffect(() => {
     window.addEventListener("resize", initVideoSize);
 
     const video = videoRef.current;
     if (video) {
       video.addEventListener("timeupdate", handleTimeUpdate);
+      video.addEventListener("loadedmetadata", () => setVideoDuration(video.duration));
     }
 
     return () => {
@@ -132,9 +140,10 @@ const LearnPageTest = () => {
 
       if (video) {
         video.removeEventListener("timeupdate", handleTimeUpdate);
+        video.removeEventListener("loadedmetadata", () => setVideoDuration(video.duration));
       }
     };
-  }, [handleTimeUpdate, videoRef]);
+  }, [handleTimeUpdate, setVideoDuration, videoRef]);
 
   return (
     <Container>
@@ -152,7 +161,7 @@ const LearnPageTest = () => {
             height={cameraSize.height}
             src="src/assets/sample.mp4"
             ref={videoRef}
-            controls
+            // controls
           ></video>
         </VideoContainer>
         <VideoContainer>
@@ -166,7 +175,7 @@ const LearnPageTest = () => {
           <IconButtonList>
             <IconButton icon={<ToggleOnOutlined />} text="감추기" />
             <IconButton icon={<VideocamOutlined />} text="챌린지모드" link="/challenge" />
-            <IconButton icon={<PlayCircleOutline />} text="재생" />
+            <IconButton icon={<PlayArrow />} text="재생" />
             <IconButton icon={<SpeedOutlined />} text="배속" />
             <IconButton icon={<VolumeUpOutlined />} text="소리" />
             <IconButton icon={<LoopOutlined />} text="반복" onClick={handleClickLoopButton} />
@@ -186,6 +195,10 @@ const IconButtonList = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 8px;
+
+  & > * {
+    margin-bottom: 8px;
+  }
 `;
 
 const VideoContainer = styled.div`

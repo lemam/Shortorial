@@ -8,6 +8,7 @@ interface LearnVideoStoreState {
   currentTime: number;
   isLoop: boolean;
   loopSection: VideoSection | null;
+  videoDuration: number;
 
   computed: {
     currentSection: () => VideoSection;
@@ -18,6 +19,7 @@ interface LearnVideoStoreState {
     setCurrentTime: (time: number) => void;
     setIsLoop: (isLoop: boolean) => void;
     setLoopSection: (section: VideoSection | null) => void;
+    setVideoDuration: (duration: number) => void;
 
     loadSectionList: () => VideoSection[];
     moveVideoTime: (time: number) => void;
@@ -31,6 +33,7 @@ const useLearnVideoStore = create<LearnVideoStoreState>((set, get) => ({
   currentTime: 0,
   isLoop: false,
   loopSection: null,
+  videoDuration: 0,
 
   computed: {
     // 현재 동영상의 구간을 반환한다.
@@ -49,6 +52,7 @@ const useLearnVideoStore = create<LearnVideoStoreState>((set, get) => ({
     setCurrentTime: (newTime: number) => set({ currentTime: newTime }),
     setIsLoop: (isLoop: boolean) => set({ isLoop }),
     setLoopSection: (newSection: VideoSection | null) => set({ loopSection: newSection }),
+    setVideoDuration: (duration: number) => set({ videoDuration: duration }),
 
     // 동영상의 구간 리스트를 반환한다. 구간은 3초를 기준으로 나눈다.
     loadSectionList: () => {
@@ -69,6 +73,7 @@ const useLearnVideoStore = create<LearnVideoStoreState>((set, get) => ({
 
         get().action.setSectionList(result);
       }
+
       return result;
     },
 
