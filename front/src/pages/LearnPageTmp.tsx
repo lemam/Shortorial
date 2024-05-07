@@ -1,41 +1,39 @@
 import styled from "styled-components";
 import MotionCamera from "../components/motion/MotionCamera";
 import MotionVideo from "../components/motion/MotionVideo";
-import MotionVideo2 from "../components/motion/MotionVideo copy";
-import { Acc } from "../modules/Acc";
+// import MotionVideo2 from "../components/motion/MotionVideo copy";
+// import { Acc } from "../modules/Acc";
 import { NormalizedLandmark } from "@mediapipe/tasks-vision";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 // import { text } from "stream/consumers";
 
 export default function LearnPage() {
-  const [videoLandmark, setVideoLandmark] = useState<
-    NormalizedLandmark[] | null
-  >(null);
+  const [, setVideoLandmark] = useState<NormalizedLandmark[] | null>(null);
 
-  const [camLandmark, setCamLandmark] = useState<NormalizedLandmark[] | null>(
-    null
-  );
+  // const [camLandmark, setCamLandmark] = useState<NormalizedLandmark[] | null>(
+  //   null
+  // );
 
-  const [accValue, setAccValue] = useState(0);
+  // const [accValue, setAccValue] = useState(0);
 
   const getVideoLandmark = (landmarkData: NormalizedLandmark[]) => {
     setVideoLandmark(landmarkData);
   };
 
-  const getCamLandmark = (landmarkData: NormalizedLandmark[]) => {
-    setCamLandmark(landmarkData);
-  };
+  // const getCamLandmark = (landmarkData: NormalizedLandmark[]) => {
+  //   setCamLandmark(landmarkData);
+  // };
 
   // const accValue =
   //   videoLandmark && camLandmark ? Acc(videoLandmark, camLandmark) : 0;
 
-  useEffect(() => {
-    if (videoLandmark && camLandmark) {
-      const accValue = Acc(videoLandmark, camLandmark);
-      setAccValue(accValue);
-      // console.log(accValue);
-    }
-  }, [videoLandmark, camLandmark]);
+  // useEffect(() => {
+  //   if (videoLandmark && camLandmark) {
+  //     const accValue = Acc(videoLandmark, camLandmark);
+  //     setAccValue(accValue);
+  //     // console.log(accValue);
+  //   }
+  // }, [videoLandmark, camLandmark]);
   return (
     <Container>
       <VideoContainer>
@@ -47,9 +45,9 @@ export default function LearnPage() {
       <MotionCameraContainer>
         <MotionCamera width={500} height={700} />
       </MotionCameraContainer>
-      <div id="Acc" style={{ background: "white", width: "100%" }}>
+      {/* <div id="Acc" style={{ background: "white", width: "100%" }}>
         Acc: {accValue}
-      </div>
+      </div> */}
     </Container>
   );
 }
