@@ -9,12 +9,12 @@ interface IconButtonType {
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-const IconButton = ({ link = "", text, icon, onClick }: IconButtonType) => {
+const IconButton = ({ link = "", icon, onClick }: IconButtonType) => {
   return (
     <LinkContainer to={link}>
       <Button onClick={onClick}>
         <div className="icon">{icon}</div>
-        <span className="text">{text}</span>
+        {/* <span className="text">{text}</span> */}
       </Button>
     </LinkContainer>
   );
@@ -25,6 +25,9 @@ const LinkContainer = styled(Link)`
   justify-content: center;
   align-items: center;
   word-break: keep-all;
+  padding: 8px;
+  border-radius: 50%;
+  background-color: #35353580;
 `;
 
 const Button = styled.button`
@@ -43,7 +46,7 @@ const Button = styled.button`
   .icon svg {
     width: 32px;
     height: 32px;
-    color: #fb2576;
+    color: #fff;
   }
 
   .text {
