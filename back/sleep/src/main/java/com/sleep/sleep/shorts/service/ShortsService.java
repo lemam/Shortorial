@@ -34,6 +34,7 @@ public class ShortsService {
             shortsDto.setShortsTitle(value.getShortsTitle());
             shortsDto.setShortsDirector(value.getShortsDirector());
             shortsDto.setShortsChallengers(value.getShortsChallengers());
+            shortsDto.setShortsLink(value.getShortsLink());
             shortsList.add(shortsDto);
         }
         return shortsList;

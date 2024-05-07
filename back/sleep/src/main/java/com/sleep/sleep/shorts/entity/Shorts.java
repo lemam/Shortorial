@@ -26,4 +26,6 @@ public class Shorts {
 
     private int shortsChallengers;
 
+    private String shortsLink;
+
 }
