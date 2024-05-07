@@ -1,19 +1,39 @@
-import { NormalizedLandmark } from "@mediapipe/tasks-vision";
+import {
+  PoseLandmarker,
+  NormalizedLandmark,
+  DrawingUtils,
+  FilesetResolver,
+} from "@mediapipe/tasks-vision";
+import { useVisibleStore } from "../store/useMotionStore";
+
+// 버튼 모션에 활용되는 함수
+let visible_count = 0;
 
 // 좌우 모션 인식에 활용되는 변수
 let left_count = 0;
 let right_count = 0;
+let poseLandmarker: PoseLandmarker | null = null;
 
 // 우측 상단에 접근하면 우측상단! 반환
-export function btn_with_landmark(handLandmarker: NormalizedLandmark) {
+export function btn_with_landmark(
+  handLandmarker: NormalizedLandmark,
+  setVisibleBtn: (newVisibleBtn: boolean) => void
+) {
   if (
     handLandmarker.x < 0.2 &&
     handLandmarker.y < 0.2 &&
     handLandmarker.visibility > 0.5
   ) {
-    console.log("우측 상단!");
+    if (visible_count >= 20) {
+      let visibleBtn: boolean = useVisibleStore.getState().visibleBtn;
+      console.log(visibleBtn);
+      setVisibleBtn(!visibleBtn);
+      visible_count = 0;
+    } else {
+      visible_count++;
+    }
   } else {
-    console.log("아니지렁");
+    // console.log("아니지렁");
   }
 }
 
@@ -37,14 +57,118 @@ export function action_with_landmark(
       if (before_handLandmarker.x - curr_handmarker.x < 0) {
         right_count = 0;
         left_count++;
-        if (left_count > 10) console.log("왼쪽");
+        if (left_count > 5) console.log("왼쪽");
       } else if (before_handLandmarker.x - curr_handmarker.x > 0) {
         left_count = 0;
         right_count++;
-        if (right_count > 10) console.log("오른쪽");
+        if (right_count > 5) console.log("오른쪽");
       } else {
         left_count = right_count = 0;
       }
     }
   }
+}
+
+export const createPoseLandmarker = async () => {
+  const vision = await FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+  );
+
+  poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task`,
+      delegate: "GPU",
+    },
+    runningMode: "VIDEO",
+    numPoses: 2,
+  }).then((res) => {
+    console.log("초기화 완");
+    return res;
+  });
+};
+
+createPoseLandmarker();
+
+export async function predictWebcam(
+  webcam: HTMLVideoElement | null,
+  canvasCtx: CanvasRenderingContext2D | null,
+  canvasElement: HTMLCanvasElement | null,
+  drawingUtils: DrawingUtils | null,
+  lastWebcamTime: number,
+  before_handmarker: NormalizedLandmark | null,
+  curr_handmarker: NormalizedLandmark | null,
+  setVisibleBtn: (newVisibleBtn: boolean) => void
+) {
+  // console.log("loading...s");
+  if (webcam && poseLandmarker) {
+    // console.log("Start");
+    let startTimeMs = performance.now();
+    if (lastWebcamTime !== webcam.currentTime) {
+      // console.log("Test");
+      lastWebcamTime = webcam.currentTime;
+
+      poseLandmarker.detectForVideo(webcam, startTimeMs, (result) => {
+        // if (!canvasCtx || !drawingUtils || !canvasElement) return null;
+        // canvasCtx.save();
+        // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+        for (const landmark of result.landmarks) {
+          // 오른손이 우측 상단에 가면 알려주는 함수
+          btn_with_landmark(landmark[18], setVisibleBtn);
+
+          if (!before_handmarker) {
+            if (landmark[18].visibility > 0.5) {
+              before_handmarker = landmark[18];
+              console.log("설정완");
+            }
+          } else {
+            curr_handmarker = landmark[18];
+            action_with_landmark(before_handmarker, curr_handmarker);
+            // console.log(cnt);
+            before_handmarker = curr_handmarker;
+          }
+          // drawingUtils.drawLandmarks(landmark, {
+          //   radius: (data: any) =>
+          //     DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
+          // });
+          // drawingUtils.drawConnectors(
+          //   landmark,
+          //   PoseLandmarker.POSE_CONNECTIONS
+          // );
+        }
+        // canvasCtx.restore();
+      });
+    }
+  }
+  // 모션인식 계속 진행
+  window.requestAnimationFrame(() =>
+    predictWebcam(
+      webcam,
+      canvasCtx,
+      canvasElement,
+      drawingUtils,
+      lastWebcamTime,
+      before_handmarker,
+      curr_handmarker,
+      setVisibleBtn
+    )
+  );
+  // 뒤로 가기 하면 webcam 멈추기
+  // window.addEventListener("popstate", () => {
+  //   webcam.pause();
+
+  // });
+  // Call this function again to keep predicting when the browser is ready.
+  // if (webcamRunning === true) {
+  //   webcam.style.display = "block";
+  //   window.requestAnimationFrame(predictWebcam);
+  // } else {
+  //   webcam.pause();
+  //   const stream = webcam.srcObject as MediaStream;
+  //   if (stream) {
+  //     const tracks = stream.getTracks();
+  //     tracks.forEach((track) => track.stop());
+  //   }
+  //   webcam.style.display = "none";
+  // }
 }
