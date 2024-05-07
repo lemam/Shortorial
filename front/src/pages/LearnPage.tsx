@@ -3,11 +3,7 @@ import styled from "styled-components";
 import { Videocam } from "@mui/icons-material";
 import IconButton from "../components/button/IconButton";
 import SectionButton from "../components/button/SectionButton";
-import useLearnVideoStore, {
-  useLearnVideoFetch,
-  useLearnVideoComputed,
-  useLearnVideoActions,
-} from "../store/useLearnVideoStore";
+import useLearnVideoStore from "../store/useLearnVideoStore";
 import { VideoSection } from "../constants/types";
 
 const LearnPageTest = () => {
@@ -20,10 +16,10 @@ const LearnPageTest = () => {
   });
 
   const { videoRef, sectionList, isLoop } = useLearnVideoStore();
-  const { fetchSectionList } = useLearnVideoFetch();
-  const { currentSection } = useLearnVideoComputed();
+  const { fetchSectionList } = useLearnVideoStore((state) => state.fetch);
+  const { currentSection } = useLearnVideoStore((state) => state.computed);
   const { setCurrentTime, moveVideoTime, setIsLoop, loopVideoSetion, setLoopSection } =
-    useLearnVideoActions();
+    useLearnVideoStore((state) => state.action);
 
   // 카메라 설정 초기화
   const initCamera = useCallback(() => {
