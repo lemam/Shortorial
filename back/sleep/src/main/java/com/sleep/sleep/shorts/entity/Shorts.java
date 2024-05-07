@@ -26,7 +26,4 @@ public class Shorts {
 
     private int shortsChallengers;
 
-    private int shortsChallengersComplete;
-
-
 }

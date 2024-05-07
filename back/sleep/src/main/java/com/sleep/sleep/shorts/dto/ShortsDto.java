@@ -19,6 +19,4 @@ public class ShortsDto {
     private String shortsDirector;
 
     private int shortsChallengers;
-
-    private int shortsChallengersComplete;
 }
