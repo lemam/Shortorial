@@ -10,6 +10,7 @@ let visible_count = 0;
 let timer_count = 0;
 let record_count = 0;
 let save_count = 0;
+let mode_count = 0;
 
 // 좌우 모션 인식에 활용되는 변수
 let left_count = 0;
@@ -54,6 +55,12 @@ export function btn_with_landmark(
         setBtn("save");
         save_count = 0;
       } else save_count++;
+    } else if (handLandmarker.y > 0.62 && handLandmarker.y < 0.75) {
+      if (mode_count >= RECORD_COUNT) {
+        console.log("mode");
+        setBtn("mode");
+        mode_count = 0;
+      } else mode_count++;
     }
   }
 }

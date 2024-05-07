@@ -354,6 +354,12 @@ const ChallengePage = () => {
         if (isVisible) {
           handleShowModal();
         }
+        break;
+      case "mode":
+        if (isVisible) {
+          goToLearnMode();
+        }
+        break;
     }
     setBtn("none");
   }, [btn]);
