@@ -5,24 +5,16 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import useChallengeStore from "../store/useChallengeStore";
 
 const ffmpeg = createFFmpeg({ log: true });
 
-const VideoTrimPage = () => {
-  const [videoSrc, setVideoSrc] = useState("");
+const VideoEditPage = () => {
   const [outputVideo, setOutputVideo] = useState("");
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(10);
   const [processing, setProcessing] = useState(false);
-
-  const onDrop = async (acceptedFiles: File[]) => {
-    if (acceptedFiles.length === 0) return;
-    const file = acceptedFiles[0];
-    const url = URL.createObjectURL(file);
-    setVideoSrc(url);
-  };
-
-  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+  const { downloadURL } = useChallengeStore();
 
   const handleTrim = async () => {
     setProcessing(true);
@@ -33,7 +25,7 @@ const VideoTrimPage = () => {
     const inputFilename = 'input.mp4';
     const outputFilename = 'output.mp4';
 
-    ffmpeg.FS('writeFile', inputFilename, await fetchFile(videoSrc));
+    ffmpeg.FS('writeFile', inputFilename, await fetchFile(downloadURL));
     await ffmpeg.run('-i', inputFilename, '-ss', `${startTime}`, '-to', `${endTime}`, '-c', 'copy', outputFilename);
 
     const output = ffmpeg.FS('readFile', outputFilename);
@@ -44,13 +36,9 @@ const VideoTrimPage = () => {
 
   return (
     <div>
-      <div {...getRootProps()} style={{ border: '2px dashed black', padding: '20px', textAlign: 'center' }}>
-        <input {...getInputProps()} />
-        <p>Drag 'n' drop video file here, or click to select file</p>
-      </div>
-      {videoSrc && (
+      {downloadURL && (
         <>
-          <video controls width="250" src={videoSrc} style={{ marginTop: '20px' }}></video>
+          <video controls width="250" src={downloadURL} style={{ marginTop: '20px' }}></video>
           <div>
             <label>
               Start time (seconds):
@@ -74,4 +62,4 @@ const VideoTrimPage = () => {
   );
 };
 
-export default VideoTrimPage;
+export default VideoEditPage;

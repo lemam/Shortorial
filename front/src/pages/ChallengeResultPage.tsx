@@ -39,8 +39,7 @@ const ChallengeResultPage = () => {
 
   return (
     <ResultContainer>
-      <VideoContainer autoPlay playsInline loop src={downloadURL}></VideoContainer>
-      <ControlBoxContainer>
+      <VideoContainer playsInline src={downloadURL}></VideoContainer>      <ControlBoxContainer>
         <ControlBox>
           <div>촬영이 완료되었습니다.</div>
           <input
@@ -56,6 +55,7 @@ const ChallengeResultPage = () => {
           <div>
             <Link to={"/challenge"}>다시 촬영하기 |</Link>
             <Link to={"/"}> 쇼츠 목록보기</Link>
+            <Link to={"/video-trim"}> | 영상 자르기</Link>
           </div>
         </ControlBox>
       </ControlBoxContainer>
