@@ -3,13 +3,13 @@
 // 파일 다운로드 다윤이가 한 기능 가져오면 될 듯
 
 import React, { useEffect, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
-import useChallengeStore from "../store/useChallengeStore";
+// import { useDropzone } from 'react-dropzone';
+// import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+// import useChallengeStore from "../store/useChallengeStore";
 import { shorts } from '../apis/shorts';
 import { axios } from '../utils/axios';
 
-const ffmpeg = createFFmpeg({ log: true });
+// const ffmpeg = createFFmpeg({ log: true });
 
 const VideoTrimPage = () => {
   // const [outputVideo, setOutputVideo] = useState("");
@@ -40,6 +40,25 @@ const VideoTrimPage = () => {
 
   const [shortsList, setShortsList] = useState<shorts[]>([]);
 
+  function getYoutubeThumbnail(url: string): string {
+    const videoId = url.split('v=')[1];
+    const ampersandPosition = videoId.indexOf('&');
+    if (ampersandPosition !== -1) {
+      return `https://img.youtube.com/vi/${videoId.substring(0, ampersandPosition)}/0.jpg`;
+    }
+    return `https://img.youtube.com/vi/${videoId}/0.jpg`;
+  }
+  interface VideoThumbnailProps {
+    videoUrl: string;
+  }
+  const VideoThumbnail: React.FC<VideoThumbnailProps> = ({ videoUrl }) => {
+    let thumbnailUrl = '';
+
+    thumbnailUrl = getYoutubeThumbnail(videoUrl);
+
+    return <img src={thumbnailUrl} alt="Video Thumbnail" />;
+  };
+
   useEffect(() => {
     axios.get<shorts[]>("/api/shorts")
       .then(response => {
@@ -51,15 +70,6 @@ const VideoTrimPage = () => {
         console.error('Error fetching data:', error);
       });
   }, [])
-
-  // 동영상 URL을 썸네일 이미지 URL로 변환하는 함수
-  const getVideoThumbnailUrl = (videoUrl: string): string => {
-  // YouTube 등 특정 서비스에서는 동영상 URL을 썸네일 이미지 URL로 변환할 수 있는 API를 제공합니다.
-  // 실제로는 해당 동영상 호스팅 서비스의 API를 사용하여 동영상 썸네일을 가져와야 합니다.
-  // 여기서는 간단한 예제를 위해 동영상 URL을 곧바로 이미지 태그의 src로 사용합니다.
-  // 실제 애플리케이션에서는 적절한 방법으로 썸네일을 가져와야 합니다.
-    return videoUrl;
-  }
 
   return (
     // <div>
@@ -91,7 +101,7 @@ const VideoTrimPage = () => {
       <div>
         {shortsList.map(shorts => (
           <div key={shorts.shortsNo}>
-            <img src={getVideoThumbnailUrl(shorts.shortsUrl)} alt={shorts.shortsTitle} />
+            {VideoThumbnail(shorts.shortsUrl)}
             <h2>쇼츠 제목 : {shorts.shortsTitle}</h2>
             <p>쇼츠 디렉터 : {shorts.shortsDirector}</p>
             <p>쇼츠 시간 : {shorts.shortsTime}</p>
