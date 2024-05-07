@@ -106,9 +106,10 @@ public class MemberService {
     }
     private TokenInfo reissueRefreshToken(String refreshToken, String username) {
         if (lessThanReissueExpirationTimesLeft(refreshToken)) {
-            String accessToken = jwtTokenUtil.generateAccessToken(username);
-            return TokenInfo.of(accessToken, saveRefreshToken(username).getRefreshToken());
+            System.out.println("리프레시 토큰도 재발급");
+            return TokenInfo.of(jwtTokenUtil.generateAccessToken(username), saveRefreshToken(username).getRefreshToken());
         }
+        System.out.println("엑세스 토큰만 재발급");
         return TokenInfo.of(jwtTokenUtil.generateAccessToken(username), refreshToken);
     }
 

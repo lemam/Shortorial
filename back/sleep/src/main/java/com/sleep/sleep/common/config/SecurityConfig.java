@@ -33,7 +33,8 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth ->
-                        auth.anyRequest().permitAll())
+                        auth.requestMatchers("/").hasRole("USER")
+                        .anyRequest().permitAll())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf().disable()
                 .headers().frameOptions().disable()

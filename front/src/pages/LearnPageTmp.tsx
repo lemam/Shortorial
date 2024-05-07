@@ -1,16 +1,53 @@
 import styled from "styled-components";
 import MotionCamera from "../components/motion/MotionCamera";
 import MotionVideo from "../components/motion/MotionVideo";
+// import MotionVideo2 from "../components/motion/MotionVideo copy";
+// import { Acc } from "../modules/Acc";
+import { NormalizedLandmark } from "@mediapipe/tasks-vision";
+import { useState } from "react";
+// import { text } from "stream/consumers";
 
 export default function LearnPage() {
+  const [, setVideoLandmark] = useState<NormalizedLandmark[] | null>(null);
+
+  // const [camLandmark, setCamLandmark] = useState<NormalizedLandmark[] | null>(
+  //   null
+  // );
+
+  // const [accValue, setAccValue] = useState(0);
+
+  const getVideoLandmark = (landmarkData: NormalizedLandmark[]) => {
+    setVideoLandmark(landmarkData);
+  };
+
+  // const getCamLandmark = (landmarkData: NormalizedLandmark[]) => {
+  //   setCamLandmark(landmarkData);
+  // };
+
+  // const accValue =
+  //   videoLandmark && camLandmark ? Acc(videoLandmark, camLandmark) : 0;
+
+  // useEffect(() => {
+  //   if (videoLandmark && camLandmark) {
+  //     const accValue = Acc(videoLandmark, camLandmark);
+  //     setAccValue(accValue);
+  //     // console.log(accValue);
+  //   }
+  // }, [videoLandmark, camLandmark]);
   return (
     <Container>
       <VideoContainer>
-        <MotionVideo width={500} height={700} />
+        <MotionVideo width={500} height={700} getLandmark={getVideoLandmark} />
       </VideoContainer>
+      {/* <VideoContainer>
+        <MotionVideo2 width={500} height={700} getLandmark={getCamLandmark} />
+      </VideoContainer> */}
       <MotionCameraContainer>
         <MotionCamera width={500} height={700} />
       </MotionCameraContainer>
+      {/* <div id="Acc" style={{ background: "white", width: "100%" }}>
+        Acc: {accValue}
+      </div> */}
     </Container>
   );
 }

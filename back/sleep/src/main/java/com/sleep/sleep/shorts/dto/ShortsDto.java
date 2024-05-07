@@ -2,10 +2,11 @@ package com.sleep.sleep.shorts.dto;
 
 import lombok.*;
 
-@ToString
+@Data
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShortsDto {
     private int shortsNo;
 
@@ -18,6 +19,4 @@ public class ShortsDto {
     private String shortsDirector;
 
     private int shortsChallengers;
-
-    private int shortsChallengersComplete;
 }

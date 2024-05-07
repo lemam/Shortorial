@@ -1,63 +1,47 @@
-import { Check } from "@mui/icons-material";
-import { MouseEvent } from "react";
+import { useMemo } from "react";
 import styled from "styled-components";
 
-interface SectionType {
-  text: string;
-  isCurrent?: boolean;
-  isDone?: boolean;
-  onClick?: (event: MouseEvent) => void;
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, SectionButtonProps {}
+
+interface SectionButtonProps {
+  time: number;
+  isSmall?: boolean;
+  active?: boolean;
 }
 
-interface StyleType {
-  [key: string]: {
-    backgroundColor: string;
-    border: string;
-  };
-}
+const SectionButton = ({
+  time,
+  isSmall = false,
+  active = false,
+  ...buttonAttribute
+}: ButtonProps) => {
+  // 출력될 시간 텍스트 반환
+  const getText = useMemo(() => {
+    if (!time) return "0:00";
 
-const style: StyleType = {
-  current: {
-    backgroundColor: "#FF95BD50",
-    border: " 1px solid #FB2576",
-  },
-};
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    const formatedSeconds = seconds < 10 ? `0${seconds}` : seconds;
 
-const SectionButton = ({ text, isCurrent = false, isDone = false, onClick }: SectionType) => {
-  const styleKey = isCurrent ? "current" : "default";
+    return `${minutes}:${formatedSeconds}`;
+  }, [time]);
 
   return (
-    <Button style={style[styleKey]} onClick={onClick}>
-      <div>{text}</div>
-      <CheckIcon $isDone={isDone}>
-        <Check fontSize="small" />
-      </CheckIcon>
-    </Button>
+    <Container {...buttonAttribute} $isSmall={isSmall} $active={active}>
+      {getText}
+    </Container>
   );
 };
 
 export default SectionButton;
 
-const Button = styled.button`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 140px;
-  padding: 8px 16px;
+const Container = styled.button<{ $isSmall: boolean; $active: boolean }>`
+  width: ${(props) => (props.$isSmall ? "48px" : "100%")};
+  max-width: 140px;
+  height: ${(props) => (props.$isSmall ? "48px" : "40px")};
   font-size: 16px;
-  color: #fff;
-  background-color: #353535;
-  border: 1px solid #808080;
-  border-radius: 4px;
-`;
-
-const CheckIcon = styled.div<{ $isDone: boolean }>`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 24px;
-  background-color: #fb2576;
-  border-radius: 50%;
-  visibility: ${(props) => (props.$isDone ? "visible" : "hidden")};
+  color: inherit;
+  background-color: ${(props) => (props.$active ? "#FF95BD50" : "#353535")};
+  border: 1px solid ${(props) => (props.$active ? "#FB2576" : "#808080")};
+  border-radius: ${(props) => (props.$isSmall ? "50%" : "4px")};
 `;

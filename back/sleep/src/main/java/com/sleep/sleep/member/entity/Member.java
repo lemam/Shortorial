@@ -1,5 +1,7 @@
 package com.sleep.sleep.member.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sleep.sleep.shorts.entity.TryShorts;
 import com.sleep.sleep.shorts.entity.UploadShorts;
 import jakarta.persistence.*;
@@ -55,6 +57,7 @@ public class Member implements UserDetails {
                 .build();
     }
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         ArrayList<GrantedAuthority> authorities = new ArrayList<>();
@@ -62,39 +65,45 @@ public class Member implements UserDetails {
         return authorities;
     }
 
+    @JsonIgnore
     @Override
     public String getPassword() {
         return getMemberPass();
     }
 
+    @JsonIgnore
     @Override
     public String getUsername() {
         return getMemberId();
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;
     }
 
     private String  memberTiktokLink;
-    @OneToMany(mappedBy="tryNo")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy="tryNo")
     private List<TryShorts> tryShorts;
-    @OneToMany(mappedBy = "uploadNo")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "uploadNo")
     private List<UploadShorts> uploadShorts;
 }
