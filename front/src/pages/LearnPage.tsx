@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Videocam } from "@mui/icons-material";
+import {
+  LoopOutlined,
+  PlayCircleOutline,
+  SpeedOutlined,
+  ToggleOnOutlined,
+  VideocamOutlined,
+  VolumeUpOutlined,
+} from "@mui/icons-material";
 import IconButton from "../components/button/IconButton";
-import SectionButton from "../components/button/SectionButton";
 import useLearnVideoStore from "../store/useLearnVideoStore";
+import SectionButtonList from "../components/ButtonList/SectionButtonList";
 import { VideoSection } from "../constants/types";
 
 const LearnPageTest = () => {
@@ -127,19 +134,11 @@ const LearnPageTest = () => {
   return (
     <Container>
       <LeftSection ref={(el) => measuredRef(el)}>
-        <SectionButtonList>
-          {sectionList?.map((section) => {
-            return (
-              <SectionButton
-                key={section.id}
-                time={section.start}
-                isSmall={leftSectionWidth < 100}
-                active={section.id === currentSection().id}
-                onClick={() => handleClickSectionButton(section)}
-              ></SectionButton>
-            );
-          })}
-        </SectionButtonList>
+        <SectionButtonList
+          sectionList={sectionList}
+          parentWidth={leftSectionWidth}
+          clickHandler={handleClickSectionButton}
+        />
       </LeftSection>
       <CenterSection>
         <VideoContainer>
@@ -160,10 +159,12 @@ const LearnPageTest = () => {
             autoPlay
           ></video>
           <IconButtonList>
-            <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
-            <button style={{ background: "#fff" }} onClick={handleClickLoopButton}>
-              {isLoop ? "루프 중" : "루프 안하는 중"}
-            </button>
+            <IconButton icon={<ToggleOnOutlined />} text="감추기" />
+            <IconButton icon={<VideocamOutlined />} text="챌린지모드" link="/challenge" />
+            <IconButton icon={<PlayCircleOutline />} text="재생" />
+            <IconButton icon={<SpeedOutlined />} text="배속" />
+            <IconButton icon={<VolumeUpOutlined />} text="소리" />
+            <IconButton icon={<LoopOutlined />} text="반복" onClick={handleClickLoopButton} />
           </IconButtonList>
         </VideoContainer>
       </CenterSection>
@@ -176,35 +177,10 @@ const IconButtonList = styled.div`
   position: absolute;
   top: 0;
   right: 0;
-  padding: 8px;
-`;
-
-const SectionButtonList = styled.div`
-  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
-
-  button {
-    margin: 8px 0;
-  }
-
-  @media screen and (max-width: 479px) {
-    flex-direction: row;
-    justify-content: start;
-    align-items: flex-start;
-    overflow: scroll;
-    height: auto;
-    padding: 16px 0;
-
-    button {
-      min-width: 120px;
-      margin: 0 8px;
-    }
-  }
+  padding: 8px;
 `;
 
 const VideoContainer = styled.div`
