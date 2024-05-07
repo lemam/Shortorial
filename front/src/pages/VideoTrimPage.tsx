@@ -8,6 +8,9 @@ import React, { useEffect, useState } from 'react';
 // import useChallengeStore from "../store/useChallengeStore";
 import { shorts } from '../apis/shorts';
 import { axios } from '../utils/axios';
+import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import ModalComponent from '../components/modal/ModalComponent';
 
 // const ffmpeg = createFFmpeg({ log: true });
 
@@ -36,35 +39,25 @@ const VideoTrimPage = () => {
   //   setProcessing(false);
   // };
 
-  
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  const goToLearnMode = () => {
+    navigate("/learn");
+  };
+
+  const goToChallengeMode = () => {
+    navigate("/challenge");
+  };
 
   const [shortsList, setShortsList] = useState<shorts[]>([]);
-
-  function getYoutubeThumbnail(url: string): string {
-    const videoId = url.split('v=')[1];
-    const ampersandPosition = videoId.indexOf('&');
-    if (ampersandPosition !== -1) {
-      return `https://img.youtube.com/vi/${videoId.substring(0, ampersandPosition)}/0.jpg`;
-    }
-    return `https://img.youtube.com/vi/${videoId}/0.jpg`;
-  }
-  interface VideoThumbnailProps {
-    videoUrl: string;
-  }
-  const VideoThumbnail: React.FC<VideoThumbnailProps> = ({ videoUrl }) => {
-    let thumbnailUrl = '';
-
-    thumbnailUrl = getYoutubeThumbnail(videoUrl);
-
-    return <img src={thumbnailUrl} alt="Video Thumbnail" />;
-  };
 
   useEffect(() => {
     axios.get<shorts[]>("/api/shorts")
       .then(response => {
         setShortsList(response.data);
-        console.log(response.data);
-        console.log(shortsList);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
@@ -97,20 +90,57 @@ const VideoTrimPage = () => {
     //   )}
     // </div>
     <div>
-      <h1>쇼츠 목록</h1>
-      <div>
+      <div
+        style={{
+          position: "relative",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(162px, 1fr))",
+          gap: "16px 16px",
+        }}
+      >
+        <div>
         {shortsList.map(shorts => (
           <div key={shorts.shortsNo}>
-            {VideoThumbnail(shorts.shortsUrl)}
-            <h2>쇼츠 제목 : {shorts.shortsTitle}</h2>
-            <p>쇼츠 디렉터 : {shorts.shortsDirector}</p>
-            <p>쇼츠 시간 : {shorts.shortsTime}</p>
-            <p>쇼츠 참여 인원 : {shorts.shortsChallengers}</p>
+            <VideoBox onClick={handleShowModal}>
+              <video src={shorts.shortsLink}></video>
+            </VideoBox>
+            <ModalComponent
+              title={shorts.shortsTitle}
+              body={
+                <VideoBox>
+                  <video src={shorts.shortsLink} autoPlay loop></video>
+                </VideoBox>
+              }
+              showModal={showModal}
+              handleCloseModal={handleCloseModal}
+              goToLearnMode={goToLearnMode}
+              goToChallengeMode={goToChallengeMode}
+              />
+              <p>쇼츠 제목 : {shorts.shortsTitle}</p>
+              <p>쇼츠 디렉터 : {shorts.shortsDirector}</p>
+              <p>쇼츠 시간 : {shorts.shortsTime}</p>
+              <p>쇼츠 참여 인원 : {shorts.shortsChallengers}</p>
           </div>
         ))}
+          
+        </div>
       </div>
     </div>
   );
 };
 
 export default VideoTrimPage;
+
+const VideoBox = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 286px;
+  border-radius: 8px;
+  overflow: hidden;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;

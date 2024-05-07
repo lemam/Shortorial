@@ -26,6 +26,7 @@ export interface shorts {
   shortsDirector : string;
   shortsTime : number;
   shortsChallengers : number;
+  shortsLink : string;
 }
 
 // 쇼츠 리스트 조회
