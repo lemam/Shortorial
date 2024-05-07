@@ -96,19 +96,3 @@ const useLearnVideoStore = create<LearnVideoStoreState>((set, get) => ({
 }));
 
 export default useLearnVideoStore;
-
-export const useVideoRef = () => useLearnVideoStore((state) => state.videoRef);
-
-export const useSectionList = () => useLearnVideoStore((state) => state.sectionList);
-
-export const useCurrentTime = () => useLearnVideoStore((state) => state.currentTime);
-
-export const useIsLoop = () => useLearnVideoStore((state) => state.isLoop);
-
-export const useLoopSection = () => useLearnVideoStore((state) => state.loopSection);
-
-export const useLearnVideoFetch = () => useLearnVideoStore((state) => state.fetch);
-
-export const useLearnVideoComputed = () => useLearnVideoStore((state) => state.computed);
-
-export const useLearnVideoActions = () => useLearnVideoStore((state) => state.action);
