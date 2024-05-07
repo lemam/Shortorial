@@ -1,21 +1,11 @@
 import { create } from "zustand";
 
-interface VisibleState {
-  visibleBtn: boolean;
-  setVisibleBtn: (newVisibleBtn: boolean) => void;
+interface BtnState {
+  btn: String;
+  setBtn: (newBtn: String) => void;
 }
 
-interface TimerState {
-  timerBtn: boolean;
-  setTimerBtn: (newTimerBtn: boolean) => void;
-}
-
-export const useVisibleStore = create<VisibleState>((set) => ({
-  visibleBtn: false,
-  setVisibleBtn: (newVisibleBtn: boolean) => set({ visibleBtn: newVisibleBtn }),
-}));
-
-export const useTimerStore = create<TimerState>((set) => ({
-  timerBtn: false,
-  setTimerBtn: (newTimerBtn: boolean) => set({ timerBtn: newTimerBtn }),
+export const useBtnStore = create<BtnState>((set) => ({
+  btn: "none",
+  setBtn: (newBtn: String) => set({ btn: newBtn }),
 }));

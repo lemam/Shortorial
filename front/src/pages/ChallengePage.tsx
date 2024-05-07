@@ -8,7 +8,7 @@ import VideoButton from "../components/button/VideoButton";
 import axios from "axios";
 import { predictWebcam } from "../modules/Motion";
 import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
-import { useVisibleStore, useTimerStore } from "../store/useMotionStore";
+import { useBtnStore } from "../store/useMotionStore";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -288,8 +288,7 @@ const ChallengePage = () => {
             lastWebcamTime,
             before_handmarker,
             curr_handmarker,
-            setVisibleBtn,
-            setTimerBtn
+            setBtn
           );
         });
       }
@@ -334,19 +333,26 @@ const ChallengePage = () => {
     };
   }, []);
 
-  const { visibleBtn, setVisibleBtn } = useVisibleStore();
-  const { timerBtn, setTimerBtn } = useTimerStore();
-  useEffect(() => {
-    showVideoButtonContainer();
-  }, [visibleBtn]);
+  const { btn, setBtn } = useBtnStore();
 
   useEffect(() => {
-    if (isVisible) {
-      changeTimer();
-    } else {
-      setTimerBtn(!timerBtn);
+    switch (btn) {
+      case "visible":
+        // console.log("A");
+        showVideoButtonContainer();
+        break;
+      case "timer":
+        if (isVisible) changeTimer();
+        break;
+      case "record":
+        if (isVisible) {
+          if (recording) cancelRecording();
+          else showCancleButton();
+        }
+        break;
     }
-  }, [timerBtn]);
+    setBtn("none");
+  }, [btn]);
 
   return (
     <ChallengeContainer>

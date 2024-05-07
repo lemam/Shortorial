@@ -4,30 +4,29 @@ import {
   DrawingUtils,
   FilesetResolver,
 } from "@mediapipe/tasks-vision";
-import { useTimerStore, useVisibleStore } from "../store/useMotionStore";
 
 // 버튼 모션에 활용되는 함수
 let visible_count = 0;
 let timer_count = 0;
+let record_count = 0;
 
 // 좌우 모션 인식에 활용되는 변수
 let left_count = 0;
 let right_count = 0;
 let poseLandmarker: PoseLandmarker | null = null;
-const MAX_COUNT: number = 30;
+const MAX_COUNT: number = 10;
 const TIMER_COUNT: number = 15;
+const RECORD_COUNT: number = 30;
 // 우측 상단에 접근하면 우측상단! 반환
 export function btn_with_landmark(
   handLandmarker: NormalizedLandmark,
-  setVisibleBtn: (newVisibleBtn: boolean) => void,
-  setTimerBtn: (newTimerBtn: boolean) => void
+  setBtn: (newBtn: String) => void
 ) {
   if (handLandmarker.x < 0.2 && handLandmarker.visibility > 0.5) {
     if (handLandmarker.y < 0.15) {
+      console.log("A");
       if (visible_count >= MAX_COUNT) {
-        let visibleBtn: boolean = useVisibleStore.getState().visibleBtn;
-        console.log(visibleBtn);
-        setVisibleBtn(!visibleBtn);
+        setBtn("visible");
         visible_count = 0;
         timer_count = 0;
       } else {
@@ -35,11 +34,18 @@ export function btn_with_landmark(
       }
     } else if (handLandmarker.y > 0.18 && handLandmarker.y < 0.3) {
       if (timer_count >= TIMER_COUNT) {
-        let timerBtn: boolean = useTimerStore.getState().timerBtn;
-        setTimerBtn(!timerBtn);
+        setBtn("timer");
         timer_count = 0;
       } else {
         timer_count++;
+      }
+    } else if (handLandmarker.y > 0.32 && handLandmarker.y < 0.5) {
+      if (record_count >= RECORD_COUNT) {
+        console.log("re");
+        setBtn("record");
+        record_count = 0;
+      } else {
+        record_count++;
       }
     }
   }
@@ -105,8 +111,7 @@ export async function predictWebcam(
   lastWebcamTime: number,
   before_handmarker: NormalizedLandmark | null,
   curr_handmarker: NormalizedLandmark | null,
-  setVisibleBtn: (newVisibleBtn: boolean) => void,
-  setTimerBtn: (newTimerBtn: boolean) => void
+  setBtn: (newBtn: String) => void
 ) {
   // console.log("loading...s");
   if (webcam && poseLandmarker) {
@@ -123,7 +128,7 @@ export async function predictWebcam(
 
         for (const landmark of result.landmarks) {
           // 오른손이 우측 상단에 가면 알려주는 함수
-          btn_with_landmark(landmark[18], setVisibleBtn, setTimerBtn);
+          btn_with_landmark(landmark[18], setBtn);
 
           if (!before_handmarker) {
             if (landmark[18].visibility > 0.5) {
@@ -159,8 +164,7 @@ export async function predictWebcam(
       lastWebcamTime,
       before_handmarker,
       curr_handmarker,
-      setVisibleBtn,
-      setTimerBtn
+      setBtn
     )
   );
   // 뒤로 가기 하면 webcam 멈추기
