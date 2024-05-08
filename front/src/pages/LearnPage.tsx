@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Videocam } from "@mui/icons-material";
+import {
+  LoopOutlined,
+  PlayArrow,
+  SpeedOutlined,
+  ToggleOnOutlined,
+  VideocamOutlined,
+  VolumeUpOutlined,
+} from "@mui/icons-material";
 import IconButton from "../components/button/IconButton";
-import SectionButton from "../components/button/SectionButton";
 import useLearnVideoStore from "../store/useLearnVideoStore";
+import SectionButtonList from "../components/ButtonList/SectionButtonList";
 import { VideoSection } from "../constants/types";
 
 const LearnPageTest = () => {
@@ -15,11 +22,18 @@ const LearnPageTest = () => {
     height: 0,
   });
 
-  const { videoRef, sectionList, isLoop } = useLearnVideoStore();
-  const { fetchSectionList } = useLearnVideoStore((state) => state.fetch);
+  const { videoRef, sectionList, isLoop, videoDuration } = useLearnVideoStore();
   const { currentSection } = useLearnVideoStore((state) => state.computed);
-  const { setCurrentTime, moveVideoTime, setIsLoop, loopVideoSetion, setLoopSection } =
-    useLearnVideoStore((state) => state.action);
+  const {
+    setSectionList,
+    setCurrentTime,
+    moveVideoTime,
+    setIsLoop,
+    loopVideoSetion,
+    setLoopSection,
+    loadSectionList,
+    setVideoDuration,
+  } = useLearnVideoStore((state) => state.action);
 
   // 카메라 설정 초기화
   const initCamera = useCallback(() => {
@@ -102,17 +116,23 @@ const LearnPageTest = () => {
   useEffect(() => {
     initCamera();
     initVideoSize();
-    fetchSectionList();
-  }, [fetchSectionList, initCamera]);
+  }, [initCamera, setSectionList]);
+
+  // SectionList 초기화
+  useEffect(() => {
+    loadSectionList();
+  }, [loadSectionList, videoDuration]);
 
   // window에 resize event 추가
   // 동영상에 timeupdate event 추가
+  // 동영상에 loadedmetadata event 추가 - 동영상 길이 가져오기
   useEffect(() => {
     window.addEventListener("resize", initVideoSize);
 
     const video = videoRef.current;
     if (video) {
       video.addEventListener("timeupdate", handleTimeUpdate);
+      video.addEventListener("loadedmetadata", () => setVideoDuration(video.duration));
     }
 
     return () => {
@@ -120,26 +140,19 @@ const LearnPageTest = () => {
 
       if (video) {
         video.removeEventListener("timeupdate", handleTimeUpdate);
+        video.removeEventListener("loadedmetadata", () => setVideoDuration(video.duration));
       }
     };
-  }, [handleTimeUpdate, videoRef]);
+  }, [handleTimeUpdate, setVideoDuration, videoRef]);
 
   return (
     <Container>
       <LeftSection ref={(el) => measuredRef(el)}>
-        <SectionButtonList>
-          {sectionList?.map((section) => {
-            return (
-              <SectionButton
-                key={section.id}
-                time={section.start}
-                isSmall={leftSectionWidth < 100}
-                active={section.id === currentSection().id}
-                onClick={() => handleClickSectionButton(section)}
-              ></SectionButton>
-            );
-          })}
-        </SectionButtonList>
+        <SectionButtonList
+          sectionList={sectionList}
+          parentWidth={leftSectionWidth}
+          clickHandler={handleClickSectionButton}
+        />
       </LeftSection>
       <CenterSection>
         <VideoContainer>
@@ -148,7 +161,7 @@ const LearnPageTest = () => {
             height={cameraSize.height}
             src="src/assets/sample.mp4"
             ref={videoRef}
-            controls
+            // controls
           ></video>
         </VideoContainer>
         <VideoContainer>
@@ -160,10 +173,12 @@ const LearnPageTest = () => {
             autoPlay
           ></video>
           <IconButtonList>
-            <IconButton icon={<Videocam />} text="챌린지 모드" link="/challenge" />
-            <button style={{ background: "#fff" }} onClick={handleClickLoopButton}>
-              {isLoop ? "루프 중" : "루프 안하는 중"}
-            </button>
+            <IconButton icon={<ToggleOnOutlined />} text="감추기" />
+            <IconButton icon={<VideocamOutlined />} text="챌린지모드" link="/challenge" />
+            <IconButton icon={<PlayArrow />} text="재생" />
+            <IconButton icon={<SpeedOutlined />} text="배속" />
+            <IconButton icon={<VolumeUpOutlined />} text="소리" />
+            <IconButton icon={<LoopOutlined />} text="반복" onClick={handleClickLoopButton} />
           </IconButtonList>
         </VideoContainer>
       </CenterSection>
@@ -176,34 +191,13 @@ const IconButtonList = styled.div`
   position: absolute;
   top: 0;
   right: 0;
-  padding: 8px;
-`;
-
-const SectionButtonList = styled.div`
-  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
+  padding: 8px;
 
-  button {
-    margin: 8px 0;
-  }
-
-  @media screen and (max-width: 479px) {
-    flex-direction: row;
-    justify-content: start;
-    align-items: flex-start;
-    overflow: scroll;
-    height: auto;
-    padding: 16px 0;
-
-    button {
-      min-width: 120px;
-      margin: 0 8px;
-    }
+  & > * {
+    margin-bottom: 8px;
   }
 `;
 

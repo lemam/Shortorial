@@ -8,7 +8,7 @@ import stop from "../assets/stop.png";
 import start from "../assets/start.png";
 import load from "../assets/loading.gif";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
-import ModalComponent from "../components/ModalComponent";
+import ModalComponent from "../components/modal/ModalComponent";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -17,7 +17,9 @@ const ChallengePage = () => {
   const { setDownloadURL } = useChallengeStore();
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -34,7 +36,9 @@ const ChallengePage = () => {
 
     try {
       // 카메라 불러오기
-      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      const mediaStream = await navigator.mediaDevices.getUserMedia(
+        constraints
+      );
       // userVideoRef를 참조하고 있는 DOM에 넣기
       if (userVideoRef.current) userVideoRef.current.srcObject = mediaStream;
       setStream(mediaStream);
@@ -68,8 +72,12 @@ const ChallengePage = () => {
     })();
 
     return () => {
-      window.removeEventListener("orientationchange", () => initVideoSize(userVideoRef));
-      window.removeEventListener("orientationchange", () => initVideoSize(danceVideoRef));
+      window.removeEventListener("orientationchange", () =>
+        initVideoSize(userVideoRef)
+      );
+      window.removeEventListener("orientationchange", () =>
+        initVideoSize(danceVideoRef)
+      );
     };
   }, []);
 
@@ -165,7 +173,10 @@ const ChallengePage = () => {
           "finalUserVideoFlip.mp4"
         );
 
-        const userVideoFlipFinal = ffmpeg.FS("readFile", "finalUserVideoFlip.mp4");
+        const userVideoFlipFinal = ffmpeg.FS(
+          "readFile",
+          "finalUserVideoFlip.mp4"
+        );
         // 최종 파일 Blob 변환
         const userVideoFinalBlob = new Blob([userVideoFlipFinal.buffer], {
           type: "video/mp4",
@@ -200,8 +211,15 @@ const ChallengePage = () => {
         playsInline
         onEnded={stopRecording}
       ></VideoContainer>
-      <PracticeModeButton src={learnMode} onClick={goToLearnMode}></PracticeModeButton>
-      <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
+      <PracticeModeButton
+        src={learnMode}
+        onClick={goToLearnMode}
+      ></PracticeModeButton>
+      <UserVideoContainer
+        ref={userVideoRef}
+        autoPlay
+        playsInline
+      ></UserVideoContainer>
       <RecordButtonContainer>
         {mediaRecorder && (
           <RecordButton onClick={stopRecording}>

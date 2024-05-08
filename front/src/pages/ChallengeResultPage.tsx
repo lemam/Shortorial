@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 // import { uploadShorts } from "../apis/shorts";
-import useChallengeStore from "../store/useChallengeStore";
+// import useChallengeStore from "../store/useChallengeStore";
 import styled from "styled-components";
-import axios from "axios";
+// import axios from "axios";
 
 const ChallengeResultPage = () => {
   // const [uploadURL, setuploadURL] = useState<string>("");
@@ -71,14 +71,14 @@ const ResultContainer = styled.div`
   justify-content: center;
 `;
 
-const VideoContainer = styled.video`
-  height: 100vh;
-  aspect-ratio: 9 / 16;
-  object-fit: cover;
-  padding: 30px;
-  box-sizing: border-box;
-  //transform: scaleX(-1);
-`;
+// const VideoContainer = styled.video`
+//   height: 100vh;
+//   aspect-ratio: 9 / 16;
+//   object-fit: cover;
+//   padding: 30px;
+//   box-sizing: border-box;
+//   //transform: scaleX(-1);
+// `;
 
 const ControlBoxContainer = styled.div`
   display: flex;
