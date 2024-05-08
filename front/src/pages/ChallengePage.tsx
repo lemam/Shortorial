@@ -6,9 +6,9 @@ import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import LoadingModalComponent from "../components/modal/LoadingModalComponent";
 import VideoButton from "../components/button/VideoButton";
 import axios from "axios";
-import { btnPlace, predictWebcam, setBtnInfo } from "../modules/Motion";
+import { predictWebcam, setBtnInfo } from "../modules/Motion";
 import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
-import { useBtnStore, useDomStore } from "../store/useMotionStore";
+import { useBtnStore } from "../store/useMotionStore";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
