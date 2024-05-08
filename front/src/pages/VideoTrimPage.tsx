@@ -2,7 +2,7 @@
 // 직접 시간을 넣어서 수정된 영상을 보여줌
 // 파일 다운로드 다윤이가 한 기능 가져오면 될 듯
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { shorts } from "../apis/shorts";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
