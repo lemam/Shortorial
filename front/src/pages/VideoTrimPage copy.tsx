@@ -102,45 +102,45 @@ const VideoBox = styled.div`
 `;
 
 
-const PageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
-`;
+// const PageContainer = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   margin-top: 20px;
+// `;
 
-const Header = styled.header`
-  width: 100%;
-  background-color: #f8f9fa;
-  padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
+// const Header = styled.header`
+//   width: 100%;
+//   background-color: #f8f9fa;
+//   padding: 10px 20px;
+//   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+// `;
 
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-  img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-  span {
-    font-size: 18px;
-    font-weight: bold;
-  }
-`;
+// const UserInfo = styled.div`
+//   display: flex;
+//   align-items: center;
+//   img {
+//     width: 50px;
+//     height: 50px;
+//     border-radius: 50%;
+//     margin-right: 10px;
+//   }
+//   span {
+//     font-size: 18px;
+//     font-weight: bold;
+//   }
+// `;
 
-const VideoGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  max-width: 1024px;
-  margin-top: 20px;
-`;
+// const VideoGrid = styled.div`
+//   display: grid;
+//   grid-template-columns: repeat(4, 1fr);
+//   gap: 16px;
+//   max-width: 1024px;
+//   margin-top: 20px;
+// `;
 
 // const VideoBox = styled.div`
 //   position: relative;
@@ -157,19 +157,19 @@ const VideoGrid = styled.div`
 //   }
 // `;
 
-const Pagination = styled.div`
-  margin-top: 20px;
-  button {
-    padding: 5px 10px;
-    margin: 0 5px;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
+// const Pagination = styled.div`
+//   margin-top: 20px;
+//   button {
+//     padding: 5px 10px;
+//     margin: 0 5px;
+//     background-color: #007bff;
+//     border: none;
+//     border-radius: 5px;
+//     color: white;
+//     cursor: pointer;
 
-    &:disabled {
-      background-color: #ccc;
-    }
-  }
-`;
+//     &:disabled {
+//       background-color: #ccc;
+//     }
+//   }
+// `;
