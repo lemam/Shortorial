@@ -189,16 +189,18 @@ const ChallengePage = () => {
   const s3Upload = async (url: string, title: Date) => {
     try {
       const response = await axios.get(url, { responseType: "blob" });
-      const file = new File([response.data], `${title.toISOString()}.mp4`, { type: "video/mp4" });
+      const file = new File([response.data], `${"얀녕"}.mp4`, {
+        type: "video/mp4",
+      });
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("fileName", title.toISOString());
+      formData.append("fileName", "안녕");
 
-      const uploadResponse = await axios.post("http://localhost:8080/s3/upload", formData, {
+      const uploadResponse = await axios.post("http://localhost:8089/s3/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTAwNjIyMiwiZXhwIjoxNzE1MDA4MDIyfQ.x1MaVyGOu5IBQyXAlod8OH50I07kmHL_IpSQfDnL8x0",
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InNzYWZ5IiwiaWF0IjoxNzE1MTM0MzYwLCJleHAiOjE3MTUxMzYxNjB9.dLgfU0beVuOgun8xp2rSZ_EqWPufI2iulWOnndORkr8",
         },
       });
       setFfmpegLog("저장 완료");

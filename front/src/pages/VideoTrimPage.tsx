@@ -3,46 +3,17 @@
 // 파일 다운로드 다윤이가 한 기능 가져오면 될 듯
 
 import React, { useEffect, useState } from 'react';
-// import { useDropzone } from 'react-dropzone';
-// import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
-// import useChallengeStore from "../store/useChallengeStore";
 import { shorts } from '../apis/shorts';
 import { axios } from '../utils/axios';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import ModalComponent from '../components/modal/ModalComponent';
 
-// const ffmpeg = createFFmpeg({ log: true });
-
 const VideoTrimPage = () => {
-  // const [outputVideo, setOutputVideo] = useState("");
-  // const [startTime, setStartTime] = useState(0);
-  // const [endTime, setEndTime] = useState(10);
-  // const [processing, setProcessing] = useState(false);
-  // const { downloadURL } = useChallengeStore();
-
-  // const handleTrim = async () => {
-  //   setProcessing(true);
-  //   if (!ffmpeg.isLoaded()) {
-  //     await ffmpeg.load();
-  //   }
-
-  //   const inputFilename = 'input.mp4';
-  //   const outputFilename = 'output.mp4';
-
-  //   ffmpeg.FS('writeFile', inputFilename, await fetchFile(downloadURL));
-  //   await ffmpeg.run('-i', inputFilename, '-ss', `${startTime}`, '-to', `${endTime}`, '-c', 'copy', outputFilename);
-
-  //   const output = ffmpeg.FS('readFile', outputFilename);
-  //   const outputUrl = URL.createObjectURL(new Blob([output.buffer], { type: 'video/mp4' }));
-  //   setOutputVideo(outputUrl);
-  //   setProcessing(false);
-  // };
 
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
-  const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = (id : number) => setClickId(id);
+  const handleCloseModal = () => setClickId(-1);
 
   const goToLearnMode = () => {
     navigate("/learn");
@@ -53,42 +24,27 @@ const VideoTrimPage = () => {
   };
 
   const [shortsList, setShortsList] = useState<shorts[]>([]);
+  const [clickId, setClickId] = useState<number>(-1);
 
   useEffect(() => {
     axios.get<shorts[]>("/api/shorts")
       .then(response => {
         setShortsList(response.data);
+
+        console.log(response.data);
+        for(let i = 0; i < shortsList.length; i++) {
+          console.log(shortsList[i].shortsUrl);
+        }
       })
       .catch(error => {
         console.error('Error fetching data:', error);
       });
+    
+    
+
   }, [])
 
   return (
-    // <div>
-    //   {downloadURL && (
-    //     <>
-    //       <video controls width="250" src={downloadURL} style={{ marginTop: '20px' }}></video>
-    //       <div>
-    //         <label>
-    //           Start time (seconds):
-    //           <input type="number" value={startTime} onChange={(e) => setStartTime(Number(e.target.value))} />
-    //         </label>
-    //         <label>
-    //           End time (seconds):
-    //           <input type="number" value={endTime} onChange={(e) => setEndTime(Number(e.target.value))} />
-    //         </label>
-    //         <button onClick={handleTrim} disabled={processing}>Trim Video</button>
-    //       </div>
-    //       {outputVideo && (
-    //         <div>
-    //           <h3>Trimmed Video</h3>
-    //           <video controls width="250" src={outputVideo}></video>
-    //         </div>
-    //       )}
-    //     </>
-    //   )}
-    // </div>
     <div>
       <div
         style={{
@@ -101,17 +57,17 @@ const VideoTrimPage = () => {
         <div>
         {shortsList.map(shorts => (
           <div key={shorts.shortsNo}>
-            <VideoBox onClick={handleShowModal}>
-              <video src={shorts.shortsLink}></video>
+            <VideoBox onClick={() => handleShowModal(shorts.shortsNo)}>
+              <video src={shorts.shortsLink} crossOrigin="anonymous"></video>
             </VideoBox>
             <ModalComponent
               title={shorts.shortsTitle}
               body={
                 <VideoBox>
-                  <video src={shorts.shortsLink} autoPlay loop></video>
+                  <video src={shorts.shortsLink} autoPlay loop crossOrigin='anonymous'></video>
                 </VideoBox>
               }
-              showModal={showModal}
+              showModal={clickId === shorts.shortsNo}
               handleCloseModal={handleCloseModal}
               goToLearnMode={goToLearnMode}
               goToChallengeMode={goToChallengeMode}
