@@ -3,24 +3,25 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 interface IconButtonType {
-  text: string;
+  tooltip: string;
   link?: string;
   icon: JSX.Element;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-const IconButton = ({ link = "", icon, onClick }: IconButtonType) => {
+const IconButton = ({ link = "", tooltip, icon, onClick }: IconButtonType) => {
   return (
     <LinkContainer to={link}>
       <Button onClick={onClick}>
         <div className="icon">{icon}</div>
-        {/* <span className="text">{text}</span> */}
+        <div className="tooltipText">{tooltip}</div>
       </Button>
     </LinkContainer>
   );
 };
 
 const LinkContainer = styled(Link)`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,6 +32,7 @@ const LinkContainer = styled(Link)`
 `;
 
 const Button = styled.button`
+  position: relative;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -49,9 +51,22 @@ const Button = styled.button`
     color: #fff;
   }
 
-  .text {
+  .tooltipText {
+    visibility: hidden;
+    position: absolute;
+    top: 50%;
+    right: 48px;
+    padding: 4px;
     font-size: 12px;
-    padding: 4px 0;
+    background-color: #35353580;
+    border-radius: 4px;
+    transform: translateY(-50%);
+    z-index: 200;
+  }
+
+  &:hover > .tooltipText,
+  &:active > .tooltipText {
+    visibility: visible;
   }
 `;
 

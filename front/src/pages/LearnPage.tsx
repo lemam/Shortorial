@@ -173,12 +173,12 @@ const LearnPageTest = () => {
             autoPlay
           ></video>
           <IconButtonList>
-            <IconButton icon={<ToggleOnOutlined />} text="감추기" />
-            <IconButton icon={<VideocamOutlined />} text="챌린지모드" link="/challenge" />
-            <IconButton icon={<PlayArrow />} text="재생" />
-            <IconButton icon={<SpeedOutlined />} text="배속" />
-            <IconButton icon={<VolumeUpOutlined />} text="소리" />
-            <IconButton icon={<LoopOutlined />} text="반복" onClick={handleClickLoopButton} />
+            <IconButton icon={<ToggleOnOutlined />} tooltip="감추기" />
+            <IconButton icon={<VideocamOutlined />} tooltip="챌린지모드" link="/challenge" />
+            <IconButton icon={<PlayArrow />} tooltip="재생" />
+            <IconButton icon={<SpeedOutlined />} tooltip="배속" />
+            <IconButton icon={<VolumeUpOutlined />} tooltip="소리" />
+            <IconButton icon={<LoopOutlined />} tooltip="반복" onClick={handleClickLoopButton} />
           </IconButtonList>
         </VideoContainer>
       </CenterSection>
