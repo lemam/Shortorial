@@ -18,12 +18,13 @@ export async function uploadShorts(file: File, fileName: string) {
 }
 
 export interface shorts {
-  shortsNo: number;
-  shortsUrl: string;
-  shortsTitle: string;
-  shortsDirector: string;
-  shortsTime: number;
-  shortsChallengers: number;
+  shortsNo : number;
+  shortsUrl : string;
+  shortsTitle : string;
+  shortsDirector : string;
+  shortsTime : number;
+  shortsChallengers : number;
+  shortsLink : string;
 }
 
 // 쇼츠 리스트 조회

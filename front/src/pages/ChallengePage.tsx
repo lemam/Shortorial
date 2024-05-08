@@ -199,7 +199,7 @@ const ChallengePage = () => {
       formData.append("file", blob, `${title}.mp4`);
       formData.append("fileName", title);
 
-      const uploadResponse = await axios.post("http://localhost:8080/s3/upload", formData, {
+      const uploadResponse = await axios.post("http://localhost:8089/s3/upload", formData, {
         headers: {
           Authorization:
             "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTE1MTUxOCwiZXhwIjoxNzE1MTUzMzE4fQ.PGF6vM4wRzjA-fb2B5mxzdrBMns3dUMSc4d2wWU_aBU",
