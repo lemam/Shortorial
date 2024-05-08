@@ -46,8 +46,8 @@ const Button = styled.button`
   }
 
   .icon svg {
-    width: 32px;
-    height: 32px;
+    /* width: 32px; */
+    /* height: 32px; */
     color: #fff;
   }
 
