@@ -1,21 +1,21 @@
 import { Modal } from "react-bootstrap";
-import loading from "../../assets/challenge/loading.gif";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 interface ModalType {
   progress: string;
   showModal: boolean;
+  path: string;
   handleCloseModal: () => void;
 }
 
-const ModalComponent = ({ progress, showModal, handleCloseModal }: ModalType) => {
+const ModalComponent = ({ progress, showModal, path, handleCloseModal }: ModalType) => {
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
       <Modal.Body>
         <LoadingComponent>
-          <LoadingImg src={loading} />
-          <div>{progress}</div>
+          <LoadingImg src={path} />
+          <Progress>{progress}</Progress>
         </LoadingComponent>
       </Modal.Body>
     </Modal>
@@ -26,11 +26,18 @@ const LoadingComponent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: 3px solid black;
+  padding: 15px;
 `;
 
 const LoadingImg = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
+  margin-bottom: 5px;
+`;
+
+const Progress = styled.div`
+  font-size: 18px;
 `;
 
 export default ModalComponent;

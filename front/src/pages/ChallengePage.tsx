@@ -23,10 +23,11 @@ const ChallengePage = () => {
   const [isVisible, setIsVisible] = useState(true); // 토글
   const [recording, setRecording] = useState(false); // 녹화 진행
   const initialTimer = parseInt(localStorage.getItem("timer") || "3");
-  const [timer, setTimer] = useState<number>(initialTimer);
+  const [timer, setTimer] = useState<number>(initialTimer); // 타이머
   const [timerPath, setTimerPath] = useState(
     `src/assets/challenge/${timer}sec.svg`
-  );
+  ); // 타이머 이미지 경로
+  const [loadPath, setLoadPath] = useState("src/assets/challenge/loading.gif"); // 로딩 이미지 경로
   const [ffmpegLog, setFfmpegLog] = useState("");
 
   const handleShowModal = () => {
@@ -65,6 +66,8 @@ const ChallengePage = () => {
   };
 
   const stopRecording = () => {
+    setLoadPath("src/assets/challenge/loading.gif");
+    setFfmpegLog("대기중...");
     cancelRecording();
     mediaRecorder?.stop(); // recorder.onstop() 실행
   };
@@ -81,9 +84,6 @@ const ChallengePage = () => {
       recorder.ondataavailable = (e) => chunks.push(e.data); // 스트림 조각이 어느 정도 커지면 push하기
 
       recorder.onstop = async () => {
-        //handleShowModal(); // 로딩창 띄우기
-        //setDownload(true);
-
         if (!ffmpeg.isLoaded()) {
           await ffmpeg.load(); // ffmpeg 로드
         }
@@ -96,7 +96,8 @@ const ChallengePage = () => {
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setFfmpegLog(`노래 추출 중 : ${Math.round(ratio * 100)}%\n`);
+            setLoadPath("src/assets/challenge/loading.gif");
+            setFfmpegLog(`노래 추출... ${Math.round(ratio * 100)}%\n`);
           }
         });
 
@@ -134,7 +135,8 @@ const ChallengePage = () => {
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setFfmpegLog(`노래 삽입 중 : ${Math.round(ratio * 100)}%\n`);
+            setLoadPath("src/assets/challenge/loading.gif");
+            setFfmpegLog(`노래 삽입... ${Math.round(ratio * 100)}%\n`);
           }
         });
 
@@ -157,7 +159,8 @@ const ChallengePage = () => {
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setFfmpegLog(`비디오 방향 전환 중 : ${Math.round(ratio * 100)}%\n`);
+            setLoadPath("src/assets/challenge/loading.gif");
+            setFfmpegLog(`거울모드로 저장... ${Math.round(ratio * 100)}%\n`);
           }
         });
 
@@ -189,40 +192,51 @@ const ChallengePage = () => {
 
   const makeDownloadURL = async (userVideoFinalBlob: Blob) => {
     try {
-      await s3Upload(URL.createObjectURL(userVideoFinalBlob), new Date());
-      setTimeout(handleCloseModal, 2000);
+      await s3Upload(userVideoFinalBlob);
+      setTimeout(handleCloseModal, 100000);
     } catch (error) {
       console.error("비디오 저장 중 오류 발생:", error);
     }
   };
 
-  const s3Upload = async (url: string, title: Date) => {
+  const s3Upload = async (blob: Blob) => {
     try {
-      const response = await axios.get(url, { responseType: "blob" });
-      const file = new File([response.data], `${title.toISOString()}.mp4`, {
-        type: "video/mp4",
-      });
+      const title = getCurrentDateTime();
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("fileName", "안녕");
+      formData.append("fileName", title.toISOString());
 
       const uploadResponse = await axios.post(
         "http://localhost:8080/s3/upload",
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTAwNjIyMiwiZXhwIjoxNzE1MDA4MDIyfQ.x1MaVyGOu5IBQyXAlod8OH50I07kmHL_IpSQfDnL8x0",
+              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTE1MTUxOCwiZXhwIjoxNzE1MTUzMzE4fQ.PGF6vM4wRzjA-fb2B5mxzdrBMns3dUMSc4d2wWU_aBU",
           },
         }
       );
+
+      setLoadPath("src/assets/challenge/complete.svg");
       setFfmpegLog("저장 완료");
       console.log("s3 upload success", uploadResponse.data);
     } catch (error) {
-      setFfmpegLog("저장 실패");
+      setLoadPath("src/assets/challenge/uncomplete.svg");
+      if (error instanceof Error && error.stack) setFfmpegLog(error.stack);
       console.error("s3 upload fail", error);
     }
+  };
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // 월은 0부터 시작하므로 1을 더합니다.
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+
+    return `${year}${month}${day}${hours}${minutes}${seconds}`;
   };
 
   // 타이머
@@ -471,11 +485,6 @@ const ChallengePage = () => {
 
 const VideoContainer = styled.video`
   position: relative;
-  display: flex;
-`;
-
-const UserVideoContainer = styled.video`
-  position: relative;
   display: none;
 
   @media screen and (min-width: 1024) {
@@ -485,6 +494,12 @@ const UserVideoContainer = styled.video`
   @media screen and (orientation: landscape) {
     display: flex;
   }
+`;
+
+const UserVideoContainer = styled.video`
+  position: relative;
+  display: flex;
+
   object-fit: cover;
   transform: scaleX(-1);
 `;

@@ -3,9 +3,8 @@ import { axios } from "../utils/axios";
 const REST_SHORTS_URL = "/s3/upload";
 const REST_SHORTS_LIST_URL = "/api/shorts";
 
-
 // S3 동영상 업로드
-export async function uploadShorts(file: string, fileName: string) {
+export async function uploadShorts(file: File, fileName: string) {
   try {
     const data = await axios.post(REST_SHORTS_URL, {
       file: file,
@@ -18,15 +17,13 @@ export async function uploadShorts(file: string, fileName: string) {
   }
 }
 
-
 export interface shorts {
-  shortsNo : number;
-  shortsUrl : string;
-  shortsTitle : string;
-  shortsDirector : string;
-  shortsTime : number;
-  shortsChallengers : number;
-  shortsLink : string;
+  shortsNo: number;
+  shortsUrl: string;
+  shortsTitle: string;
+  shortsDirector: string;
+  shortsTime: number;
+  shortsChallengers: number;
 }
 
 // 쇼츠 리스트 조회
@@ -37,4 +34,4 @@ export const getShortsList = async () => {
   } catch (error) {
     console.error(error);
   }
-}
+};
