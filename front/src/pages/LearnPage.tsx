@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import {
+  Close,
   LoopOutlined,
+  Menu,
   PlayArrow,
   SpeedOutlined,
-  ToggleOnOutlined,
   VideocamOutlined,
   VolumeUpOutlined,
 } from "@mui/icons-material";
@@ -145,6 +146,8 @@ const LearnPageTest = () => {
     };
   }, [handleTimeUpdate, setVideoDuration, videoRef]);
 
+  const [isMenuShow, setIsMenuShow] = useState<boolean>(true);
+
   return (
     <Container>
       <LeftSection ref={(el) => measuredRef(el)}>
@@ -161,7 +164,7 @@ const LearnPageTest = () => {
             height={cameraSize.height}
             src="src/assets/sample.mp4"
             ref={videoRef}
-            // controls
+            controls
           ></video>
         </VideoContainer>
         <VideoContainer>
@@ -173,12 +176,18 @@ const LearnPageTest = () => {
             autoPlay
           ></video>
           <IconButtonList>
-            <IconButton icon={<ToggleOnOutlined />} text="감추기" />
-            <IconButton icon={<VideocamOutlined />} text="챌린지모드" link="/challenge" />
-            <IconButton icon={<PlayArrow />} text="재생" />
-            <IconButton icon={<SpeedOutlined />} text="배속" />
-            <IconButton icon={<VolumeUpOutlined />} text="소리" />
-            <IconButton icon={<LoopOutlined />} text="반복" onClick={handleClickLoopButton} />
+            <IconButton
+              icon={isMenuShow ? <Close /> : <Menu />}
+              tooltip={isMenuShow ? "접기" : "펼치기"}
+              onClick={() => setIsMenuShow(!isMenuShow)}
+            />
+            <FoldIconButtonList $show={isMenuShow}>
+              <IconButton icon={<VideocamOutlined />} tooltip="챌린지모드" link="/challenge" />
+              <IconButton icon={<PlayArrow />} tooltip="재생" />
+              <IconButton icon={<SpeedOutlined />} tooltip="배속" />
+              <IconButton icon={<VolumeUpOutlined />} tooltip="소리" />
+              <IconButton icon={<LoopOutlined />} tooltip="반복" onClick={handleClickLoopButton} />
+            </FoldIconButtonList>
           </IconButtonList>
         </VideoContainer>
       </CenterSection>
@@ -186,6 +195,17 @@ const LearnPageTest = () => {
     </Container>
   );
 };
+
+const FoldIconButtonList = styled.div<{ $show: boolean }>`
+  position: relative;
+  height: ${(props) => (props.$show ? "250px" : "0px")};
+  overflow: hidden;
+  transition: height 0.5s;
+
+  & > a {
+    margin-bottom: 8px;
+  }
+`;
 
 const IconButtonList = styled.div`
   position: absolute;
