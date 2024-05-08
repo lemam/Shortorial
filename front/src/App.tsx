@@ -1,6 +1,6 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import MainPage from "./pages/MainPage";
-import LearnPage from "./pages/LearnPage";
+// import LearnPage from "./pages/LearnPage";
 import GlobalStyle from "./GlobalStyle";
 import ChallengePage from "./pages/ChallengePage";
 import ChallengeResultPage from "./pages/ChallengeResultPage";
@@ -9,6 +9,7 @@ import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 // import VideoResizePage from "./pages/VideoResizePage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import LearnPageTmp from "./pages/LearnPageTmp";
+import LearnPageTest from "./pages/LearnPageTest";
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="/learn" element={<LearnPage />} />
+          <Route path="/learn" element={<LearnPageTest />} />
           <Route path="/learn2" element={<LearnPageTmp />} />
           <Route path="/challenge" element={<ChallengePage />} />
           <Route path="/challenge/result" element={<ChallengeResultPage />} />
