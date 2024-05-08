@@ -9,6 +9,7 @@ import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 import VideoResizePage from "./pages/VideoResizePage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import LearnPageTmp from "./pages/LearnPageTmp";
+import MyPage from "./pages/MyPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/video-trim" element={<VideoTrimPage />} />
           <Route path="/video-marker" element={<VideoMarkerPage />} />
           <Route path="/video-resize" element={<VideoResizePage />} />
+          <Route path="/mypage" element={<MyPage/>}/>
         </Routes>
       </BrowserRouter>
     </>
