@@ -6,9 +6,9 @@ import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import LoadingModalComponent from "../components/modal/LoadingModalComponent";
 import VideoButton from "../components/button/VideoButton";
 import axios from "axios";
-import { predictWebcam } from "../modules/Motion";
+import { btnPlace, predictWebcam, setBtnInfo } from "../modules/Motion";
 import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
-import { useBtnStore } from "../store/useMotionStore";
+import { useBtnStore, useDomStore } from "../store/useMotionStore";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -338,10 +338,10 @@ const ChallengePage = () => {
   useEffect(() => {
     switch (btn) {
       case "visible":
-        // console.log("A");
         showVideoButtonContainer();
         break;
       case "timer":
+        console.log("timer");
         if (isVisible) changeTimer();
         break;
       case "record":
@@ -360,91 +360,109 @@ const ChallengePage = () => {
           goToLearnMode();
         }
         break;
+      case "rslt":
+        if (isVisible) {
+          goToResult();
+        }
     }
     setBtn("none");
   }, [btn]);
 
+  useEffect(() => {
+    setBtnInfo();
+  }, []);
+
   return (
-    <ChallengeContainer>
-      <VideoContainer
-        ref={danceVideoRef}
-        src={danceVideo}
-        playsInline
-        controls
-        onEnded={handleShowModal}
-      ></VideoContainer>
-      <div style={{ position: "relative" }}>
-        <UserVideoContainer
-          ref={userVideoRef}
-          autoPlay
+    <div>
+      <ChallengeContainer>
+        <VideoContainer
+          ref={danceVideoRef}
+          src={danceVideo}
           playsInline
-        ></UserVideoContainer>
-        {/* <canvas
+          controls
+          onEnded={handleShowModal}
+        ></VideoContainer>
+        <div id="dom" style={{ position: "relative" }}>
+          <UserVideoContainer
+            ref={userVideoRef}
+            autoPlay
+            playsInline
+          ></UserVideoContainer>
+          {/* <canvas
           id="output_canvas"
           width={500}
           height={700}
           style={{ objectFit: "cover" }}
         ></canvas> */}
-        <VideoToggleContainer>
-          <VideoButton
-            path="src/assets/challenge/open.svg"
-            text="감추기"
-            onClick={showVideoButtonContainer}
-            isVisible={isVisible}
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/close.svg"
-            text="보기"
-            onClick={showVideoButtonContainer}
-            isVisible={!isVisible}
-          ></VideoButton>
-        </VideoToggleContainer>
-        <Timer>{timer}</Timer>
-        <VideoButtonContainer>
-          <VideoButton
-            path={timerPath}
-            text="타이머"
-            isVisible={isVisible}
-            onClick={changeTimer}
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/stop.svg"
-            text="취소"
-            onClick={cancelRecording}
-            isVisible={isVisible && recording} // isVisible, recording 일 때 보임
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/record.svg"
-            text="녹화"
-            onClick={showCancleButton}
-            isVisible={isVisible && !recording} // isVisible, not recording 일 때 보임
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/save.svg"
-            text="저장"
-            isVisible={isVisible}
-            onClick={handleShowModal}
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/learn.svg"
-            text="연습모드"
-            onClick={goToLearnMode}
-            isVisible={isVisible}
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/mine.svg"
-            text="나의 챌린지"
-            onClick={goToResult}
-            isVisible={isVisible}
-          ></VideoButton>
-        </VideoButtonContainer>
-      </div>
-      <LoadingModalComponent
-        progress={ffmpegLog}
-        showModal={show}
-        handleCloseModal={handleCloseModal}
-      ></LoadingModalComponent>
-    </ChallengeContainer>
+          <VideoToggleContainer>
+            <VideoButton
+              path="src/assets/challenge/open.svg"
+              id="visible"
+              text="감추기"
+              onClick={showVideoButtonContainer}
+              isVisible={isVisible}
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/close.svg"
+              id="visible"
+              text="보기"
+              onClick={showVideoButtonContainer}
+              isVisible={!isVisible}
+            ></VideoButton>
+          </VideoToggleContainer>
+          <Timer>{timer}</Timer>
+          <VideoButtonContainer>
+            <VideoButton
+              path={timerPath}
+              id="timer"
+              text="타이머"
+              isVisible={isVisible}
+              onClick={changeTimer}
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/stop.svg"
+              id="timer"
+              text="취소"
+              onClick={cancelRecording}
+              isVisible={isVisible && recording} // isVisible, recording 일 때 보임
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/record.svg"
+              id="record"
+              text="녹화"
+              onClick={showCancleButton}
+              isVisible={isVisible && !recording} // isVisible, not recording 일 때 보임
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/save.svg"
+              id="save"
+              text="저장"
+              isVisible={isVisible}
+              onClick={handleShowModal}
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/learn.svg"
+              id="mode"
+              text="연습모드"
+              onClick={goToLearnMode}
+              isVisible={isVisible}
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/mine.svg"
+              id="rslt"
+              text="나의 챌린지"
+              onClick={goToResult}
+              isVisible={isVisible}
+            ></VideoButton>
+          </VideoButtonContainer>
+        </div>
+        <LoadingModalComponent
+          progress={ffmpegLog}
+          showModal={show}
+          handleCloseModal={handleCloseModal}
+        ></LoadingModalComponent>
+      </ChallengeContainer>
+    </div>
   );
 };
 

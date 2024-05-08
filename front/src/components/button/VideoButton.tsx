@@ -1,15 +1,22 @@
 import styled from "styled-components";
 
 interface VideoButtonType {
+  id: string;
   path: string;
   onClick?: () => void;
   text: string;
   isVisible: boolean;
 }
 
-const VideoButton = ({ path, onClick, text, isVisible }: VideoButtonType) => {
+const VideoButton = ({
+  id,
+  path,
+  onClick,
+  text,
+  isVisible,
+}: VideoButtonType) => {
   return (
-    <ButtonContainer isVisible={isVisible}>
+    <ButtonContainer id={id} isVisible={isVisible}>
       <Button src={path} onClick={onClick}></Button>
       <ButtonText>{text}</ButtonText>
     </ButtonContainer>

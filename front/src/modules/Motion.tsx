@@ -4,6 +4,8 @@ import {
   DrawingUtils,
   FilesetResolver,
 } from "@mediapipe/tasks-vision";
+import { useDomStore } from "../store/useMotionStore";
+// import { useDomStore } from "../store/useMotionStore";
 
 // 버튼 모션에 활용되는 함수
 let visible_count = 0;
@@ -11,6 +13,15 @@ let timer_count = 0;
 let record_count = 0;
 let save_count = 0;
 let mode_count = 0;
+let rslt_count = 0;
+
+let domSize: DOMRect | null = null;
+let visibleBtnSize: DOMRect | null = null;
+let timerBtnSize: DOMRect | null = null;
+let recorderBtnSize: DOMRect | null = null;
+let saveBtnSize: DOMRect | null = null;
+let modeBtnSize: DOMRect | null = null;
+let rsltBtnSize: DOMRect | null = null;
 
 // 좌우 모션 인식에 활용되는 변수
 let left_count = 0;
@@ -19,14 +30,25 @@ let poseLandmarker: PoseLandmarker | null = null;
 const MAX_COUNT: number = 10;
 const TIMER_COUNT: number = 15;
 const RECORD_COUNT: number = 30;
-// 우측 상단에 접근하면 우측상단! 반환
+
 export function btn_with_landmark(
   handLandmarker: NormalizedLandmark,
   setBtn: (newBtn: String) => void
 ) {
-  if (handLandmarker.x < 0.2 && handLandmarker.visibility > 0.5) {
-    if (handLandmarker.y < 0.15) {
-      console.log("A");
+  handLandmarker.x = makeAbsoluteLandmarkX(handLandmarker.x);
+  handLandmarker.y = makeAbsoluteLandmarkY(handLandmarker.y);
+
+  console.log(handLandmarker.y);
+  if (
+    visibleBtnSize &&
+    handLandmarker.x <= visibleBtnSize.right &&
+    handLandmarker.x >= visibleBtnSize.left &&
+    handLandmarker.visibility > 0.5
+  ) {
+    if (
+      handLandmarker.y >= visibleBtnSize.top &&
+      handLandmarker.y <= visibleBtnSize.bottom
+    ) {
       if (visible_count >= MAX_COUNT) {
         setBtn("visible");
         visible_count = 0;
@@ -34,33 +56,58 @@ export function btn_with_landmark(
       } else {
         visible_count++;
       }
-    } else if (handLandmarker.y > 0.17 && handLandmarker.y < 0.3) {
+    } else if (
+      timerBtnSize &&
+      handLandmarker.y >= timerBtnSize.top &&
+      handLandmarker.y <= timerBtnSize.bottom
+    ) {
       if (timer_count >= TIMER_COUNT) {
         setBtn("timer");
         timer_count = 0;
       } else {
         timer_count++;
       }
-    } else if (handLandmarker.y > 0.32 && handLandmarker.y < 0.45) {
+    } else if (
+      recorderBtnSize &&
+      handLandmarker.y >= recorderBtnSize.top &&
+      handLandmarker.y <= recorderBtnSize.bottom
+    ) {
       if (record_count >= RECORD_COUNT) {
-        console.log("re");
         setBtn("record");
         record_count = 0;
       } else {
         record_count++;
       }
-    } else if (handLandmarker.y > 0.47 && handLandmarker.y < 0.6) {
+    } else if (
+      saveBtnSize &&
+      handLandmarker.y >= saveBtnSize.top &&
+      handLandmarker.y <= saveBtnSize.bottom
+    ) {
       if (save_count >= RECORD_COUNT) {
         console.log("save");
         setBtn("save");
         save_count = 0;
       } else save_count++;
-    } else if (handLandmarker.y > 0.62 && handLandmarker.y < 0.75) {
+    } else if (
+      modeBtnSize &&
+      handLandmarker.y >= modeBtnSize.top &&
+      handLandmarker.y <= modeBtnSize.bottom
+    ) {
       if (mode_count >= RECORD_COUNT) {
         console.log("mode");
         setBtn("mode");
         mode_count = 0;
       } else mode_count++;
+    } else if (
+      rsltBtnSize &&
+      handLandmarker.y >= rsltBtnSize.top &&
+      handLandmarker.y <= rsltBtnSize.bottom
+    ) {
+      if (rslt_count == MAX_COUNT) {
+        console.log("rslt");
+        setBtn("rslt");
+        rslt_count = 0;
+      } else rslt_count++;
     }
   }
 }
@@ -199,4 +246,51 @@ export async function predictWebcam(
   //   }
   //   webcam.style.display = "none";
   // }
+}
+
+function makeAbsoluteLandmarkX(relativeX: number): number {
+  // 상대적인 위치를 픽셀 단위로 변환
+  if (domSize) {
+    // console.log(domSize.left + (1 - relativeX) * domSize?.width);
+    // console.log("A " + visibleBtnSize?.right);
+    return domSize.left + (1 - relativeX) * domSize?.width;
+  }
+  return -1;
+}
+
+function makeAbsoluteLandmarkY(relativeY: number): number {
+  // 상대적인 위치를 픽셀 단위로 변환
+  if (domSize) return relativeY * domSize?.height;
+  return -1;
+}
+
+export function btnPlace(id: string): DOMRect | undefined {
+  const btnElement = document.getElementById(id);
+  const btnRect = btnElement?.getBoundingClientRect();
+  console.log(`${id} 요소:`, btnRect);
+  return btnRect;
+}
+
+export function setBtnInfo() {
+  const dom = btnPlace("dom");
+  const visibleBtn = btnPlace("visible");
+  const timerBtn = btnPlace("timer");
+  const recordBtn = btnPlace("record");
+  const saveBtn = btnPlace("save");
+  const rsltBtn = btnPlace("rslt");
+
+  if (dom) useDomStore.getState().setDomSize(dom);
+  if (visibleBtn) useDomStore.getState().setVisibleBtnSize(visibleBtn);
+  if (timerBtn) useDomStore.getState().setTimeBtnSize(timerBtn);
+  if (recordBtn) useDomStore.getState().setRecordBtnSize(recordBtn);
+  if (saveBtn) useDomStore.getState().setSaveBtnSize(saveBtn);
+  if (rsltBtn) useDomStore.getState().setRsltBtnSize(rsltBtn);
+
+  domSize = useDomStore.getState().domSize;
+  visibleBtnSize = useDomStore.getState().visibleBtnSize;
+  timerBtnSize = useDomStore.getState().timerBtnSize;
+  recorderBtnSize = useDomStore.getState().recordBtnSize;
+  saveBtnSize = useDomStore.getState().saveBtnSize;
+  modeBtnSize = useDomStore.getState().modeBtnSize;
+  rsltBtnSize = useDomStore.getState().rsltBtnSize;
 }
