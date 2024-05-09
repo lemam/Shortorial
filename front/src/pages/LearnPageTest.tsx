@@ -162,22 +162,39 @@ const LearnPageTest = () => {
           ></video>
           <VideoMotionButtonList>
             {state === "PAUSE" ? (
-              <VideoMotionButton icon={<PlayArrow />} onClick={changeStateReady} />
+              <VideoMotionButton icon={<PlayArrow />} toolTip="재생" onClick={changeStateReady} />
             ) : (
-              <VideoMotionButton icon={<Pause />} onClick={changeStatePause} />
+              <VideoMotionButton icon={<Pause />} toolTip="일시정지" onClick={changeStatePause} />
             )}
             <div className="foldList">
-              <VideoMotionButton icon={<Videocam />} link="/challenge" />
+              <VideoMotionButton
+                icon={<Videocam />}
+                toolTip="챌린지 모드로 이동"
+                link="/challenge"
+              />
               {isLooping ? (
-                <VideoMotionButton icon={<Repeat />} onClick={() => setISLooping(!isLooping)} />
+                <VideoMotionButton
+                  icon={<Repeat />}
+                  toolTip="구간 반복 해제"
+                  onClick={() => setISLooping(!isLooping)}
+                />
               ) : (
                 <VideoMotionButton
                   imgSrc="src/assets/icon/repeat-off.svg"
+                  toolTip="구간 반복"
                   onClick={() => setISLooping(!isLooping)}
                 />
               )}
-              <VideoMotionButton icon={<Flip />} onClick={() => setIsFlipped(!isFlipped)} />
-              <VideoMotionButton text={`${currPlaySpeed}x`} onClick={handlePlaySpeedButtonClick} />
+              <VideoMotionButton
+                icon={<Flip />}
+                toolTip="거울 모드"
+                onClick={() => setIsFlipped(!isFlipped)}
+              />
+              <VideoMotionButton
+                text={`${currPlaySpeed}x`}
+                toolTip="재생 속도"
+                onClick={handlePlaySpeedButtonClick}
+              />
             </div>
           </VideoMotionButtonList>
         </VideoContainer>
