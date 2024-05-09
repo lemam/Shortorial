@@ -41,6 +41,19 @@ public class MemberService {
     private final BCryptPasswordEncoder passwordEncoder;
 
 
+    public boolean checkDup(String category, String input) {
+        //category로 id, nickname의 값이 넘어오면 해당하는 중복검사 실행
+        //true = 해당하는 값이 이미 있음
+        boolean check = switch (category){
+            case "id"->memberRepository.existsByMemberId(input);
+
+            case "nickname" -> memberRepository.existsByMemberNickname(input);
+
+            default -> throw new IllegalStateException("올바른 category가 아닙니다. ");
+        };
+        return check;
+    }
+
     public void join(JoinDto dto) {
         memberRepository.save(Member.builder()
                 .memberId(dto.getMemberId())
