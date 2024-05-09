@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import VideoMotionButton from "../components/button/VideoMotionButton";
+import { VideoSection } from "../constants/types";
+import SectionButtonList from "../components/ButtonList/SectionButtonList";
 
 const LearnPageTest = () => {
   type LearnState = "PAUSE" | "READY" | "PLAY";
@@ -12,6 +14,8 @@ const LearnPageTest = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const video = videoRef.current;
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [leftSectionWidth, setLeftSectionWidth] = useState<number>(0);
 
   const [state, setState] = useState<LearnState>("PAUSE");
   const [cameraSize, setCameraSize] = useState({
@@ -24,6 +28,9 @@ const LearnPageTest = () => {
   const [playSpeedIdx, setPlaySpeedIdx] = useState<number>(0);
   const currPlaySpeed = PLAY_SPEEDS[playSpeedIdx];
   const [isLooping, setISLooping] = useState<boolean>(false);
+
+  const [sectionList, setSectionList] = useState<VideoSection[]>([]);
+  const [currentTime, setCurrentTime] = useState<number>(0);
 
   // 카메라 설정 초기화
   const initCamera = useCallback(() => {
@@ -67,6 +74,15 @@ const LearnPageTest = () => {
     setCameraSize({ width, height });
   };
 
+  // LeftSection 요소의 너비 저장
+  const measuredRef = useCallback((node: HTMLElement | null) => {
+    if (node) {
+      setLeftSectionWidth(node.getBoundingClientRect().width);
+    } else {
+      setLeftSectionWidth(0);
+    }
+  }, []);
+
   // 타이머 초기화
   const initInterval = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -108,6 +124,34 @@ const LearnPageTest = () => {
     setState("PLAY");
   }, [currPlaySpeed, video]);
 
+  // 동영상 구간 리스트 반환
+  const getSectionList = () => {
+    // 동영상을 3초마다 구간으로 나눈다.
+    // TODO: API로 받을 값 (동영상 전체 길이)
+    const videoLength = 17;
+    const secondsPerSection = 3;
+    const numberOfSections = videoLength / secondsPerSection;
+    const result: VideoSection[] = [];
+
+    for (let i = 0; i < numberOfSections; i++) {
+      result.push({
+        id: i,
+        start: i * secondsPerSection,
+        end: (i + 1) * secondsPerSection,
+      });
+    }
+
+    return result;
+  };
+
+  // 비디오 시간 time초로 이동
+  const moveVideoTime = (time: number) => {
+    if (video) {
+      video.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
   // 카메라 초기화
   useEffect(() => {
     initCamera();
@@ -131,16 +175,34 @@ const LearnPageTest = () => {
 
   // 동영상 감시
   useEffect(() => {
-    if (video) video.addEventListener("ended", changeStatePause);
+    if (video) {
+      video.addEventListener("ended", changeStatePause);
+      video.addEventListener("timeupdate", () => setCurrentTime(video.currentTime));
+    }
 
     return () => {
-      if (video) video.removeEventListener("ended", changeStatePause);
+      if (video) {
+        video.removeEventListener("ended", changeStatePause);
+        video.removeEventListener("timeupdate", () => setCurrentTime(video.currentTime));
+      }
     };
   }, [changeStatePause, video]);
 
+  // 동영상 구간 리스트 가져오기
+  useEffect(() => {
+    setSectionList(getSectionList());
+  }, []);
+
   return (
     <Container>
-      <LeftSection></LeftSection>
+      <LeftSection ref={(el) => measuredRef(el)}>
+        <SectionButtonList
+          sectionList={sectionList}
+          parentWidth={leftSectionWidth}
+          currentTime={currentTime}
+          clickHandler={(section) => moveVideoTime(section.start)}
+        />
+      </LeftSection>
       <CenterSection>
         <VideoContainer>
           <video
