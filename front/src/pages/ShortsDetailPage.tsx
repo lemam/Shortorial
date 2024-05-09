@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import ModalComponent from "../components/modal/ModalComponent";
 
-const VideoTrimPage = () => {
+const ShortsDetailPage = () => {
   const navigate = useNavigate();
   const handleShowModal = (id: number) => setClickId(id);
   const handleCloseModal = () => setClickId(-1);
@@ -64,7 +64,7 @@ const VideoTrimPage = () => {
   );
 };
 
-export default VideoTrimPage;
+export default ShortsDetailPage;
 
 // Component 로 나중에 빼자
 const Header = styled.header`
