@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import IconButton from "../components/button/IconButton";
-import { Pause, PlayArrow } from "@mui/icons-material";
+import { Flip, Pause, PlayArrow, Speed, Videocam } from "@mui/icons-material";
 
 const LearnPageTest = () => {
   type LearnState = "PAUSE" | "READY" | "PLAY";
+  const READY_TIMER = 3;
+  const PLAY_SPEEDS = [1, 0.75, 0.5];
 
   const cameraRef = useRef<HTMLVideoElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -17,8 +19,10 @@ const LearnPageTest = () => {
     height: 0,
   });
 
-  const [timer] = useState(3);
-  const [currTimer, setCurrTimer] = useState(timer);
+  const [currTimer, setCurrTimer] = useState<number>(READY_TIMER);
+  const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const [playSpeedIdx, setPlaySpeedIdx] = useState<number>(0);
+  const currPlaySpeed = PLAY_SPEEDS[playSpeedIdx];
 
   // 카메라 설정 초기화
   const initCamera = useCallback(() => {
@@ -66,8 +70,8 @@ const LearnPageTest = () => {
   const initInterval = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = null;
-    setCurrTimer(timer);
-  }, [timer]);
+    setCurrTimer(READY_TIMER);
+  }, [READY_TIMER]);
 
   // PAUSE 상태로 변경
   const changeStatePause = useCallback(() => {
@@ -76,7 +80,6 @@ const LearnPageTest = () => {
     if (video) {
       initInterval();
       video.pause();
-      video.currentTime = 0;
     }
     setState("PAUSE");
   }, [initInterval, video]);
@@ -88,12 +91,21 @@ const LearnPageTest = () => {
     setState("READY");
   };
 
+  // 동영상 재생 속도 버튼 클릭 이벤트 리스너
+  const handlePlaySpeedButtonClick = () => {
+    const nextIdx = (playSpeedIdx + 1) % PLAY_SPEEDS.length;
+    setPlaySpeedIdx(nextIdx);
+  };
+
   // PLAY 상태로 변경
   const changeStatePlay = useCallback(() => {
     // 동영상 재생
-    if (video) video.play();
+    if (video) {
+      video.playbackRate = currPlaySpeed;
+      video.play();
+    }
     setState("PLAY");
-  }, [video]);
+  }, [currPlaySpeed, video]);
 
   // 카메라 초기화
   useEffect(() => {
@@ -136,6 +148,7 @@ const LearnPageTest = () => {
             height={cameraSize.height}
             src="src/assets/sample.mp4"
             ref={videoRef}
+            className={isFlipped ? "flip" : ""}
             controls
           ></video>
         </VideoContainer>
@@ -144,7 +157,7 @@ const LearnPageTest = () => {
             width={cameraSize.width}
             height={cameraSize.height}
             ref={cameraRef}
-            className="camera"
+            className="camera flip"
             autoPlay
           ></video>
           <div>
@@ -154,6 +167,14 @@ const LearnPageTest = () => {
               ) : (
                 <IconButton icon={<Pause />} text="일시정지" onClick={changeStatePause} />
               )}
+              <IconButton icon={<Videocam />} text="챌린지 모드로 이동" link="/challenge" />
+              <IconButton
+                icon={<Flip />}
+                text="거울 모드"
+                onClick={() => setIsFlipped(!isFlipped)}
+              />
+              <IconButton icon={<Speed />} text="재생 속도" onClick={handlePlaySpeedButtonClick} />
+              <div style={{ color: "#fff" }}>{PLAY_SPEEDS[playSpeedIdx]}</div>
             </div>
           </div>
         </VideoContainer>
@@ -217,6 +238,10 @@ const VideoContainer = styled.div`
 
   video {
     object-fit: cover;
+  }
+
+  video.flip {
+    transform: scaleX(-1);
   }
 
   @media screen and (max-width: 479px) {
