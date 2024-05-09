@@ -27,6 +27,24 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtTokenUtil jwtTokenUtil;
 
+    @Operation(summary = "카테고리 별 중복 검사.아이디, 닉네임, 이메일")
+    @GetMapping("/check/{category}/{input}")
+    public ResponseEntity<Map<String, Object>> dupCheck(@PathVariable String category,@PathVariable String input){
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status = HttpStatus.OK;
+        try{
+            boolean dupCheck = memberService.checkDup(category,input);
+            resultMap.put("dupCheck", dupCheck);
+        }catch(Exception e){
+            log.info(e.getMessage());
+            resultMap.put("message", e.getMessage());
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(resultMap);
+    }
+
+
+
     @Operation(summary = "일반 로그인")
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> originLogin(@RequestBody OriginLoginRequestDto originLoginRequestDto) {
