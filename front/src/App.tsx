@@ -10,6 +10,7 @@ import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import LearnPageTmp from "./pages/LearnPageTmp";
 import MyPage from "./pages/MyPage";
+import ShortsDetailPage from "./pages/ShortsDetailPage";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
             path="/mypage"
             element={<MyPage />}
           />
+          <Route path="/shorts/:shortsNo" element={<ShortsDetailPage />} />
         </Routes>
       </BrowserRouter>
     </>
