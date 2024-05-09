@@ -1,95 +1,151 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-// import { uploadShorts } from "../apis/shorts";
-// import useChallengeStore from "../store/useChallengeStore";
 import styled from "styled-components";
-// import axios from "axios";
+import axios from "axios";
+import fs from "fs";
+import readline from "readline";
+import { google } from "googleapis";
+import { Check, Create, Download } from "@mui/icons-material";
+import { relative } from "path";
 
 const ChallengeResultPage = () => {
-  // const [uploadURL, setuploadURL] = useState<string>("");
-  // const { downloadURL } = useChallengeStore();
-  // console.log(downloadURL);
-
-  const [title, setTitle] = useState<string>("");
+  const [title, setTitle] = useState<string>("minji");
+  const [modify, setModify] = useState<boolean>(false);
+  const [download, setDownload] = useState<boolean>(false);
 
   const saveTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
   };
 
-  // const s3Upload = (url: string, title: string) => {
-  //   axios.get(url, { responseType: "blob" }).then((response) => {
-  //     const file = new File([response.data], `${title}.mp4`, {
-  //       type: "video/mp4",
-  //     }); // url 파일 변환
-  //     const formData = new FormData();
-  //     formData.append("file", file); // 파일 매개변수
-  //     formData.append("fileName", title); // 파일 이름 매개변수
+  const titleCanbeModified = () => setModify(true);
+  const titleCanNotbeModified = () => setModify(false);
+  const startDownload = () => setDownload(true);
+  const completeDownload = () => setDownload(false);
 
-  //     axios
-  //       .post("http://localhost:8080/s3/upload", formData, {
-  //         // formData 보내기
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //           Authorization:
-  //             "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNDcyMjU2MywiZXhwIjoxNzE0NzI0MzYzfQ.4lVoZsp98z0ZYwnMPVuuXFSxY6pfoHmAOuE61Oj8syg",
-  //         },
-  //       })
-  //       .then((response) => console.log("s3 upload success", response.data))
-  //       .catch((error) => console.error("s3 upload fail", error));
-  //   });
-  // };
+  const downloadVideo = () => {
+    startDownload();
+
+    axios
+      .get("http://localhost:8080/s3/download/file/minji", {
+        responseType: "blob",
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTI0Mzk5MCwiZXhwIjoxNzE1MjQ1NzkwfQ.S0BMRsugGqsEIu0mPNWCa68AF2rgUwubPFxQJjuUr-w",
+        },
+      })
+      .then((res) => {
+        const videoBlob = new Blob([res.data], { type: "video/mp4" }); // 비디오를 blob으로 변경
+        const downloadUrl = URL.createObjectURL(videoBlob); // blob url 생성
+
+        const downloadLink = document.createElement("a"); // 임시 a 태그 생성
+        downloadLink.href = downloadUrl; // href 링크 지정
+        downloadLink.setAttribute("download", `${title}.mp4`);
+        document.body.appendChild(downloadLink);
+        downloadLink.click(); // a 태그 클릭
+
+        document.body.removeChild(downloadLink); // 임시 a 태그 제거
+        URL.revokeObjectURL(downloadUrl);
+
+        completeDownload();
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <ResultContainer>
-      {/* <VideoContainer autoPlay playsInline loop src={downloadURL}></VideoContainer> */}
-      <ControlBoxContainer>
-        <ControlBox>
-          <div>촬영이 완료되었습니다.</div>
-          <input
+      <VideoContainer>
+        <Video
+          crossOrigin="anonymous"
+          src="https://ssafy2024-dance.s3.ap-northeast-2.amazonaws.com/string/minji"
+          controls
+        ></Video>
+        {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
+        {download && <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>}
+      </VideoContainer>
+      {!modify && (
+        <TitleContainer>
+          <Title>{title}</Title>
+          <ModifyIcon onClick={titleCanbeModified}></ModifyIcon>
+        </TitleContainer>
+      )}
+      {modify && (
+        <TitleContainer>
+          <InputBox
             type="text"
             value={title}
             onChange={saveTitle}
             placeholder="제목을 입력하세요."
-          ></input>
-          {/* <a href={downloadURL} download={title}>
-            로컬저장
-          </a> */}
-          {/* <button onClick={() => s3Upload(downloadURL, title)}>s3저장</button> */}
-          <div>
-            <Link to={"/challenge"}>다시 촬영하기 |</Link>
-            <Link to={"/"}> 쇼츠 목록보기</Link>
-            <Link to={"/video-trim"}> | 영상 자르기</Link>
-          </div>
-        </ControlBox>
-      </ControlBoxContainer>
+          />
+          <CheckIcon onClick={titleCanNotbeModified}></CheckIcon>
+        </TitleContainer>
+      )}
     </ResultContainer>
   );
 };
 
 const ResultContainer = styled.div`
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  width: 360px;
 `;
 
-// const VideoContainer = styled.video`
-//   height: 100vh;
-//   aspect-ratio: 9 / 16;
-//   object-fit: cover;
-//   padding: 30px;
-//   box-sizing: border-box;
-//   //transform: scaleX(-1);
-// `;
-
-const ControlBoxContainer = styled.div`
+const VideoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  position: relative;
 `;
 
-const ControlBox = styled.div`
-  height: 300px;
-  width: 300px;
-  border: 1px solid black;
+const Video = styled.video`
+  width: 360px;
+  height: 640px;
+  object-fit: cover;
+`;
+
+const DownloadIcon = styled(Download)`
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+`;
+
+const DownloadingIcon = styled.img`
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  position: relative;
+`;
+
+const Title = styled.div`
+  font-size: 20px;
+`;
+
+const ModifyIcon = styled(Create)`
+  position: absolute;
+  cursor: pointer;
+  right: 0;
+`;
+
+const InputBox = styled.input`
+  width: 360px;
+  border: 0;
+  border-radius: 15px;
+  outline: none;
+  padding-left: 10px;
+  background-color: rgb(233, 233, 233);
+  font-size: 20px;
+`;
+
+const CheckIcon = styled(Check)`
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
 `;
 
 export default ChallengeResultPage;
