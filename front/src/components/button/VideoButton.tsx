@@ -16,8 +16,8 @@ const VideoButton = ({
   isVisible,
 }: VideoButtonType) => {
   return (
-    <ButtonContainer id={id} isVisible={isVisible}>
-      <Button src={path} onClick={onClick}></Button>
+    <ButtonContainer isVisible={isVisible}>
+      <Button id={id} src={path} onClick={onClick}></Button>
       <ButtonText>{text}</ButtonText>
     </ButtonContainer>
   );

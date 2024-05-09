@@ -27,8 +27,8 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
     // 비디오 재생 상태를 감시하는 이벤트 리스너 추가
     const handlePlay = () => {
       videoRunning = true;
-      if (canvasElement) canvasElement.style.display = "block";
-      if (canvasElementTest) canvasElementTest.style.display = "none";
+      // if (canvasElement) canvasElement.style.display = "block";
+      // if (canvasElementTest) canvasElementTest.style.display = "none";
       predictVideo();
     };
 
@@ -62,38 +62,39 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
     createPoseLandmarker();
 
     const video = document.getElementById("video") as HTMLVideoElement | null;
-    const canvasElement = document.getElementById(
-      "video_canvas"
-    ) as HTMLCanvasElement | null;
-    let canvasCtx: CanvasRenderingContext2D | null = null;
-    let drawingUtils: DrawingUtils | null = null;
+    // const canvasElement = document.getElementById(
+    //   "video_canvas"
+    // ) as HTMLCanvasElement | null;
+    // let canvasCtx: CanvasRenderingContext2D | null = null;
+    // let drawingUtils: DrawingUtils | null = null;
 
-    if (canvasElement) canvasCtx = canvasElement.getContext("2d");
-    if (canvasCtx) drawingUtils = new DrawingUtils(canvasCtx);
+    // if (canvasElement) canvasCtx = canvasElement.getContext("2d");
+    // if (canvasCtx) drawingUtils = new DrawingUtils(canvasCtx);
 
-    let canvasElementTest = document.getElementById(
-      "test_canvas"
-    ) as HTMLCanvasElement | null;
-    let canvasCtxTest: CanvasRenderingContext2D | null = null;
-    let drawingUtilsTest: DrawingUtils | null = null;
+    // let canvasElementTest = document.getElementById(
+    //   "test_canvas"
+    // ) as HTMLCanvasElement | null;
+    // let canvasCtxTest: CanvasRenderingContext2D | null = null;
+    // let drawingUtilsTest: DrawingUtils | null = null;
 
-    if (canvasElementTest) canvasCtxTest = canvasElementTest.getContext("2d");
-    if (canvasCtxTest) drawingUtilsTest = new DrawingUtils(canvasCtxTest);
+    // if (canvasElementTest) canvasCtxTest = canvasElementTest.getContext("2d");
+    // if (canvasCtxTest) drawingUtilsTest = new DrawingUtils(canvasCtxTest);
 
     let lastVideoTime = -1;
     async function predictVideo() {
-      if (!canvasElement || !video || !poseLandmarker) return null;
+      // if (!canvasElement) return null;
+      if (!video || !poseLandmarker) return null;
 
       let startTimeMs = performance.now();
       if (lastVideoTime !== video.currentTime) {
         lastVideoTime = video.currentTime;
         poseLandmarker.detectForVideo(video, startTimeMs, (result) => {
-          if (!canvasCtx || !drawingUtils) return null;
-          if (!canvasCtxTest || !drawingUtilsTest || !canvasElementTest)
-            return null;
+          // if (!canvasCtx || !drawingUtils) return null;
+          // if (!canvasCtxTest || !drawingUtilsTest || !canvasElementTest)
+          //   return null;
 
-          canvasCtx.save();
-          canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+          // canvasCtx.save();
+          // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
           for (const landmark of result.landmarks) {
             if (cnt == 0) {
@@ -108,42 +109,40 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
               }
             }
             if (cnt === MAX_COUNT && sumLandmark) {
-              canvasCtxTest.clearRect(
-                0,
-                0,
-                canvasElementTest.width,
-                canvasElementTest.height
-              );
-              for (const landmark of sumLandmark) {
-                landmark.x /= cnt + 1; // 랜드마크의 개수로 나누어 평균을 계산
-                landmark.y /= cnt + 1;
-                landmark.z /= cnt + 1;
-              }
-
+              // canvasCtxTest.clearRect(
+              //   0,
+              //   0,
+              //   canvasElementTest.width,
+              //   canvasElementTest.height
+              // );
+              // for (const landmark of sumLandmark) {
+              //   landmark.x /= cnt + 1; // 랜드마크의 개수로 나누어 평균을 계산
+              //   landmark.y /= cnt + 1;
+              //   landmark.z /= cnt + 1;
+              // }
               // getLandmark(sumLandmark);
-
-              drawingUtilsTest.drawLandmarks(sumLandmark, {
-                radius: (data: any) =>
-                  DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
-              });
-              drawingUtilsTest.drawConnectors(
-                sumLandmark,
-                PoseLandmarker.POSE_CONNECTIONS
-              );
-              canvasCtxTest.restore();
+              // drawingUtilsTest.drawLandmarks(sumLandmark, {
+              //   radius: (data: any) =>
+              //     DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
+              // });
+              // drawingUtilsTest.drawConnectors(
+              //   sumLandmark,
+              //   PoseLandmarker.POSE_CONNECTIONS
+              // );
+              // canvasCtxTest.restore();
             }
             getLandmark(landmark);
 
-            drawingUtils.drawLandmarks(landmark, {
-              radius: (data: any) =>
-                DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
-            });
-            drawingUtils.drawConnectors(
-              landmark,
-              PoseLandmarker.POSE_CONNECTIONS
-            );
+            // drawingUtils.drawLandmarks(landmark, {
+            //   radius: (data: any) =>
+            //     DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
+            // });
+            // drawingUtils.drawConnectors(
+            //   landmark,
+            //   PoseLandmarker.POSE_CONNECTIONS
+            // );
           }
-          canvasCtx.restore();
+          // canvasCtx.restore();
         });
       }
 
@@ -187,7 +186,7 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
         // autoPlay
         playsInline
       ></video>
-      <canvas
+      {/* <canvas
         id="video_canvas"
         width={width}
         height={height}
@@ -198,7 +197,7 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
         width={width}
         height={height}
         style={{ objectFit: "cover", background: "grey", display: "none" }}
-      ></canvas>
+      ></canvas> */}
     </Container>
   );
 }

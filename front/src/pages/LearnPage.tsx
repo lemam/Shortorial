@@ -132,7 +132,9 @@ const LearnPageTest = () => {
     const video = videoRef.current;
     if (video) {
       video.addEventListener("timeupdate", handleTimeUpdate);
-      video.addEventListener("loadedmetadata", () => setVideoDuration(video.duration));
+      video.addEventListener("loadedmetadata", () =>
+        setVideoDuration(video.duration)
+      );
     }
 
     return () => {
@@ -140,7 +142,9 @@ const LearnPageTest = () => {
 
       if (video) {
         video.removeEventListener("timeupdate", handleTimeUpdate);
-        video.removeEventListener("loadedmetadata", () => setVideoDuration(video.duration));
+        video.removeEventListener("loadedmetadata", () =>
+          setVideoDuration(video.duration)
+        );
       }
     };
   }, [handleTimeUpdate, setVideoDuration, videoRef]);
@@ -161,7 +165,7 @@ const LearnPageTest = () => {
             height={cameraSize.height}
             src="src/assets/sample.mp4"
             ref={videoRef}
-            // controls
+            controls
           ></video>
         </VideoContainer>
         <VideoContainer>
@@ -174,11 +178,19 @@ const LearnPageTest = () => {
           ></video>
           <IconButtonList>
             <IconButton icon={<ToggleOnOutlined />} text="감추기" />
-            <IconButton icon={<VideocamOutlined />} text="챌린지모드" link="/challenge" />
+            <IconButton
+              icon={<VideocamOutlined />}
+              text="챌린지모드"
+              link="/challenge"
+            />
             <IconButton icon={<PlayArrow />} text="재생" />
             <IconButton icon={<SpeedOutlined />} text="배속" />
             <IconButton icon={<VolumeUpOutlined />} text="소리" />
-            <IconButton icon={<LoopOutlined />} text="반복" onClick={handleClickLoopButton} />
+            <IconButton
+              icon={<LoopOutlined />}
+              text="반복"
+              onClick={handleClickLoopButton}
+            />
           </IconButtonList>
         </VideoContainer>
       </CenterSection>

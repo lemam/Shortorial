@@ -1,10 +1,11 @@
 import styled from "styled-components";
-// import MotionCamera from "../components/motion/MotionCamera";
+import MotionCamera from "../components/motion/MotionCamera";
 import MotionVideo from "../components/motion/MotionVideo";
 // import MotionVideo2 from "../components/motion/MotionVideo copy";
 // import { Acc } from "../modules/Acc";
 import { NormalizedLandmark } from "@mediapipe/tasks-vision";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { setBtnInfo } from "../modules/Motion";
 // import { text } from "stream/consumers";
 
 export default function LearnPage() {
@@ -34,6 +35,9 @@ export default function LearnPage() {
   //     // console.log(accValue);
   //   }
   // }, [videoLandmark, camLandmark]);
+  useEffect(() => {
+    setBtnInfo();
+  }, []);
   return (
     <Container>
       <VideoContainer>
@@ -43,7 +47,7 @@ export default function LearnPage() {
         <MotionVideo2 width={500} height={700} getLandmark={getCamLandmark} />
       </VideoContainer> */}
       <MotionCameraContainer>
-        {/* <MotionCamera width={500} height={700} /> */}
+        <MotionCamera width={500} height={700} />
       </MotionCameraContainer>
       {/* <div id="Acc" style={{ background: "white", width: "100%" }}>
         Acc: {accValue}

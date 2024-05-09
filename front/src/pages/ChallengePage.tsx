@@ -213,7 +213,7 @@ const ChallengePage = () => {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTAwNjIyMiwiZXhwIjoxNzE1MDA4MDIyfQ.x1MaVyGOu5IBQyXAlod8OH50I07kmHL_IpSQfDnL8x0",
+              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTIyODUyNSwiZXhwIjoxNzE1MjMwMzI1fQ.E7LyajxUdw5NOcmhItdVStJ1hefb548BBQSknI6ArZk",
           },
         }
       );
