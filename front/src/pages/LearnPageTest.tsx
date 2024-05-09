@@ -23,6 +23,7 @@ const LearnPageTest = () => {
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
   const [playSpeedIdx, setPlaySpeedIdx] = useState<number>(0);
   const currPlaySpeed = PLAY_SPEEDS[playSpeedIdx];
+  const [isLooping, setISLooping] = useState<boolean>(false);
 
   // 카메라 설정 초기화
   const initCamera = useCallback(() => {
@@ -168,7 +169,14 @@ const LearnPageTest = () => {
             )}
             <div className="foldList">
               <VideoMotionButton icon={<Videocam />} link="/challenge" />
-              <VideoMotionButton icon={<Repeat />} />
+              {isLooping ? (
+                <VideoMotionButton icon={<Repeat />} onClick={() => setISLooping(!isLooping)} />
+              ) : (
+                <VideoMotionButton
+                  imgSrc="src/assets/icon/repeat-off.svg"
+                  onClick={() => setISLooping(!isLooping)}
+                />
+              )}
               <VideoMotionButton icon={<Flip />} onClick={() => setIsFlipped(!isFlipped)} />
               <VideoMotionButton text={`${currPlaySpeed}x`} onClick={handlePlaySpeedButtonClick} />
             </div>
@@ -254,7 +262,8 @@ const Timer = styled.div`
 
 const VideoMotionButtonList = styled.div`
   position: absolute;
-  top: 0;
+  top: 50%;
+  transform: translateY(-50%);
   right: 0;
   display: flex;
   flex-direction: column;
@@ -265,9 +274,17 @@ const VideoMotionButtonList = styled.div`
     flex-direction: column;
   }
 
-  & a {
+  button {
     display: inline-block;
     margin-bottom: 24px;
+  }
+
+  @media screen and (min-width: 768px) {
+    button {
+      width: 52px;
+      height: 52px;
+      margin-bottom: 36px;
+    }
   }
 `;
 

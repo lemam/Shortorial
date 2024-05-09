@@ -5,15 +5,24 @@ interface VideoMotionButtonProps {
   toolTip?: string;
   icon?: JSX.Element | undefined;
   text?: string;
+  imgSrc?: string;
   link?: string;
   onClick?: () => void;
 }
 
-const VideoMotionButton = ({ icon, text, toolTip, onClick, link = "" }: VideoMotionButtonProps) => {
+const VideoMotionButton = ({
+  icon,
+  text,
+  imgSrc,
+  toolTip,
+  onClick,
+  link = "",
+}: VideoMotionButtonProps) => {
   return (
     <Link to={link}>
       <Container onClick={onClick}>
         {icon}
+        {imgSrc && <img src={imgSrc} alt="" />}
         <div>{text}</div>
         <div>{toolTip}</div>
       </Container>
