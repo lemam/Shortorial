@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import IconButton from "../components/button/IconButton";
-import { Flip, Pause, PlayArrow, Speed, Videocam } from "@mui/icons-material";
+import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
+import VideoMotionButton from "../components/button/VideoMotionButton";
 
 const LearnPageTest = () => {
   type LearnState = "PAUSE" | "READY" | "PLAY";
@@ -160,25 +160,19 @@ const LearnPageTest = () => {
             className="camera flip"
             autoPlay
           ></video>
-          <div>
-            <div>
-              {state === "PAUSE" ? (
-                <IconButton icon={<PlayArrow />} text="재생" onClick={changeStateReady} />
-              ) : (
-                <IconButton icon={<Pause />} text="일시정지" onClick={changeStatePause} />
-              )}
-              <IconButton icon={<Videocam />} text="챌린지 모드로 이동" link="/challenge" />
-              <IconButton
-                icon={<Flip />}
-                text="거울 모드"
-                onClick={() => setIsFlipped(!isFlipped)}
-              />
-              <VideoMotionButton onClick={handlePlaySpeedButtonClick}>
-                <div>{currPlaySpeed}x</div>
-              </VideoMotionButton>
-              <IconButton icon={<Speed />} text="재생 속도" onClick={handlePlaySpeedButtonClick} />
+          <VideoMotionButtonList>
+            {state === "PAUSE" ? (
+              <VideoMotionButton icon={<PlayArrow />} onClick={changeStateReady} />
+            ) : (
+              <VideoMotionButton icon={<Pause />} onClick={changeStatePause} />
+            )}
+            <div className="foldList">
+              <VideoMotionButton icon={<Videocam />} link="/challenge" />
+              <VideoMotionButton icon={<Repeat />} />
+              <VideoMotionButton icon={<Flip />} onClick={() => setIsFlipped(!isFlipped)} />
+              <VideoMotionButton text={`${currPlaySpeed}x`} onClick={handlePlaySpeedButtonClick} />
             </div>
-          </div>
+          </VideoMotionButtonList>
         </VideoContainer>
         {state === "READY" && <Timer>{currTimer}</Timer>}
       </CenterSection>
@@ -186,18 +180,6 @@ const LearnPageTest = () => {
     </Container>
   );
 };
-
-const VideoMotionButton = styled.button`
-  color: #fff;
-  display: flex;
-  width: 40px;
-  height: 40px;
-  justify-content: center;
-  align-items: center;
-  background-color: #35353580;
-  border-radius: 50%;
-  font-size: 14px;
-`;
 
 const Container = styled.div`
   position: relative;
@@ -268,6 +250,25 @@ const VideoContainer = styled.div`
 const Timer = styled.div`
   position: absolute;
   color: #fff;
+`;
+
+const VideoMotionButtonList = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 8px;
+
+  .foldList {
+    display: flex;
+    flex-direction: column;
+  }
+
+  & a {
+    display: inline-block;
+    margin-bottom: 24px;
+  }
 `;
 
 export default LearnPageTest;
