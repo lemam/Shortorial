@@ -173,8 +173,10 @@ const LearnPageTest = () => {
                 text="거울 모드"
                 onClick={() => setIsFlipped(!isFlipped)}
               />
+              <VideoMotionButton onClick={handlePlaySpeedButtonClick}>
+                <div>{currPlaySpeed}x</div>
+              </VideoMotionButton>
               <IconButton icon={<Speed />} text="재생 속도" onClick={handlePlaySpeedButtonClick} />
-              <div style={{ color: "#fff" }}>{PLAY_SPEEDS[playSpeedIdx]}</div>
             </div>
           </div>
         </VideoContainer>
@@ -184,6 +186,18 @@ const LearnPageTest = () => {
     </Container>
   );
 };
+
+const VideoMotionButton = styled.button`
+  color: #fff;
+  display: flex;
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  background-color: #35353580;
+  border-radius: 50%;
+  font-size: 14px;
+`;
 
 const Container = styled.div`
   position: relative;
