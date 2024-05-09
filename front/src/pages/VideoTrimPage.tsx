@@ -1,8 +1,4 @@
-// 트림 기능 역할
-// 직접 시간을 넣어서 수정된 영상을 보여줌
-// 파일 다운로드 다윤이가 한 기능 가져오면 될 듯
-
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { shorts } from "../apis/shorts";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
@@ -42,54 +38,54 @@ const VideoTrimPage = () => {
   }, []);
 
   return (
-    <div>
-      <div
-        style={{
-          position: "relative",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(162px, 1fr))",
-          gap: "16px 16px",
-        }}
-      >
-        <div>
-          {shortsList.map((shorts) => (
-            <div key={shorts.shortsNo}>
-              <VideoBox onClick={() => handleShowModal(shorts.shortsNo)}>
-                <video
-                  src={shorts.shortsLink}
-                  crossOrigin="anonymous"
-                ></video>
-              </VideoBox>
-              <ModalComponent
-                title={shorts.shortsTitle}
-                body={
-                  <VideoBox>
-                    <video
-                      src={shorts.shortsLink}
-                      autoPlay
-                      loop
-                      crossOrigin="anonymous"
-                    ></video>
-                  </VideoBox>
-                }
-                showModal={clickId === shorts.shortsNo}
-                handleCloseModal={handleCloseModal}
-                goToLearnMode={goToLearnMode}
-                goToChallengeMode={goToChallengeMode}
-              />
-              <p>쇼츠 제목 : {shorts.shortsTitle}</p>
-              <p>쇼츠 디렉터 : {shorts.shortsDirector}</p>
-              <p>쇼츠 시간 : {shorts.shortsTime}</p>
-              <p>쇼츠 참여 인원 : {shorts.shortsChallengers}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <Container>
+      <Header>Let's DANCE</Header>
+      <GridContainer>
+        {shortsList.map((shorts) => (
+          <VideoItem key={shorts.shortsNo}>
+            <VideoBox onClick={() => handleShowModal(shorts.shortsNo)}>
+              <video
+                src={shorts.shortsLink}
+                crossOrigin="anonymous"
+              ></video>
+            </VideoBox>
+            <ModalComponent
+              title={shorts.shortsTitle}
+              body={
+                <VideoBox>
+                  <video
+                    src={shorts.shortsLink}
+                    autoPlay
+                    loop
+                    crossOrigin="anonymous"
+                  ></video>
+                </VideoBox>
+              }
+              showModal={clickId === shorts.shortsNo}
+              handleCloseModal={handleCloseModal}
+              goToLearnMode={goToLearnMode}
+              goToChallengeMode={goToChallengeMode}
+            />
+            <VideoTitle>{shorts.shortsTitle}</VideoTitle>
+          </VideoItem>
+        ))}
+      </GridContainer>
+    </Container>
   );
 };
 
 export default VideoTrimPage;
+
+const Container = styled.div`
+  box-sizing: border-box;
+`;
+
+const GridContainer = styled.div`
+  position: ;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(162px, 1fr));
+  gap: 16px 16px;
+`;
 
 const VideoBox = styled.div`
   position: relative;
@@ -103,4 +99,33 @@ const VideoBox = styled.div`
     height: 100%;
     object-fit: cover;
   }
+`;
+
+// Component 로 나중에 빼자
+const Header = styled.header`
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const VideoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%; // 비디오 박스의 최대 너비를 고려
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+`;
+
+// 쇼츠 제목
+const VideoTitle = styled.div`
+  font-weight: bold;
+  white-space: nowrap; /* 줄 바꿈 방지 */
+  overflow: hidden; /* 넘침 숨김 */
+  text-overflow: ellipsis; /* 넘침시 생략 부호(...) 표시 */
 `;
