@@ -4,7 +4,7 @@ import LearnPage from "./pages/LearnPage";
 import GlobalStyle from "./GlobalStyle";
 import ChallengePage from "./pages/ChallengePage";
 import ChallengeResultPage from "./pages/ChallengeResultPage";
-// import VideoTrimPage from "./pages/VideoTrimPage";
+import VideoTrimPage from "./pages/VideoTrimPage";
 import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 // import VideoResizePage from "./pages/VideoResizePage";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -37,7 +37,7 @@ function App() {
             path="/challenge/result"
             element={<ChallengeResultPage />}
           />
-          {/* <Route path="/video-trim" element={<VideoTrimPage />} /> */}
+          <Route path="/video-trim" element={<VideoTrimPage />} />
           <Route
             path="/video-marker"
             element={<VideoMarkerPage />}

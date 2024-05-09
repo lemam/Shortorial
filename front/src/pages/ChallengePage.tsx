@@ -15,18 +15,14 @@ const ChallengePage = () => {
   const ffmpeg = createFFmpeg({ log: false });
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [show, setShow] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // 토글
   const [recording, setRecording] = useState(false); // 녹화 진행
   const initialTimer = parseInt(localStorage.getItem("timer") || "3");
   const [timer, setTimer] = useState<number>(initialTimer); // 타이머
-  const [timerPath, setTimerPath] = useState(
-    `src/assets/challenge/${timer}sec.svg`
-  ); // 타이머 이미지 경로
+  const [timerPath, setTimerPath] = useState(`src/assets/challenge/${timer}sec.svg`); // 타이머 이미지 경로
   const [loadPath, setLoadPath] = useState("src/assets/challenge/loading.gif"); // 로딩 이미지 경로
   const [ffmpegLog, setFfmpegLog] = useState("");
 
@@ -172,10 +168,7 @@ const ChallengePage = () => {
           "finalUserVideoFlip.mp4"
         );
 
-        const userVideoFlipFinal = ffmpeg.FS(
-          "readFile",
-          "finalUserVideoFlip.mp4"
-        );
+        const userVideoFlipFinal = ffmpeg.FS("readFile", "finalUserVideoFlip.mp4");
         // 최종 파일 Blob 변환
         const userVideoFinalBlob = new Blob([userVideoFlipFinal.buffer], {
           type: "video/mp4",
@@ -203,19 +196,15 @@ const ChallengePage = () => {
     try {
       const title = getCurrentDateTime();
       const formData = new FormData();
-      formData.append("file", file);
-      formData.append("fileName", title.toISOString());
+      formData.append("file", blob, `${title}.mp4`);
+      formData.append("fileName", title);
 
-      const uploadResponse = await axios.post(
-        "http://localhost:8080/s3/upload",
-        formData,
-        {
-          headers: {
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTE1MTUxOCwiZXhwIjoxNzE1MTUzMzE4fQ.PGF6vM4wRzjA-fb2B5mxzdrBMns3dUMSc4d2wWU_aBU",
-          },
-        }
-      );
+      const uploadResponse = await axios.post("http://localhost:8089/s3/upload", formData, {
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTE1MTUxOCwiZXhwIjoxNzE1MTUzMzE4fQ.PGF6vM4wRzjA-fb2B5mxzdrBMns3dUMSc4d2wWU_aBU",
+        },
+      });
 
       setLoadPath("src/assets/challenge/complete.svg");
       setFfmpegLog("저장 완료");
@@ -260,9 +249,7 @@ const ChallengePage = () => {
     }
   }, [recording]);
 
-  const canvasElement = document.getElementById(
-    "output_canvas"
-  ) as HTMLCanvasElement | null;
+  const canvasElement = document.getElementById("output_canvas") as HTMLCanvasElement | null;
   let canvasCtx: CanvasRenderingContext2D | null = null;
   // 그리기 도구
   let drawingUtils: DrawingUtils | null = null;
@@ -285,9 +272,7 @@ const ChallengePage = () => {
 
     try {
       // 카메라 불러오기
-      const mediaStream = await navigator.mediaDevices.getUserMedia(
-        constraints
-      );
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       // userVideoRef를 참조하고 있는 DOM에 넣기
       if (userVideoRef.current) {
         userVideoRef.current.srcObject = mediaStream;
@@ -338,12 +323,8 @@ const ChallengePage = () => {
     })();
 
     return () => {
-      window.removeEventListener("orientationchange", () =>
-        initVideoSize(userVideoRef)
-      );
-      window.removeEventListener("orientationchange", () =>
-        initVideoSize(danceVideoRef)
-      );
+      window.removeEventListener("orientationchange", () => initVideoSize(userVideoRef));
+      window.removeEventListener("orientationchange", () => initVideoSize(danceVideoRef));
     };
   }, []);
 

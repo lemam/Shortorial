@@ -19,11 +19,11 @@ const ModalComponent = ({
   goToChallengeMode,
 }: ModalType) => {
   return (
-    <Modal show={showModal} onHide={handleCloseModal}>
+    <Modal show={showModal} onHide={handleCloseModal} size="sm">
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>{body}</Modal.Body>
+      <Modal.Body >{body}</Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={goToLearnMode}>
           연습 모드
@@ -37,3 +37,4 @@ const ModalComponent = ({
 };
 
 export default ModalComponent;
+

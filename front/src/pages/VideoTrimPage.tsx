@@ -1,118 +1,131 @@
-// // 트림 기능 역할
-// // 직접 시간을 넣어서 수정된 영상을 보여줌
-// // 파일 다운로드 다윤이가 한 기능 가져오면 될 듯
+import { useEffect, useState } from "react";
+import { shorts } from "../apis/shorts";
+import { axios } from "../utils/axios";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import ModalComponent from "../components/modal/ModalComponent";
 
-// import React, { useEffect, useState } from "react";
-// // import { useDropzone } from 'react-dropzone';
-// // import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
-// // import useChallengeStore from "../store/useChallengeStore";
-// import { shorts } from "../apis/shorts";
-// import { axios } from "../utils/axios";
+const VideoTrimPage = () => {
+  const navigate = useNavigate();
+  const handleShowModal = (id: number) => setClickId(id);
+  const handleCloseModal = () => setClickId(-1);
 
-// // const ffmpeg = createFFmpeg({ log: true });
+  const goToLearnMode = () => {
+    navigate("/learn");
+  };
 
-// const VideoTrimPage = () => {
-//   // const [outputVideo, setOutputVideo] = useState("");
-//   // const [startTime, setStartTime] = useState(0);
-//   // const [endTime, setEndTime] = useState(10);
-//   // const [processing, setProcessing] = useState(false);
-//   // const { downloadURL } = useChallengeStore();
+  const goToChallengeMode = () => {
+    navigate("/challenge");
+  };
 
-//   // const handleTrim = async () => {
-//   //   setProcessing(true);
-//   //   if (!ffmpeg.isLoaded()) {
-//   //     await ffmpeg.load();
-//   //   }
+  const [shortsList, setShortsList] = useState<shorts[]>([]);
+  const [clickId, setClickId] = useState<number>(-1);
 
-//   //   const inputFilename = 'input.mp4';
-//   //   const outputFilename = 'output.mp4';
+  useEffect(() => {
+    axios
+      .get<shorts[]>("/api/shorts")
+      .then((response) => {
+        setShortsList(response.data);
 
-//   //   ffmpeg.FS('writeFile', inputFilename, await fetchFile(downloadURL));
-//   //   await ffmpeg.run('-i', inputFilename, '-ss', `${startTime}`, '-to', `${endTime}`, '-c', 'copy', outputFilename);
+        console.log(response.data);
+        for (let i = 0; i < shortsList.length; i++) {
+          console.log(shortsList[i].shortsUrl);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
 
-//   //   const output = ffmpeg.FS('readFile', outputFilename);
-//   //   const outputUrl = URL.createObjectURL(new Blob([output.buffer], { type: 'video/mp4' }));
-//   //   setOutputVideo(outputUrl);
-//   //   setProcessing(false);
-//   // };
+  return (
+    <Container>
+      <Header>Let's DANCE</Header>
+      <GridContainer>
+        {shortsList.map((shorts) => (
+          <VideoItem key={shorts.shortsNo}>
+            <VideoBox onClick={() => handleShowModal(shorts.shortsNo)}>
+              <video
+                src={shorts.shortsLink}
+                crossOrigin="anonymous"
+              ></video>
+            </VideoBox>
+            <ModalComponent
+              title={shorts.shortsTitle}
+              body={
+                <VideoBox>
+                  <video
+                    src={shorts.shortsLink}
+                    autoPlay
+                    loop
+                    crossOrigin="anonymous"
+                  ></video>
+                </VideoBox>
+              }
+              showModal={clickId === shorts.shortsNo}
+              handleCloseModal={handleCloseModal}
+              goToLearnMode={goToLearnMode}
+              goToChallengeMode={goToChallengeMode}
+            />
+            <VideoTitle>{shorts.shortsTitle}</VideoTitle>
+          </VideoItem>
+        ))}
+      </GridContainer>
+    </Container>
+  );
+};
 
-//   const [shortsList, setShortsList] = useState<shorts[]>([]);
+export default VideoTrimPage;
 
-//   function getYoutubeThumbnail(url: string): string {
-//     const videoId = url.split("v=")[1];
-//     const ampersandPosition = videoId.indexOf("&");
-//     if (ampersandPosition !== -1) {
-//       return `https://img.youtube.com/vi/${videoId.substring(
-//         0,
-//         ampersandPosition
-//       )}/0.jpg`;
-//     }
-//     return `https://img.youtube.com/vi/${videoId}/0.jpg`;
-//   }
-//   interface VideoThumbnailProps {
-//     videoUrl: string;
-//   }
-//   const VideoThumbnail: React.FC<VideoThumbnailProps> = ({ videoUrl }) => {
-//     let thumbnailUrl = "";
+const Container = styled.div`
+  box-sizing: border-box;
+`;
 
-//     thumbnailUrl = getYoutubeThumbnail(videoUrl);
+const GridContainer = styled.div`
+  position: ;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(162px, 1fr));
+  gap: 16px 16px;
+`;
 
-//     return <img src={thumbnailUrl} alt="Video Thumbnail" />;
-//   };
+const VideoBox = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 286px;
+  border-radius: 8px;
+  overflow: hidden;
 
-//   useEffect(() => {
-//     axios
-//       .get<shorts[]>("/api/shorts")
-//       .then((response) => {
-//         setShortsList(response.data);
-//         console.log(response.data);
-//         console.log(shortsList);
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching data:", error);
-//       });
-//   }, []);
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
 
-//   return (
-//     // <div>
-//     //   {downloadURL && (
-//     //     <>
-//     //       <video controls width="250" src={downloadURL} style={{ marginTop: '20px' }}></video>
-//     //       <div>
-//     //         <label>
-//     //           Start time (seconds):
-//     //           <input type="number" value={startTime} onChange={(e) => setStartTime(Number(e.target.value))} />
-//     //         </label>
-//     //         <label>
-//     //           End time (seconds):
-//     //           <input type="number" value={endTime} onChange={(e) => setEndTime(Number(e.target.value))} />
-//     //         </label>
-//     //         <button onClick={handleTrim} disabled={processing}>Trim Video</button>
-//     //       </div>
-//     //       {outputVideo && (
-//     //         <div>
-//     //           <h3>Trimmed Video</h3>
-//     //           <video controls width="250" src={outputVideo}></video>
-//     //         </div>
-//     //       )}
-//     //     </>
-//     //   )}
-//     // </div>
-//     <div>
-//       <h1>쇼츠 목록</h1>
-//       <div>
-//         {shortsList.map((shorts) => (
-//           <div key={shorts.shortsNo}>
-//             {VideoThumbnail(shorts.shortsUrl)}
-//             <h2>쇼츠 제목 : {shorts.shortsTitle}</h2>
-//             <p>쇼츠 디렉터 : {shorts.shortsDirector}</p>
-//             <p>쇼츠 시간 : {shorts.shortsTime}</p>
-//             <p>쇼츠 참여 인원 : {shorts.shortsChallengers}</p>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
+// Component 로 나중에 빼자
+const Header = styled.header`
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
-// export default VideoTrimPage;
+const VideoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%; // 비디오 박스의 최대 너비를 고려
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+`;
+
+// 쇼츠 제목
+const VideoTitle = styled.div`
+  font-weight: bold;
+  white-space: nowrap; /* 줄 바꿈 방지 */
+  overflow: hidden; /* 넘침 숨김 */
+  text-overflow: ellipsis; /* 넘침시 생략 부호(...) 표시 */
+`;
