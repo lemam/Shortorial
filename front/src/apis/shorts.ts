@@ -37,3 +37,13 @@ export const getShortsList = async () => {
     console.error(error);
   }
 };
+
+// 특정 쇼츠 조회
+export const getShortsInfo = async (shortsNo : number) => {
+  try {
+    const response = await axios.get(`${REST_SHORTS_LIST_URL}/{shortsNo}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

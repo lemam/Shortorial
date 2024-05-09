@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { shorts } from "../apis/shorts";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import ModalComponent from "../components/modal/ModalComponent";
+import { useNavigate, useParams } from "react-router-dom";
+import { Button } from "react-bootstrap";
+
+
 
 const ShortsDetailPage = () => {
   const navigate = useNavigate();
-  const handleShowModal = (id: number) => setClickId(id);
-  const handleCloseModal = () => setClickId(-1);
-
+  
   const goToLearnMode = () => {
     navigate("/learn");
   };
@@ -18,14 +18,15 @@ const ShortsDetailPage = () => {
     navigate("/challenge");
   };
 
-  const [shortsList, setShortsList] = useState<shorts[]>([]);
-  const [clickId, setClickId] = useState<number>(-1);
+  const params = useParams();
+
+  const [shortsInfo, setShortsInfo] = useState<shorts>();
 
   useEffect(() => {
     axios
-      .get<shorts[]>("/api/shorts")
+      .get(`/api/shorts/${params.shortsNo}`)
       .then((response) => {
-        setShortsList(response.data);
+        setShortsInfo(response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -34,32 +35,34 @@ const ShortsDetailPage = () => {
 
   return (
     <Container>
-      <Header>Let's DANCE</Header>
-      <GridContainer>
-        {shortsList.map((shorts) => (
-          <VideoItem key={shorts.shortsNo}>
-            <VideoBox onClick={() => handleShowModal(shorts.shortsNo)}>
-              <video
-                src={shorts.shortsLink}
-                crossOrigin="anonymous"
-              ></video>
-            </VideoBox>
-            <ModalComponent
-              title={shorts.shortsTitle}
-              body={
-                <ModalVideoBox>
-                  <video src={shorts.shortsLink} autoPlay loop crossOrigin='anonymous'></video>
-                </ModalVideoBox>
-              }
-              showModal={clickId === shorts.shortsNo}
-              handleCloseModal={handleCloseModal}
-              goToLearnMode={goToLearnMode}
-              goToChallengeMode={goToChallengeMode}
-            />
-            <VideoTitle>{shorts.shortsTitle}</VideoTitle>
-          </VideoItem>
-        ))}
-      </GridContainer>
+        <Header>Let's DANCE</Header>
+        <VideoBox>
+            <video src={shortsInfo?.shortsLink} crossOrigin="anonymous" autoPlay loop controls/>
+        </VideoBox>
+        <DetailItem>
+      <Label>제목</Label>
+      <Value>{shortsInfo?.shortsTitle}</Value>
+    </DetailItem>
+    <DetailItem>
+      <Label>작가</Label>
+      <Value>{shortsInfo?.shortsDirector}</Value>
+    </DetailItem>
+    <DetailItem>
+      <Label>시간</Label>
+      <Value>{shortsInfo?.shortsTime}</Value>
+    </DetailItem>
+    <DetailItem>
+      <Label>참여 인원</Label>
+      <Value>{shortsInfo?.shortsChallengers}</Value>
+    </DetailItem>
+        <ButtonList>
+            <Button variant="secondary" onClick={goToLearnMode}>
+                연습 모드
+            </Button>
+            <Button variant="primary" onClick={goToChallengeMode}>
+                챌린지 모드
+            </Button>
+        </ButtonList>
     </Container>
   );
 };
@@ -73,33 +76,23 @@ const Header = styled.header`
   padding: 10px 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  font-weight: bold;
+  margin-bottom: 10px;
 `;
 
 const Container = styled.div`
-  box-sizing: border-box;
-`;
-
-const GridContainer = styled.div`
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(162px, 1fr));
-  gap: 16px 16px;
-`
-
-const VideoItem = styled.div`
   display: flex;
   flex-direction: column;
-  // align-items: center;
-  width: 100%; // 비디오 박스의 최대 너비를 고려
-  padding: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border-radius: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
+  justify-content: center;
+  align-items: center;
+  
+//   & > * {
+//     margin-bottom: 50px;
+//   }
+`
 
 const VideoBox = styled.div`
   position: relative;
@@ -107,6 +100,7 @@ const VideoBox = styled.div`
   max-width: 286px;
   border-radius: 8px;
   overflow: hidden;
+  margin-bottom: 10px;
 
   video {
     width: 100%;
@@ -115,27 +109,58 @@ const VideoBox = styled.div`
   }
 `;
 
-const ModalVideoBox = styled.div`
-  position: relative;
+// // 쇼츠 제목
+// const VideoTitle = styled.div`
+//   font-weight: bold;
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// //   margin-bottom: 10px;
+// `;
+
+// const ButtonList = styled.div`
+//   button{
+//     margin: 0 10px;
+//   }
+// `
+
+
+const DetailItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  width: 100%;
+  padding: 2px 40px;
+//   background-color: #f4f4f4;
+//   border-bottom: 1px solid #ddd;
+  font-size: 16px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const Label = styled.span`
+  font-weight: bold;
+  margin-right: 10px;
+  min-width: 100px; // 최소 너비 설정
+`;
+
+const Value = styled.span`
+  flex-grow: 1;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const ButtonList = styled.div`
   display: flex;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  max-width: 286px;
-  border-radius: 8px;
-  overflow: hidden;
+  padding: 5px;
 
-  video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  button {
+    margin: 0 10px;
+    padding: 8px 20px;
   }
-`;
-
-// 쇼츠 제목
-const VideoTitle = styled.div`
-  font-weight: bold;
-  white-space: nowrap; /* 줄 바꿈 방지 */
-  overflow: hidden; /* 넘침 숨김 */
-  text-overflow: ellipsis; /* 넘침시 생략 부호(...) 표시 */
 `;
