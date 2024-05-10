@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 interface VideoMotionButtonProps {
+  id?: string;
   toolTip?: string;
   icon?: JSX.Element | undefined;
   text?: string;
@@ -11,6 +12,7 @@ interface VideoMotionButtonProps {
 }
 
 const VideoMotionButton = ({
+  id,
   icon,
   text,
   imgSrc,
@@ -20,7 +22,7 @@ const VideoMotionButton = ({
 }: VideoMotionButtonProps) => {
   return (
     <Link to={link}>
-      <Container onClick={onClick}>
+      <Container id={id} onClick={onClick}>
         {icon}
         {imgSrc && <img src={imgSrc} alt="" />}
         <div className="text">{text}</div>

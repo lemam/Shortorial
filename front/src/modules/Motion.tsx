@@ -16,6 +16,7 @@ let mode_count = 0;
 let rslt_count = 0;
 
 let domSize: DOMRect | null = null;
+let playSize: DOMRect | null = null;
 let visibleBtnSize: DOMRect | null = null;
 let timerBtnSize: DOMRect | null = null;
 let recorderBtnSize: DOMRect | null = null;
@@ -35,10 +36,14 @@ export function btn_with_landmark(
   handLandmarker: NormalizedLandmark,
   setBtn: (newBtn: String) => void
 ) {
+  // console.log(handLandmarker.x);
   handLandmarker.x = makeAbsoluteLandmarkX(handLandmarker.x);
   handLandmarker.y = makeAbsoluteLandmarkY(handLandmarker.y);
+  if (handLandmarker.visibility > 0.5) {
+    console.log("X : ", handLandmarker.x);
+    console.log("Y : ", handLandmarker.y);
+  }
 
-  console.log(handLandmarker.y);
   if (
     visibleBtnSize &&
     handLandmarker.x <= visibleBtnSize.right &&
@@ -109,6 +114,28 @@ export function btn_with_landmark(
         rslt_count = 0;
       } else rslt_count++;
     }
+  } else if (
+    playSize &&
+    handLandmarker.x <= playSize.right &&
+    handLandmarker.x >= playSize.left &&
+    handLandmarker.visibility > 0.5
+  ) {
+    console.log("플레이 버튼 찾음");
+    if (
+      handLandmarker.y >= playSize.top &&
+      handLandmarker.y <= playSize.bottom
+    ) {
+      if (visible_count >= MAX_COUNT) {
+        console.log("play");
+        setBtn("play");
+        visible_count = 0;
+        timer_count = 0;
+      } else {
+        visible_count++;
+      }
+    }
+  } else {
+    // console.log("skdjfs");
   }
 }
 
@@ -273,6 +300,7 @@ export function btnPlace(id: string): DOMRect | undefined {
 
 export function setBtnInfo() {
   const dom = btnPlace("dom");
+  const play = btnPlace("play");
   const visibleBtn = btnPlace("visible");
   const timerBtn = btnPlace("timer");
   const recordBtn = btnPlace("record");
@@ -280,6 +308,7 @@ export function setBtnInfo() {
   const rsltBtn = btnPlace("rslt");
 
   if (dom) useDomStore.getState().setDomSize(dom);
+  if (play) useDomStore.getState().setPlaySize(play);
   if (visibleBtn) useDomStore.getState().setVisibleBtnSize(visibleBtn);
   if (timerBtn) useDomStore.getState().setTimeBtnSize(timerBtn);
   if (recordBtn) useDomStore.getState().setRecordBtnSize(recordBtn);
@@ -287,6 +316,7 @@ export function setBtnInfo() {
   if (rsltBtn) useDomStore.getState().setRsltBtnSize(rsltBtn);
 
   domSize = useDomStore.getState().domSize;
+  playSize = useDomStore.getState().playSize;
   visibleBtnSize = useDomStore.getState().visibleBtnSize;
   timerBtnSize = useDomStore.getState().timerBtnSize;
   recorderBtnSize = useDomStore.getState().recordBtnSize;

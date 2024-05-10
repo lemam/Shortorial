@@ -4,6 +4,9 @@ import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import VideoMotionButton from "../components/button/VideoMotionButton";
 import { VideoSection } from "../constants/types";
 import SectionButtonList from "../components/ButtonList/SectionButtonList";
+import MotionCamera from "../components/motion/MotionCamera";
+import { useBtnStore } from "../store/useMotionStore";
+import { setBtnInfo } from "../modules/Motion";
 
 const LearnPageTest = () => {
   type LearnState = "PAUSE" | "READY" | "PLAY";
@@ -104,7 +107,10 @@ const LearnPageTest = () => {
   // READY 상태로 변경
   const changeStateReady = () => {
     // 타이머 1초씩 카운트다운
-    intervalRef.current = setInterval(() => setCurrTimer((prev) => prev - 1), 1000);
+    intervalRef.current = setInterval(
+      () => setCurrTimer((prev) => prev - 1),
+      1000
+    );
     setState("READY");
   };
 
@@ -174,16 +180,21 @@ const LearnPageTest = () => {
   }, [changeStatePlay, currTimer, initInterval]);
 
   // 동영상 감시
+  const { btn, setBtn } = useBtnStore();
   useEffect(() => {
     if (video) {
       video.addEventListener("ended", changeStatePause);
-      video.addEventListener("timeupdate", () => setCurrentTime(video.currentTime));
+      video.addEventListener("timeupdate", () =>
+        setCurrentTime(video.currentTime)
+      );
     }
 
     return () => {
       if (video) {
         video.removeEventListener("ended", changeStatePause);
-        video.removeEventListener("timeupdate", () => setCurrentTime(video.currentTime));
+        video.removeEventListener("timeupdate", () =>
+          setCurrentTime(video.currentTime)
+        );
       }
     };
   }, [changeStatePause, video]);
@@ -193,6 +204,19 @@ const LearnPageTest = () => {
     setSectionList(getSectionList());
   }, []);
 
+  useEffect(() => {
+    switch (btn) {
+      case "play":
+        console.log("A");
+        changeStateReady();
+        break;
+    }
+    setBtn("none");
+  }, [btn]);
+
+  useEffect(() => {
+    setBtnInfo();
+  }, [cameraSize.width]);
   return (
     <Container>
       <LeftSection ref={(el) => measuredRef(el)}>
@@ -214,19 +238,28 @@ const LearnPageTest = () => {
             controls
           ></video>
         </VideoContainer>
-        <VideoContainer>
-          <video
+        <VideoContainer id="dom">
+          <MotionCamera
             width={cameraSize.width}
             height={cameraSize.height}
-            ref={cameraRef}
             className="camera flip"
             autoPlay
-          ></video>
+          ></MotionCamera>
           <VideoMotionButtonList>
             {state === "PAUSE" ? (
-              <VideoMotionButton icon={<PlayArrow />} toolTip="재생" onClick={changeStateReady} />
+              <VideoMotionButton
+                id="play"
+                icon={<PlayArrow />}
+                toolTip="재생"
+                onClick={changeStateReady}
+              />
             ) : (
-              <VideoMotionButton icon={<Pause />} toolTip="일시정지" onClick={changeStatePause} />
+              <VideoMotionButton
+                id="play"
+                icon={<Pause />}
+                toolTip="일시정지"
+                onClick={changeStatePause}
+              />
             )}
             <div className="foldList">
               <VideoMotionButton
@@ -319,6 +352,7 @@ const VideoContainer = styled.div`
   height: 100%;
 
   video {
+    display: flex;
     object-fit: cover;
   }
 

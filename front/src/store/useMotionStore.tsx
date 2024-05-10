@@ -7,6 +7,7 @@ interface BtnState {
 
 interface DomState {
   domSize: DOMRect | null;
+  playSize: DOMRect | null;
   visibleBtnSize: DOMRect | null;
   timerBtnSize: DOMRect | null;
   recordBtnSize: DOMRect | null;
@@ -14,6 +15,7 @@ interface DomState {
   modeBtnSize: DOMRect | null;
   rsltBtnSize: DOMRect | null;
   setDomSize: (newDomSize: DOMRect) => void;
+  setPlaySize: (newDomSize: DOMRect) => void;
   setVisibleBtnSize: (newBtnSize: DOMRect) => void;
   setTimeBtnSize: (newBtnSize: DOMRect) => void;
   setRecordBtnSize: (newBtnSize: DOMRect) => void;
@@ -29,6 +31,7 @@ export const useBtnStore = create<BtnState>((set) => ({
 
 export const useDomStore = create<DomState>((set) => ({
   domSize: null,
+  playSize: null,
   visibleBtnSize: null,
   timerBtnSize: null,
   recordBtnSize: null,
@@ -37,6 +40,7 @@ export const useDomStore = create<DomState>((set) => ({
   rsltBtnSize: null,
 
   setDomSize: (newDomSize: DOMRect) => set({ domSize: newDomSize }),
+  setPlaySize: (newDomSize: DOMRect) => set({ playSize: newDomSize }),
   setVisibleBtnSize: (newBtnSize: DOMRect) =>
     set({ visibleBtnSize: newBtnSize }),
   setTimeBtnSize: (newBtnSize: DOMRect) => set({ timerBtnSize: newBtnSize }),
