@@ -4,6 +4,8 @@ import com.sleep.sleep.common.JWT.JwtTokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class S3Controller {
     public ResponseEntity<?> uploadFile(@RequestHeader("Authorization") String accessToken, @RequestParam("file") MultipartFile file, @RequestParam("fileName") String fileName) {
         try {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+
             System.out.println("username : "+ username);
 
             File convFile = multipartFileToFile(file); // 멀티파트 파일 -> 파일로 형변환
@@ -34,7 +38,7 @@ public class S3Controller {
 
             System.out.println(shortsTime);
 
-            String uploadUrl = s3Service.uploadFile(file, username+"/"+fileName);
+            String uploadUrl = s3Service.uploadFile(file, fileName, username);
             return new ResponseEntity<String>(uploadUrl, HttpStatus.OK);
         } catch (IOException e) {
             return new ResponseEntity<String>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
@@ -75,6 +79,29 @@ public class S3Controller {
     private String resolveToken(String accessToken) {
         log.info("resolveToken, AccessToken: "+ accessToken.toString());
         return accessToken.substring(7);
+    }
+
+    @Operation(summary = "동영상 파일 다운로드", description = "추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
+    @GetMapping("/s3/download/file/{fileName}")
+    public ResponseEntity<?> downloadStaticFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
+        try {
+            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+            System.out.println("username : " + username);
+
+            InputStreamResource resource = new InputStreamResource(s3Service.downloadFile(username + "/" + fileName));
+
+            // 파일명 인코딩
+            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+
+            String contentDisposition = "attachment; filename*=UTF-8''" + encodedFileName;
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                    .contentType(MediaType.parseMediaType("video/mp4"))
+                    .body(resource);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
