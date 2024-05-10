@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import { VideoSection } from "../../constants/types";
 import SectionButton from "../button/SectionButton";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
+import useVideoStore from "../../store/useVideoStore";
 
 interface SectionButtonListProps {
   sectionList: VideoSection[] | null;
@@ -16,10 +17,10 @@ const SectionButtonList = ({
   currentTime = 0,
   clickHandler,
 }: SectionButtonListProps) => {
-  const [currSectionIdx, setCurrSectionIdx] = useState<number>(0);
+  const { currentSection, setCurrentSection } = useVideoStore();
 
   // 현재 시간에 있는 구간 반환
-  const getCurrSection = useCallback(() => {
+  const loadCurrSection = useCallback(() => {
     let result: VideoSection | undefined;
     const time = currentTime;
 
@@ -27,13 +28,16 @@ const SectionButtonList = ({
       result = sectionList.find((item) => time >= item.start && time < item.end);
     }
 
-    return result ?? { id: 0, start: 0, end: 0 };
-  }, [currentTime, sectionList]);
+    result = result ?? { id: 0, start: 0, end: 0 };
+    setCurrentSection(result);
+
+    return result;
+  }, [currentTime, sectionList, setCurrentSection]);
 
   // 현재 구간 인덱스 설정
   useEffect(() => {
-    setCurrSectionIdx(getCurrSection().id);
-  }, [getCurrSection, currentTime]);
+    loadCurrSection();
+  }, [loadCurrSection, currentTime]);
 
   return (
     <Container>
@@ -43,7 +47,7 @@ const SectionButtonList = ({
             key={section.id}
             time={section.start}
             isSmall={parentWidth < 100}
-            active={section.id === currSectionIdx}
+            active={section.id === currentSection.id}
             onClick={() => clickHandler(section)}
           ></SectionButton>
         );
