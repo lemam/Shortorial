@@ -1,3 +1,4 @@
+import { MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -20,9 +21,13 @@ const VideoMotionButton = ({
   onClick,
   link = "",
 }: VideoMotionButtonProps) => {
+  const handleLinkClick = (e: MouseEvent) => {
+    if (!link) e.preventDefault();
+  };
+
   return (
-    <Link to={link}>
-      <Container id={id} onClick={onClick}>
+    <Link to={link} onClick={handleLinkClick}>
+      <Container onClick={onClick}>
         {icon}
         {imgSrc && <img src={imgSrc} alt="" />}
         <div className="text">{text}</div>
