@@ -1,52 +1,84 @@
 import { useEffect, useState } from "react";
+import Profile from "../components/mypage/Profile";
+import UploadSnsList from "../components/mypage/UploadSnsList";
+import UploadList from "../components/mypage/UploadList";
+import styled from "styled-components";
+import TryList from "../components/mypage/TryList";
 
-const MyPage = () => {
-  const videoUrl =
-    "https://ssafy2024-dance.s3.ap-northeast-2.amazonaws.com/Shorts/%EC%95%84%ED%94%88%EA%B1%B4+%EB%94%B1+%EC%A7%88%EC%83%89%EC%9D%B4%EB%8B%88%EA%B9%8C";
-  const [blobUrl, setBlobUrl] = useState(null);
+export default function MyPage() {
+  const [currentTab, clickTab] = useState(0);
 
-  useEffect(() => {
-    const fetchVideo = async () => {
-      try {
-        const response = await fetch(videoUrl);
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        setBlobUrl(url);
-      } catch (error) {
-        console.error("Error fetching video:", error);
-      }
-    };
+  const menuArr = [
+    { name: "저장한 영상", content: <UploadList /> },
+    { name: "업로드한 영상", content: <UploadSnsList /> },
+    { name: "시도한 영상", content: <TryList /> },
+  ];
 
-    fetchVideo();
-
-    // 컴포넌트 언마운트 시 생성된 blob URL 해제
-    return () => {
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl);
-      }
-    };
-  }, [videoUrl]);
-
+  const selectMenuHandler = (index: number) => {
+    clickTab(index);
+  };
   return (
-    <div>
-      <h1>Hello</h1>
-      <p>World</p>
-      {blobUrl ? (
-        <video
-          controls
-          width="600"
-        >
-          <source
-            src={blobUrl}
-            type="video/mp4"
-          />
-          Your browser does not support the video tag.
-        </video>
-      ) : (
-        <p>Loading video...</p>
-      )}
-    </div>
+    <ProfileContainer>
+      <div>Header</div>
+      <div>
+        <Profile />
+      </div>
+      <div>
+        <TabMenu>
+          {menuArr.map((el, index) => (
+            <li
+              className={index === currentTab ? "submenu focused" : "submenu"}
+              onClick={() => selectMenuHandler(index)}
+            >
+              {el.name}
+            </li>
+          ))}
+        </TabMenu>
+        <div>{menuArr[currentTab].content}</div>
+      </div>
+    </ProfileContainer>
   );
-};
+}
+const ProfileContainer = styled.div`
+  display: flex;
+  margin-right: 20px; /* 오른쪽 마진을 20px로 설정 */
+  margin-left: 20px; /* 왼쪽 마진을 20px로 설정 */
+  height: 100%;
+  border: 1px solid blue;
+  flex-direction: column; /* 세로로 나열 */
+`;
 
-export default MyPage;
+const TabMenu = styled.ul`
+  background-color: #dcdcdc;
+  color: rgb(232, 234, 237);
+  font-weight: bold;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  list-style: none;
+  margin-bottom: 7rem;
+  margin-top: 10px;
+
+  .submenu {
+    // 기본 Tabmenu 에 대한 CSS를 구현
+    display: flex;
+    /* justify-content: space-between;
+    width: 380px;
+    heigth: 30px; */
+    width: calc(100% / 3);
+    padding: 10px;
+    font-size: 15px;
+    transition: 0.5s;
+    border-radius: 10px 10px 0px 0px;
+  }
+
+  .focused {
+    //선택된 Tabmenu 에만 적용되는 CSS를 구현
+    background-color: rgb(255, 255, 255);
+    color: rgb(21, 20, 20);
+  }
+
+  & div.desc {
+    text-align: center;
+  }
+`;

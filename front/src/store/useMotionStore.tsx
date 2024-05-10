@@ -11,15 +11,27 @@ interface DomState {
   timerBtnSize: DOMRect | null;
   recordBtnSize: DOMRect | null;
   saveBtnSize: DOMRect | null;
-  modeBtnSize: DOMRect | null;
+  learnBtnSize: DOMRect | null;
   rsltBtnSize: DOMRect | null;
   setDomSize: (newDomSize: DOMRect) => void;
   setVisibleBtnSize: (newBtnSize: DOMRect) => void;
   setTimeBtnSize: (newBtnSize: DOMRect) => void;
   setRecordBtnSize: (newBtnSize: DOMRect) => void;
   setSaveBtnSize: (newBtnSize: DOMRect) => void;
-  setModeBtnSize: (newBtnSize: DOMRect) => void;
+  setLearnBtnSize: (newBtnSize: DOMRect) => void;
   setRsltBtnSize: (newBtnSize: DOMRect) => void;
+
+  playSize: DOMRect | null;
+  challengeSize: DOMRect | null;
+  repeatSize: DOMRect | null;
+  flipSize: DOMRect | null;
+  speedSize: DOMRect | null;
+
+  setPlaySize: (newDomSize: DOMRect) => void;
+  setChallengeSize: (newDomSize: DOMRect) => void;
+  setRepeatSize: (newDomSize: DOMRect) => void;
+  setFlipSize: (newDomSize: DOMRect) => void;
+  setSpeedSize: (newDomSize: DOMRect) => void;
 }
 
 export const useBtnStore = create<BtnState>((set) => ({
@@ -33,8 +45,14 @@ export const useDomStore = create<DomState>((set) => ({
   timerBtnSize: null,
   recordBtnSize: null,
   saveBtnSize: null,
-  modeBtnSize: null,
+  learnBtnSize: null,
   rsltBtnSize: null,
+
+  playSize: null,
+  challengeSize: null,
+  repeatSize: null,
+  flipSize: null,
+  speedSize: null,
 
   setDomSize: (newDomSize: DOMRect) => set({ domSize: newDomSize }),
   setVisibleBtnSize: (newBtnSize: DOMRect) =>
@@ -42,6 +60,12 @@ export const useDomStore = create<DomState>((set) => ({
   setTimeBtnSize: (newBtnSize: DOMRect) => set({ timerBtnSize: newBtnSize }),
   setRecordBtnSize: (newBtnSize: DOMRect) => set({ recordBtnSize: newBtnSize }),
   setSaveBtnSize: (newBtnSize: DOMRect) => set({ saveBtnSize: newBtnSize }),
-  setModeBtnSize: (newBtnSize: DOMRect) => set({ modeBtnSize: newBtnSize }),
+  setLearnBtnSize: (newBtnSize: DOMRect) => set({ learnBtnSize: newBtnSize }),
   setRsltBtnSize: (newBtnSize: DOMRect) => set({ rsltBtnSize: newBtnSize }),
+
+  setPlaySize: (newDomSize: DOMRect) => set({ playSize: newDomSize }),
+  setChallengeSize: (newDomSize: DOMRect) => set({ challengeSize: newDomSize }),
+  setRepeatSize: (newDomSize: DOMRect) => set({ repeatSize: newDomSize }),
+  setFlipSize: (newDomSize: DOMRect) => set({ flipSize: newDomSize }),
+  setSpeedSize: (newDomSize: DOMRect) => set({ speedSize: newDomSize }),
 }));

@@ -4,13 +4,19 @@ import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import VideoMotionButton from "../components/button/VideoMotionButton";
 import { VideoSection } from "../constants/types";
 import SectionButtonList from "../components/ButtonList/SectionButtonList";
+import MotionCamera from "../components/motion/MotionCamera";
+import { useBtnStore } from "../store/useMotionStore";
+import { setBtnInfo } from "../modules/Motion";
+import useVideoStore from "../store/useVideoStore";
+import { useNavigate } from "react-router-dom";
 
 const LearnPageTest = () => {
   type LearnState = "PAUSE" | "READY" | "PLAY";
   const READY_TIMER = 3;
   const PLAY_SPEEDS = [1, 0.75, 0.5];
 
-  const cameraRef = useRef<HTMLVideoElement>(null);
+  const navigate = useNavigate();
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const video = videoRef.current;
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -32,28 +38,8 @@ const LearnPageTest = () => {
   const [sectionList, setSectionList] = useState<VideoSection[]>([]);
   const [currentTime, setCurrentTime] = useState<number>(0);
 
-  // 카메라 설정 초기화
-  const initCamera = useCallback(() => {
-    // 미디어 설정
-    const constraints: MediaStreamConstraints = {
-      video: {
-        aspectRatio: 9 / 16,
-        facingMode: "user", // 전면 카메라 사용
-      },
-      audio: false,
-    };
-
-    // 카메라 권한 요청
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then((stream: MediaStream) => {
-        if (cameraRef.current) cameraRef.current.srcObject = stream;
-      })
-      .catch((error: Error) => {
-        alert("카메라 권한을 찾을 수 없습니다.");
-        console.error("Media device access error:", error);
-      });
-  }, []);
+  const { currentSection, loopSection, setLoopSection } = useVideoStore();
+  const { btn } = useBtnStore();
 
   // 카메라 크기 초기화
   const initVideoSize = () => {
@@ -92,21 +78,11 @@ const LearnPageTest = () => {
 
   // PAUSE 상태로 변경
   const changeStatePause = useCallback(() => {
-    // 타이머 중지한다.
-    // 동영상 중지 후 처음으로 돌아간다.
-    if (video) {
-      initInterval();
-      video.pause();
-    }
     setState("PAUSE");
-  }, [initInterval, video]);
+  }, []);
 
   // READY 상태로 변경
-  const changeStateReady = () => {
-    // 타이머 1초씩 카운트다운
-    intervalRef.current = setInterval(() => setCurrTimer((prev) => prev - 1), 1000);
-    setState("READY");
-  };
+  const changeStateReady = () => setState("READY");
 
   // 동영상 재생 속도 버튼 클릭 이벤트 리스너
   const handlePlaySpeedButtonClick = () => {
@@ -115,13 +91,14 @@ const LearnPageTest = () => {
   };
 
   // PLAY 상태로 변경
-  const changeStatePlay = useCallback(() => {
-    // 동영상 재생
+  const changeStatePlay = useCallback(() => setState("PLAY"), []);
+
+  // 동영상 재생
+  const playVideo = useCallback(() => {
     if (video) {
       video.playbackRate = currPlaySpeed;
       video.play();
     }
-    setState("PLAY");
   }, [currPlaySpeed, video]);
 
   // 동영상 구간 리스트 반환
@@ -154,7 +131,6 @@ const LearnPageTest = () => {
 
   // 카메라 초기화
   useEffect(() => {
-    initCamera();
     initVideoSize();
 
     window.addEventListener("resize", initVideoSize);
@@ -162,36 +138,110 @@ const LearnPageTest = () => {
     return () => {
       window.removeEventListener("resize", initVideoSize);
     };
-  }, [initCamera]);
+  }, []);
+
+  const startTimer = () => {
+    intervalRef.current = setInterval(() => setCurrTimer((prev) => prev - 1), 1000);
+  };
+
+  // 일시 정지
+  const pauseVideo = useCallback(() => {
+    if (video) {
+      initInterval();
+      video.currentTime = currentSection.start;
+      video.pause();
+    }
+  }, [currentSection.start, initInterval, video]);
+
+  // 상태 업데이트
+  useEffect(() => {
+    switch (state) {
+      case "PAUSE":
+        pauseVideo();
+        break;
+      case "READY":
+        pauseVideo();
+        if (!intervalRef.current) startTimer();
+        break;
+      case "PLAY":
+        playVideo();
+        break;
+      default:
+        break;
+    }
+  }, [isLooping, loopSection, pauseVideo, playVideo, state]);
 
   // 타이머 감시
   useEffect(() => {
     // 카운트다운이 끝나면 재생 상태로 변경
-    if (currTimer <= 0) {
+    if (intervalRef.current && currTimer <= 0) {
       initInterval();
       changeStatePlay();
     }
   }, [changeStatePlay, currTimer, initInterval]);
 
+  const handleTimeUpdate = useCallback(() => {
+    if (video) {
+      setCurrentTime(video.currentTime);
+      console.log(loopSection);
+
+      if (isLooping && loopSection) {
+        if (video.currentTime >= loopSection?.end || video.ended) {
+          video.currentTime = loopSection.start;
+        }
+      }
+    }
+  }, [isLooping, loopSection, video]);
+
   // 동영상 감시
   useEffect(() => {
     if (video) {
       video.addEventListener("ended", changeStatePause);
-      video.addEventListener("timeupdate", () => setCurrentTime(video.currentTime));
+      video.addEventListener("timeupdate", handleTimeUpdate);
     }
 
     return () => {
       if (video) {
         video.removeEventListener("ended", changeStatePause);
-        video.removeEventListener("timeupdate", () => setCurrentTime(video.currentTime));
+        video.removeEventListener("timeupdate", handleTimeUpdate);
       }
     };
-  }, [changeStatePause, video]);
+  }, [changeStatePause, handleTimeUpdate, video]);
 
   // 동영상 구간 리스트 가져오기
   useEffect(() => {
     setSectionList(getSectionList());
   }, []);
+
+  useEffect(() => {
+    switch (btn) {
+      case "play":
+        if (state == "PAUSE") changeStateReady();
+        else changeStatePause();
+        break;
+      case "challenge":
+        navigate("/challenge");
+        break;
+      case "repeat":
+        handleLoopButtonClick();
+        break;
+      case "flip":
+        setIsFlipped(!isFlipped);
+        break;
+      case "speed":
+        handlePlaySpeedButtonClick();
+        break;
+    }
+  }, [btn, changeStatePause, handlePlaySpeedButtonClick, isFlipped, isLooping, navigate, state]);
+
+  useEffect(() => {
+    setBtnInfo();
+  }, [cameraSize.width]);
+
+  const handleLoopButtonClick = () => {
+    setISLooping(!isLooping);
+    setLoopSection(currentSection);
+  };
 
   return (
     <Container>
@@ -211,48 +261,61 @@ const LearnPageTest = () => {
             src="src/assets/sample.mp4"
             ref={videoRef}
             className={isFlipped ? "flip" : ""}
-            controls
           ></video>
         </VideoContainer>
-        <VideoContainer>
-          <video
+        <VideoContainer id="dom">
+          <MotionCamera
             width={cameraSize.width}
             height={cameraSize.height}
-            ref={cameraRef}
             className="camera flip"
             autoPlay
-          ></video>
+          ></MotionCamera>
           <VideoMotionButtonList>
             {state === "PAUSE" ? (
-              <VideoMotionButton icon={<PlayArrow />} toolTip="재생" onClick={changeStateReady} />
+              <VideoMotionButton
+                id="play"
+                icon={<PlayArrow />}
+                toolTip="재생"
+                onClick={changeStateReady}
+              />
             ) : (
-              <VideoMotionButton icon={<Pause />} toolTip="일시정지" onClick={changeStatePause} />
+              <VideoMotionButton
+                id="play"
+                icon={<Pause />}
+                toolTip="일시정지"
+                onClick={changeStatePause}
+              />
             )}
             <div className="foldList">
               <VideoMotionButton
+                id="challenge"
                 icon={<Videocam />}
                 toolTip="챌린지 모드로 이동"
                 link="/challenge"
               />
               {isLooping ? (
                 <VideoMotionButton
+                  id="repeat"
                   icon={<Repeat />}
                   toolTip="구간 반복 해제"
                   onClick={() => setISLooping(!isLooping)}
                 />
               ) : (
                 <VideoMotionButton
+                  id="repeat"
                   imgSrc="src/assets/icon/repeat-off.svg"
                   toolTip="구간 반복"
-                  onClick={() => setISLooping(!isLooping)}
+                  onClick={handleLoopButtonClick}
                 />
               )}
               <VideoMotionButton
+                id="flip"
                 icon={<Flip />}
                 toolTip="거울 모드"
                 onClick={() => setIsFlipped(!isFlipped)}
               />
               <VideoMotionButton
+                id="speed"
                 text={`${currPlaySpeed}x`}
                 toolTip="재생 속도"
                 onClick={handlePlaySpeedButtonClick}
@@ -319,6 +382,7 @@ const VideoContainer = styled.div`
   height: 100%;
 
   video {
+    display: flex;
     object-fit: cover;
   }
 

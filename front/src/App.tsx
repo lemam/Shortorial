@@ -12,6 +12,8 @@ import LearnPageTmp from "./pages/LearnPageTmp";
 import MyPage from "./pages/MyPage";
 import ShortsDetailPage from "./pages/ShortsDetailPage";
 import LearnPageTest from "./pages/LearnPageTest";
+import LoginForm from "./pages/LoginForm";
+import LearnPage from "./pages/LearnPageTmp";
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/learn" element={<LearnPageTest />} />
+          <Route path="/login" element={<LoginForm/>}/>
+          <Route path="/learn" element={<LearnPage />} />
           <Route path="/learn2" element={<LearnPageTmp />} />
           <Route path="/challenge" element={<ChallengePage />} />
           <Route path="/challenge/result" element={<ChallengeResultPage />} />
