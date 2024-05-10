@@ -3,6 +3,10 @@ package com.sleep.sleep.mypage.controller;
 import com.sleep.sleep.common.JWT.JwtTokenUtil;
 import com.sleep.sleep.mypage.dto.MyPageDto;
 import com.sleep.sleep.mypage.service.MyPageService;
+import com.sleep.sleep.shorts.dto.ShortsDto;
+import com.sleep.sleep.shorts.dto.UploadShortsDto;
+import com.sleep.sleep.shorts.service.ShortsService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RequestMapping("/api/mypage")
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MyPageController {
 
     private final MyPageService myPageService;
+    private final ShortsService shortsService;
     private final JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/info")
@@ -36,6 +43,19 @@ public class MyPageController {
         }catch (Exception e){
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Operation(summary = "사용자의 업로드한 영상 리스트", description ="사용자의 엑세스 토큰을 넣어서 사용자가 ")
+    @GetMapping("/upload-shorts")
+    public ResponseEntity<List<UploadShortsDto>> selectUploadShortList(@RequestHeader("Authorization") String accessToken) {
+        //사용자 찾기
+        System.out.println(accessToken.toString());
+        String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+        System.out.println("username : "+ username);
+
+        List<UploadShortsDto> shortsList = shortsService.getUploadShortsList(username);
+
+        return ResponseEntity.ok(shortsList);
     }
 
 
