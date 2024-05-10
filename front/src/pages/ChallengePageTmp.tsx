@@ -2,30 +2,279 @@ import { useCallback, useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import danceVideo from "../assets/sample.mp4";
 import { useNavigate } from "react-router-dom";
-import useChallengeStore from "../store/useChallengeStore";
-import learnMode from "../assets/learnmode.png";
-import stop from "../assets/stop.png";
-import start from "../assets/start.png";
-import load from "../assets/loading.gif";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
-import ModalComponent from "../components/modal/ModalComponent";
+import LoadingModalComponent from "../components/modal/LoadingModalComponent";
+import VideoButton from "../components/button/VideoButton";
+import axios from "axios";
+import { predictWebcam, setBtnInfo } from "../modules/Motion";
+import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
+import { useBtnStore } from "../store/useMotionStore";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
   const ffmpeg = createFFmpeg({ log: false });
-
-  const { setDownloadURL } = useChallengeStore();
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [show, setShow] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // 토글
+  const [recording, setRecording] = useState(false); // 녹화 진행
+  const initialTimer = parseInt(localStorage.getItem("timer") || "3");
+  const [timer, setTimer] = useState<number>(initialTimer); // 타이머
+  const [timerPath, setTimerPath] = useState(
+    `src/assets/challenge/${timer}sec.svg`
+  ); // 타이머 이미지 경로
+  const [loadPath, setLoadPath] = useState("src/assets/challenge/loading.gif"); // 로딩 이미지 경로
+  const [ffmpegLog, setFfmpegLog] = useState("");
 
-  const handleShowModal = () => setLoading(true);
-  const handleCloseModal = () => setLoading(false);
+  const handleShowModal = () => {
+    setShow(true);
+    stopRecording();
+  };
+  const handleCloseModal = () => setShow(false);
 
+  const showVideoButtonContainer = () => setIsVisible(!isVisible);
+  const showRecordButton = () => setRecording(false);
+  const showCancleButton = () => setRecording(true);
+
+  const goToLearnMode = () => {
+    stream?.getTracks().forEach((track) => track.stop());
+    navigate("/learn");
+  };
+  const goToResult = () => {
+    stream?.getTracks().forEach((track) => track.stop());
+    navigate("/challenge/result");
+  };
+
+  const changeTimer = () => {
+    var nextTimer = timer == 3 ? 5 : timer == 5 ? 10 : 3;
+
+    localStorage.setItem("timer", nextTimer.toString());
+    setTimer(nextTimer);
+    setTimerPath(`src/assets/challenge/${nextTimer}sec.svg`);
+  };
+
+  const cancelRecording = () => {
+    showRecordButton();
+    if (danceVideoRef.current) {
+      danceVideoRef.current.pause();
+      danceVideoRef.current.currentTime = 0;
+    }
+  };
+
+  const stopRecording = () => {
+    setLoadPath("src/assets/challenge/loading.gif");
+    setFfmpegLog("대기중...");
+    cancelRecording();
+    mediaRecorder?.stop(); // recorder.onstop() 실행
+  };
+
+  const startRecording = () => {
+    if (!stream) {
+      alert("카메라 접근을 허용해주세요.");
+      return;
+    }
+
+    try {
+      const recorder = new MediaRecorder(stream); // 녹화형으로 변환
+      const chunks: BlobPart[] = []; // 스트림 조각을 넣을 배열
+      recorder.ondataavailable = (e) => chunks.push(e.data); // 스트림 조각이 어느 정도 커지면 push하기
+
+      recorder.onstop = async () => {
+        if (!ffmpeg.isLoaded()) {
+          await ffmpeg.load(); // ffmpeg 로드
+        }
+
+        const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // Blob 생성
+
+        // 댄스 비디오 오디오 추출
+        const danceVideoBlob = await fetchFile(danceVideo); // 링크된 댄스 비디오를 Blob으로 변환
+        ffmpeg.FS("writeFile", "danceVideo.mp4", danceVideoBlob); // Blob을 가상 파일로 변환
+
+        ffmpeg.setProgress(({ ratio }) => {
+          if (ratio > 0) {
+            setLoadPath("src/assets/challenge/loading.gif");
+            setFfmpegLog(`노래 추출... ${Math.round(ratio * 100)}%\n`);
+          }
+        });
+
+        await ffmpeg.run(
+          "-i",
+          "danceVideo.mp4",
+          "-vn", // 비디오 무시
+          "-c:a",
+          "copy", // aac 코덱 복사
+          "dance_audio.m4a" // 오디오 파일 생성
+        );
+
+        // 비디오에 오디오 추가
+        await addAudio(userVideoBlob);
+      };
+
+      recorder.start(); // 녹화 시작
+      setMediaRecorder(recorder);
+      danceVideoRef.current?.play(); // 댄스 비디오 시작
+    } catch (error) {
+      console.log(error);
+      alert("녹화를 다시 시작해 주세요.");
+    }
+  };
+
+  const addAudio = async (userVideoBlob: Blob) => {
+    try {
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(userVideoBlob);
+      // 파일 읽기가 완료 되면
+      reader.onloadend = async () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        const uint8Array = new Uint8Array(arrayBuffer); // ffmpeg가 읽을 수 있는 8비트 정수 배열로 변환
+        ffmpeg.FS("writeFile", "userVideo.mp4", uint8Array); // 사용자 비디오 가상 파일 만들기
+
+        ffmpeg.setProgress(({ ratio }) => {
+          if (ratio > 0) {
+            setLoadPath("src/assets/challenge/loading.gif");
+            setFfmpegLog(`노래 삽입... ${Math.round(ratio * 100)}%\n`);
+          }
+        });
+
+        await ffmpeg.run(
+          "-i",
+          "userVideo.mp4", // 사용자 영상
+          "-i",
+          "dance_audio.m4a", // 원본 오디오
+          "-map",
+          "0:v:0", // 첫번째 파일(사용자 영상)의 0번째 스트림
+          "-map",
+          "1:a:0", // 두번째 파일(원본 오디오)의 0번째 스트림
+          "-c:v",
+          "copy", // 비디오 인코딩 복사
+          "-c:a",
+          "copy", // 오디오 인코딩 복사
+          "-shortest", // 두 개 파일 중 짧은 쪽에 맞춤
+          "finalUserVideo.mp4" // 파일 생성
+        );
+
+        ffmpeg.setProgress(({ ratio }) => {
+          if (ratio > 0) {
+            setLoadPath("src/assets/challenge/loading.gif");
+            setFfmpegLog(`거울모드로 저장... ${Math.round(ratio * 100)}%\n`);
+          }
+        });
+
+        await ffmpeg.run(
+          "-i",
+          "finalUserVideo.mp4",
+          "-vf", // 비디오 필터
+          "hflip", // 좌우반전
+          "finalUserVideoFlip.mp4"
+        );
+
+        const userVideoFlipFinal = ffmpeg.FS(
+          "readFile",
+          "finalUserVideoFlip.mp4"
+        );
+        // 최종 파일 Blob 변환
+        const userVideoFinalBlob = new Blob([userVideoFlipFinal.buffer], {
+          type: "video/mp4",
+        });
+
+        // 최종파일 url 전달
+        makeDownloadURL(userVideoFinalBlob);
+      };
+    } catch (error) {
+      console.log(error);
+      alert("오디오를 추가할 수 없습니다.");
+    }
+  };
+
+  const makeDownloadURL = async (userVideoFinalBlob: Blob) => {
+    try {
+      await s3Upload(userVideoFinalBlob);
+      setTimeout(handleCloseModal, 100000);
+    } catch (error) {
+      console.error("비디오 저장 중 오류 발생:", error);
+    }
+  };
+
+  const s3Upload = async (blob: Blob) => {
+    try {
+      const title = getCurrentDateTime();
+      const formData = new FormData();
+      formData.append("file", blob, `${title}.mp4`);
+      formData.append("fileName", title);
+
+      const uploadResponse = await axios.post(
+        "http://localhost:8089/s3/upload",
+        formData,
+        {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTE1MTUxOCwiZXhwIjoxNzE1MTUzMzE4fQ.PGF6vM4wRzjA-fb2B5mxzdrBMns3dUMSc4d2wWU_aBU",
+          },
+        }
+      );
+
+      setLoadPath("src/assets/challenge/complete.svg");
+      setFfmpegLog("저장 완료");
+      console.log("s3 upload success", uploadResponse.data);
+    } catch (error) {
+      setLoadPath("src/assets/challenge/uncomplete.svg");
+      if (error instanceof Error && error.stack) setFfmpegLog(error.stack);
+      console.error("s3 upload fail", error);
+    }
+  };
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // 월은 0부터 시작하므로 1을 더합니다.
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+
+    return `${year}${month}${day}${hours}${minutes}${seconds}`;
+  };
+
+  // 타이머
+  useEffect(() => {
+    if (recording) {
+      // 녹화 시작 버튼을 눌렀을 때
+      const intervalId = setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer <= 1) {
+            clearInterval(intervalId); // 인터벌 종료
+            startRecording(); // 녹화 시작
+            return initialTimer; // 로컬스토리지에 저장된 타이머값으로 초기화
+          }
+          return prevTimer - 1; // timer에 저장된 값에서 1을 뺌
+        });
+      }, 1000); // 1초에 한번씩
+
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
+  }, [recording]);
+
+  const canvasElement = document.getElementById(
+    "output_canvas"
+  ) as HTMLCanvasElement | null;
+  let canvasCtx: CanvasRenderingContext2D | null = null;
+  // 그리기 도구
+  let drawingUtils: DrawingUtils | null = null;
+
+  if (canvasElement) canvasCtx = canvasElement.getContext("2d");
+  if (canvasCtx) drawingUtils = new DrawingUtils(canvasCtx);
+
+  let lastWebcamTime = -1;
+  let before_handmarker: NormalizedLandmark | null = null;
+  let curr_handmarker: NormalizedLandmark | null = null;
+
+  // camera가 있을 HTML
   const setInit = useCallback(async () => {
     const constraints: MediaStreamConstraints = {
       video: {
@@ -40,12 +289,30 @@ const ChallengePage = () => {
         constraints
       );
       // userVideoRef를 참조하고 있는 DOM에 넣기
-      if (userVideoRef.current) userVideoRef.current.srcObject = mediaStream;
-      setStream(mediaStream);
+      if (userVideoRef.current) {
+        userVideoRef.current.srcObject = mediaStream;
+        setStream(mediaStream);
+        userVideoRef.current.addEventListener("loadeddata", () => {
+          console.log("이벤트 삽입 완");
+          predictWebcam(
+            "challenge",
+            userVideoRef.current,
+            canvasCtx,
+            canvasElement,
+            drawingUtils,
+            lastWebcamTime,
+            before_handmarker,
+            curr_handmarker,
+            setBtn
+          );
+        });
+      }
     } catch (error) {
       alert("카메라 접근을 허용해주세요.");
       console.log(error);
     }
+
+    // setInit();
   }, []);
 
   // 비디오 크기 초기화
@@ -81,175 +348,141 @@ const ChallengePage = () => {
     };
   }, []);
 
-  const startRecording = () => {
-    if (!stream) {
-      alert("카메라 접근을 허용해주세요.");
-      return;
+  const { btn, setBtn } = useBtnStore();
+
+  useEffect(() => {
+    switch (btn) {
+      case "visible":
+        showVideoButtonContainer();
+        break;
+      case "timer":
+        console.log("timer");
+        if (isVisible) changeTimer();
+        break;
+      case "record":
+        if (isVisible) {
+          if (recording) cancelRecording();
+          else showCancleButton();
+        }
+        break;
+      case "save":
+        if (isVisible) {
+          handleShowModal();
+        }
+        break;
+      case "learn":
+        console.log("mode");
+        if (isVisible) {
+          goToLearnMode();
+        }
+        break;
+      case "rslt":
+        if (isVisible) {
+          goToResult();
+        }
     }
+  }, [btn]);
 
-    try {
-      const recorder = new MediaRecorder(stream); // 녹화형으로 변환
-      const chunks: BlobPart[] = []; // 스트림 조각을 넣을 배열
-      recorder.ondataavailable = (e) => chunks.push(e.data); // 스트림 조각이 어느 정도 커지면 push하기
-
-      recorder.onstop = async () => {
-        handleShowModal();
-        console.log("로딩 시작:", new Date().toLocaleTimeString()); // 로딩 시작 시간 로그
-
-        const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // Blob 생성
-
-        // 댄스 비디오 오디오 추출
-        const danceVideoBlob = await fetchFile(danceVideo); // 링크된 댄스 비디오를 Blob으로 변환
-        ffmpeg.FS("writeFile", "danceVideo.mp4", danceVideoBlob); // Blob을 가상 파일로 변환
-        await ffmpeg.run(
-          "-i",
-          "danceVideo.mp4",
-          "-vn", // 비디오 무시
-          "-c:a",
-          "copy", // aac 코덱 복사
-          "dance_audio.m4a" // 오디오 파일 생성
-        );
-
-        // 비디오에 오디오 추가
-        await addAudio(userVideoBlob);
-      };
-
-      ffmpeg.load(); // ffmpeg 로드
-      recorder.start(); // 녹화 시작
-      setMediaRecorder(recorder);
-
-      danceVideoRef.current?.play(); // 댄스 비디오도 시작
-    } catch (error) {
-      console.log(error);
-      alert("녹화를 다시 시작해 주세요.");
-    }
-  };
-
-  const stopRecording = () => {
-    mediaRecorder?.stop(); // recorder.onstop() 실행
-    stream?.getTracks().forEach((track) => track.stop());
-  };
-
-  const goToLearnMode = () => {
-    navigate("/learn"); // 연습 페이지 가기
-  };
-
-  const goToChallengeMode = () => {
-    navigate("/challenge"); // 다시 찍기
-  };
-
-  const addAudio = async (userVideoBlob: Blob) => {
-    try {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(userVideoBlob);
-      // 파일 읽기가 완료 되면
-      reader.onloadend = async () => {
-        const arrayBuffer = reader.result as ArrayBuffer;
-        const uint8Array = new Uint8Array(arrayBuffer); // ffmpeg가 읽을 수 있는 8비트 정수 배열로 변환
-        ffmpeg.FS("writeFile", "userVideo.mp4", uint8Array); // 사용자 비디오 가상 파일 만들기
-
-        await ffmpeg.run(
-          "-i",
-          "userVideo.mp4", // 사용자 영상
-          "-i",
-          "dance_audio.m4a", // 원본 오디오
-          "-map",
-          "0:v:0", // 첫번째 파일(사용자 영상)의 0번째 스트림
-          "-map",
-          "1:a:0", // 두번째 파일(원본 오디오)의 0번째 스트림
-          "-c:v",
-          "copy", // 비디오 인코딩 복사
-          "-c:a",
-          "copy", // 오디오 인코딩 복사
-          "-shortest", // 두 개 파일 중 짧은 쪽에 맞춤
-          "finalUserVideo.mp4" // 파일 생성
-        );
-
-        await ffmpeg.run(
-          "-i",
-          "finalUserVideo.mp4",
-          "-vf", // 비디오 필터
-          "hflip", // 좌우반전
-          "finalUserVideoFlip.mp4"
-        );
-
-        const userVideoFlipFinal = ffmpeg.FS(
-          "readFile",
-          "finalUserVideoFlip.mp4"
-        );
-        // 최종 파일 Blob 변환
-        const userVideoFinalBlob = new Blob([userVideoFlipFinal.buffer], {
-          type: "video/mp4",
-        });
-
-        // 최종파일 url 전달
-        makeDownloadURL(userVideoFinalBlob);
-      };
-    } catch (error) {
-      console.log(error);
-      alert("오디오를 추가할 수 없습니다.");
-    }
-  };
-
-  const makeDownloadURL = (userVideoFinalBlob: Blob) => {
-    try {
-      setDownloadURL(URL.createObjectURL(userVideoFinalBlob));
-    } catch (error) {
-      console.log("비디오가 생성되지 않았습니다:", error);
-    } finally {
-      handleCloseModal();
-      console.log("로딩 시작:", new Date().toLocaleTimeString()); // 로딩 시작 시간 로그
-      navigate("/challenge/result"); // 결과 페이지 가기
-    }
-  };
+  useEffect(() => {
+    setBtnInfo();
+  }, []);
 
   return (
-    <ChallengeContainer>
-      <VideoContainer
-        ref={danceVideoRef}
-        src={danceVideo}
-        playsInline
-        onEnded={stopRecording}
-      ></VideoContainer>
-      <PracticeModeButton
-        src={learnMode}
-        onClick={goToLearnMode}
-      ></PracticeModeButton>
-      <UserVideoContainer
-        ref={userVideoRef}
-        autoPlay
-        playsInline
-      ></UserVideoContainer>
-      <RecordButtonContainer>
-        {mediaRecorder && (
-          <RecordButton onClick={stopRecording}>
-            <img src={stop} width="40px" height="40px"></img>
-          </RecordButton>
-        )}
-        {!mediaRecorder && (
-          <RecordButton onClick={startRecording}>
-            <img src={start} width="80px" height="80px"></img>
-          </RecordButton>
-        )}
-      </RecordButtonContainer>
-      <ModalComponent
-        title="아픈 건 딱 질색이니까"
-        body={<img src={load} width="300px" height="300px"></img>}
-        showModal={loading}
-        handleCloseModal={handleCloseModal}
-        goToLearnMode={goToLearnMode}
-        goToChallengeMode={goToChallengeMode}
-      ></ModalComponent>
-    </ChallengeContainer>
+    <div>
+      <ChallengeContainer>
+        <VideoContainer
+          ref={danceVideoRef}
+          src={danceVideo}
+          playsInline
+          controls
+          onEnded={handleShowModal}
+        ></VideoContainer>
+        <div id="dom" style={{ position: "relative" }}>
+          <UserVideoContainer
+            ref={userVideoRef}
+            autoPlay
+            playsInline
+          ></UserVideoContainer>
+          {/* <canvas
+          id="output_canvas"
+          width={500}
+          height={700}
+          style={{ objectFit: "cover" }}
+        ></canvas> */}
+          <VideoToggleContainer>
+            <VideoButton
+              path="src/assets/challenge/open.svg"
+              id="visible"
+              text="감추기"
+              onClick={showVideoButtonContainer}
+              isVisible={isVisible}
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/close.svg"
+              id="visible"
+              text="보기"
+              onClick={showVideoButtonContainer}
+              isVisible={!isVisible}
+            ></VideoButton>
+          </VideoToggleContainer>
+          <Timer>{timer}</Timer>
+          <VideoButtonContainer>
+            <VideoButton
+              path={timerPath}
+              id="timer"
+              text="타이머"
+              isVisible={isVisible}
+              onClick={changeTimer}
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/stop.svg"
+              id="timer"
+              text="취소"
+              onClick={cancelRecording}
+              isVisible={isVisible && recording} // isVisible, recording 일 때 보임
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/record.svg"
+              id="record"
+              text="녹화"
+              onClick={showCancleButton}
+              isVisible={isVisible && !recording} // isVisible, not recording 일 때 보임
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/save.svg"
+              id="save"
+              text="저장"
+              isVisible={isVisible}
+              onClick={handleShowModal}
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/learn.svg"
+              id="learn"
+              text="연습모드"
+              onClick={goToLearnMode}
+              isVisible={isVisible}
+            ></VideoButton>
+            <VideoButton
+              path="src/assets/challenge/mine.svg"
+              id="rslt"
+              text="나의 챌린지"
+              onClick={goToResult}
+              isVisible={isVisible}
+            ></VideoButton>
+          </VideoButtonContainer>
+        </div>
+        <LoadingModalComponent
+          progress={ffmpegLog}
+          showModal={show}
+          handleCloseModal={handleCloseModal}
+          path={""}
+        ></LoadingModalComponent>
+      </ChallengeContainer>
+    </div>
   );
 };
 
 const VideoContainer = styled.video`
-  position: relative;
-  display: flex;
-`;
-
-const UserVideoContainer = styled.video`
   position: relative;
   display: none;
 
@@ -260,6 +493,11 @@ const UserVideoContainer = styled.video`
   @media screen and (orientation: landscape) {
     display: flex;
   }
+`;
+
+const UserVideoContainer = styled.video`
+  position: relative;
+  display: flex;
 
   object-fit: cover;
   transform: scaleX(-1);
@@ -271,28 +509,35 @@ const ChallengeContainer = styled.div`
   justify-content: center;
 `;
 
-const RecordButtonContainer = styled.div`
+const VideoToggleContainer = styled.div`
+  position: absolute !important;
+  right: 0 !important;
+  top: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  z-index: 1;
+  min-width: 120px;
 `;
 
-const RecordButton = styled.button`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background-color: white;
+const VideoButtonContainer = styled.div`
+  position: absolute !important;
+  right: 0 !important;
+  top: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 1;
+  min-width: 120px;
 `;
 
-const PracticeModeButton = styled.img`
-  width: 32px;
-  height: 32px;
-  background-color: white;
-  border-radius: 6px;
-  padding: 4px 8px;
-  margin-left: -140px;
-  z-index: 10;
-  position: absolute;
+const Timer = styled.div`
+  position: absolute !important;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  font-size: 50px;
 `;
 
 export default ChallengePage;

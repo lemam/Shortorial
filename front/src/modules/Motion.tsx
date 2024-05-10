@@ -12,33 +12,50 @@ let visible_count = 0;
 let timer_count = 0;
 let record_count = 0;
 let save_count = 0;
-let mode_count = 0;
+let learn_count = 0;
 let rslt_count = 0;
+
+let play_count = 0;
+let challenge_count = 0;
+let repeat_count = 0;
+let flip_count = 0;
+let speed_count = 0;
 
 let domSize: DOMRect | null = null;
 let visibleBtnSize: DOMRect | null = null;
 let timerBtnSize: DOMRect | null = null;
 let recorderBtnSize: DOMRect | null = null;
 let saveBtnSize: DOMRect | null = null;
-let modeBtnSize: DOMRect | null = null;
+let learnBtnSize: DOMRect | null = null;
 let rsltBtnSize: DOMRect | null = null;
+
+let playSize: DOMRect | null = null;
+let challengeSize: DOMRect | null = null;
+let repeatSize: DOMRect | null = null;
+let flipSize: DOMRect | null = null;
+let speedSize: DOMRect | null = null;
 
 // 좌우 모션 인식에 활용되는 변수
 let left_count = 0;
 let right_count = 0;
 let poseLandmarker: PoseLandmarker | null = null;
-const MAX_COUNT: number = 10;
-const TIMER_COUNT: number = 15;
-const RECORD_COUNT: number = 30;
 
-export function btn_with_landmark(
+const SMALL_COUNT: number = 10;
+const MED_COUNT: number = 15;
+const MAX_COUNT: number = 30;
+
+export function btn_with_landmark_challenge(
   handLandmarker: NormalizedLandmark,
   setBtn: (newBtn: String) => void
 ) {
+  // console.log(handLandmarker.x);
   handLandmarker.x = makeAbsoluteLandmarkX(handLandmarker.x);
   handLandmarker.y = makeAbsoluteLandmarkY(handLandmarker.y);
+  // if (handLandmarker.visibility > 0.5) {
+  //   console.log("X : ", handLandmarker.x);
+  //   console.log("Y : ", handLandmarker.y);
+  // }
 
-  console.log(handLandmarker.y);
   if (
     visibleBtnSize &&
     handLandmarker.x <= visibleBtnSize.right &&
@@ -49,66 +66,212 @@ export function btn_with_landmark(
       handLandmarker.y >= visibleBtnSize.top &&
       handLandmarker.y <= visibleBtnSize.bottom
     ) {
-      if (visible_count >= MAX_COUNT) {
+      if (visible_count >= SMALL_COUNT) {
         setBtn("visible");
-        visible_count = 0;
-        timer_count = 0;
       } else {
         visible_count++;
+        timer_count = 0;
+        record_count = 0;
+        save_count = 0;
+        learn_count = 0;
+        rslt_count = 0;
       }
     } else if (
       timerBtnSize &&
       handLandmarker.y >= timerBtnSize.top &&
       handLandmarker.y <= timerBtnSize.bottom
     ) {
-      if (timer_count >= TIMER_COUNT) {
+      if (timer_count >= SMALL_COUNT) {
         setBtn("timer");
-        timer_count = 0;
       } else {
+        setBtn("none");
+        visible_count = 0;
         timer_count++;
+        record_count = 0;
+        save_count = 0;
+        learn_count = 0;
+        rslt_count = 0;
       }
     } else if (
       recorderBtnSize &&
       handLandmarker.y >= recorderBtnSize.top &&
       handLandmarker.y <= recorderBtnSize.bottom
     ) {
-      if (record_count >= RECORD_COUNT) {
+      if (record_count >= SMALL_COUNT) {
         setBtn("record");
-        record_count = 0;
       } else {
+        setBtn("none");
+        visible_count = 0;
+        timer_count = 0;
         record_count++;
+        save_count = 0;
+        learn_count = 0;
+        rslt_count = 0;
       }
     } else if (
       saveBtnSize &&
       handLandmarker.y >= saveBtnSize.top &&
       handLandmarker.y <= saveBtnSize.bottom
     ) {
-      if (save_count >= RECORD_COUNT) {
-        console.log("save");
+      if (save_count >= SMALL_COUNT) {
         setBtn("save");
-        save_count = 0;
-      } else save_count++;
+      } else {
+        setBtn("none");
+        visible_count = 0;
+        timer_count = 0;
+        record_count = 0;
+        save_count++;
+        learn_count = 0;
+        rslt_count = 0;
+      }
     } else if (
-      modeBtnSize &&
-      handLandmarker.y >= modeBtnSize.top &&
-      handLandmarker.y <= modeBtnSize.bottom
+      learnBtnSize &&
+      handLandmarker.y >= learnBtnSize.top &&
+      handLandmarker.y <= learnBtnSize.bottom
     ) {
-      if (mode_count >= RECORD_COUNT) {
-        console.log("mode");
-        setBtn("mode");
-        mode_count = 0;
-      } else mode_count++;
+      if (learn_count >= SMALL_COUNT) {
+        // console.log("mode");
+        setBtn("learn");
+      } else {
+        setBtn("none");
+        visible_count = 0;
+        timer_count = 0;
+        record_count = 0;
+        save_count = 0;
+        learn_count++;
+        rslt_count = 0;
+      }
     } else if (
       rsltBtnSize &&
       handLandmarker.y >= rsltBtnSize.top &&
       handLandmarker.y <= rsltBtnSize.bottom
     ) {
-      if (rslt_count == MAX_COUNT) {
+      if (rslt_count == SMALL_COUNT) {
         console.log("rslt");
         setBtn("rslt");
-        rslt_count = 0;
-      } else rslt_count++;
+      } else {
+        setBtn("none");
+        visible_count = 0;
+        timer_count = 0;
+        record_count = 0;
+        save_count = 0;
+        learn_count = 0;
+        rslt_count++;
+      }
     }
+  } else {
+    setBtn("none");
+    visible_count = 0;
+    timer_count = 0;
+    record_count = 0;
+    save_count = 0;
+    learn_count = 0;
+    rslt_count = 0;
+  }
+}
+
+export function btn_with_landmark_learn(
+  handLandmarker: NormalizedLandmark,
+  setBtn: (newBtn: String) => void
+) {
+  // console.log(handLandmarker.x);
+  handLandmarker.x = makeAbsoluteLandmarkX(handLandmarker.x);
+  handLandmarker.y = makeAbsoluteLandmarkY(handLandmarker.y);
+  // if (handLandmarker.visibility > 0.5) {
+  //   console.log("X : ", handLandmarker.x);
+  //   console.log("Y : ", handLandmarker.y);
+  // }
+
+  if (
+    playSize &&
+    handLandmarker.x <= playSize.right &&
+    handLandmarker.x >= playSize.left &&
+    handLandmarker.visibility > 0.5
+  ) {
+    // console.log("A");
+    if (
+      handLandmarker.y >= playSize.top &&
+      handLandmarker.y <= playSize.bottom
+    ) {
+      if (play_count >= SMALL_COUNT) {
+        setBtn("play");
+      } else {
+        // console.log("B");
+        setBtn("none");
+        play_count++;
+        challenge_count = 0;
+        repeat_count = 0;
+        flip_count = 0;
+        speed_count = 0;
+      }
+    } else if (
+      challengeSize &&
+      handLandmarker.y >= challengeSize.top &&
+      handLandmarker.y <= challengeSize.bottom
+    ) {
+      if (challenge_count >= SMALL_COUNT) {
+        setBtn("challenge");
+      } else {
+        setBtn("none");
+        play_count = 0;
+        challenge_count++;
+        repeat_count = 0;
+        flip_count = 0;
+        speed_count = 0;
+      }
+    } else if (
+      repeatSize &&
+      handLandmarker.y >= repeatSize.top &&
+      handLandmarker.y <= repeatSize.bottom
+    ) {
+      if (repeat_count >= SMALL_COUNT) {
+        setBtn("repeat");
+      } else {
+        setBtn("none");
+        play_count = 0;
+        challenge_count = 0;
+        repeat_count++;
+        flip_count = 0;
+        speed_count = 0;
+      }
+    } else if (
+      flipSize &&
+      handLandmarker.y >= flipSize.top &&
+      handLandmarker.y <= flipSize.bottom
+    ) {
+      if (flip_count >= SMALL_COUNT) {
+        setBtn("flip");
+      } else {
+        setBtn("none");
+        play_count = 0;
+        challenge_count = 0;
+        repeat_count = 0;
+        flip_count++;
+        speed_count = 0;
+      }
+    } else if (
+      speedSize &&
+      handLandmarker.y >= speedSize.top &&
+      handLandmarker.y <= speedSize.bottom
+    ) {
+      if (speed_count >= SMALL_COUNT) {
+        setBtn("speed");
+      } else {
+        setBtn("none");
+        play_count = 0;
+        challenge_count = 0;
+        repeat_count = 0;
+        flip_count = 0;
+        speed_count++;
+      }
+    }
+  } else {
+    setBtn("none");
+    play_count = 0;
+    challenge_count = 0;
+    repeat_count = 0;
+    flip_count = 0;
+    speed_count = 0;
   }
 }
 
@@ -165,6 +328,7 @@ export const createPoseLandmarker = async () => {
 createPoseLandmarker();
 
 export async function predictWebcam(
+  cate: string,
   webcam: HTMLVideoElement | null,
   canvasCtx: CanvasRenderingContext2D | null,
   canvasElement: HTMLCanvasElement | null,
@@ -189,7 +353,9 @@ export async function predictWebcam(
 
         for (const landmark of result.landmarks) {
           // 오른손이 우측 상단에 가면 알려주는 함수
-          btn_with_landmark(landmark[18], setBtn);
+          if (cate == "challenge")
+            btn_with_landmark_challenge(landmark[18], setBtn);
+          else btn_with_landmark_learn(landmark[18], setBtn);
 
           if (!before_handmarker) {
             if (landmark[18].visibility > 0.5) {
@@ -218,6 +384,7 @@ export async function predictWebcam(
   // 모션인식 계속 진행
   window.requestAnimationFrame(() =>
     predictWebcam(
+      cate,
       webcam,
       canvasCtx,
       canvasElement,
@@ -277,20 +444,40 @@ export function setBtnInfo() {
   const timerBtn = btnPlace("timer");
   const recordBtn = btnPlace("record");
   const saveBtn = btnPlace("save");
+  const learnBtn = btnPlace("learn");
   const rsltBtn = btnPlace("rslt");
+
+  const play = btnPlace("play");
+  const challenge = btnPlace("challenge");
+  const repeat = btnPlace("repeat");
+  const flip = btnPlace("flip");
+  const speed = btnPlace("speed");
 
   if (dom) useDomStore.getState().setDomSize(dom);
   if (visibleBtn) useDomStore.getState().setVisibleBtnSize(visibleBtn);
   if (timerBtn) useDomStore.getState().setTimeBtnSize(timerBtn);
   if (recordBtn) useDomStore.getState().setRecordBtnSize(recordBtn);
   if (saveBtn) useDomStore.getState().setSaveBtnSize(saveBtn);
+  if (learnBtn) useDomStore.getState().setLearnBtnSize(learnBtn);
   if (rsltBtn) useDomStore.getState().setRsltBtnSize(rsltBtn);
+
+  if (play) useDomStore.getState().setPlaySize(play);
+  if (challenge) useDomStore.getState().setChallengeSize(challenge);
+  if (repeat) useDomStore.getState().setRepeatSize(repeat);
+  if (flip) useDomStore.getState().setFlipSize(flip);
+  if (speed) useDomStore.getState().setSpeedSize(speed);
 
   domSize = useDomStore.getState().domSize;
   visibleBtnSize = useDomStore.getState().visibleBtnSize;
   timerBtnSize = useDomStore.getState().timerBtnSize;
   recorderBtnSize = useDomStore.getState().recordBtnSize;
   saveBtnSize = useDomStore.getState().saveBtnSize;
-  modeBtnSize = useDomStore.getState().modeBtnSize;
+  learnBtnSize = useDomStore.getState().learnBtnSize;
   rsltBtnSize = useDomStore.getState().rsltBtnSize;
+
+  playSize = useDomStore.getState().playSize;
+  challengeSize = useDomStore.getState().challengeSize;
+  repeatSize = useDomStore.getState().repeatSize;
+  flipSize = useDomStore.getState().flipSize;
+  speedSize = useDomStore.getState().speedSize;
 }

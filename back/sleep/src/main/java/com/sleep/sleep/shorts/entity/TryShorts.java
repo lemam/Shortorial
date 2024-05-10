@@ -21,9 +21,6 @@ public class TryShorts {
     @ManyToOne
     @JoinColumn(name = "member_no")
     private Member memberIndex;
-    private int tryCount;
-    private int tryComplete;
-    private int tryMaxTime;
-    private int tryCurrentTime;
+    private int tryYn;
 
 }
