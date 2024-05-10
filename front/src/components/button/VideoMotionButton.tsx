@@ -27,7 +27,7 @@ const VideoMotionButton = ({
 
   return (
     <Link to={link} onClick={handleLinkClick}>
-      <Container onClick={onClick}>
+      <Container id={id} onClick={onClick}>
         {icon}
         {imgSrc && <img src={imgSrc} alt="" />}
         <div className="text">{text}</div>
