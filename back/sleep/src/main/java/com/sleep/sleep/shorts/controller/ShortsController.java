@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,5 +24,11 @@ public class ShortsController {
         List<ShortsDto> shortsList = shortsService.getShortList();
 
         return ResponseEntity.ok(shortsList);
+    }
+
+    @Operation(summary = "특정 쇼츠 조회")
+    @GetMapping("/api/shorts/{shortsNo}")
+    public ResponseEntity<ShortsDto> selectUserPrediction(@PathVariable int shortsNo) {
+        return ResponseEntity.ok(shortsService.getShortsInfo(shortsNo));
     }
 }

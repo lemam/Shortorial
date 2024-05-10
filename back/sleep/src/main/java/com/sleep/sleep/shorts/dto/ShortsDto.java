@@ -2,6 +2,8 @@ package com.sleep.sleep.shorts.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Data
 @Getter
 @Setter
@@ -21,4 +23,6 @@ public class ShortsDto {
     private int shortsChallengers;
 
     private String shortsLink;
+
+    private LocalDate shortDate;
 }

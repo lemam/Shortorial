@@ -1,16 +1,39 @@
 import styled from "styled-components";
 import { VideoSection } from "../../constants/types";
 import SectionButton from "../button/SectionButton";
-import useLearnVideoStore from "../../store/useLearnVideoStore";
+import { useCallback, useEffect, useState } from "react";
 
 interface SectionButtonListProps {
   sectionList: VideoSection[] | null;
-  parentWidth: number;
+  parentWidth: number | undefined;
+  currentTime: number;
   clickHandler: (section: VideoSection) => void;
 }
 
-const SectionButtonList = ({ sectionList, parentWidth, clickHandler }: SectionButtonListProps) => {
-  const currentSection = useLearnVideoStore((state) => state.computed.currentSection);
+const SectionButtonList = ({
+  sectionList = [],
+  parentWidth = 0,
+  currentTime = 0,
+  clickHandler,
+}: SectionButtonListProps) => {
+  const [currSectionIdx, setCurrSectionIdx] = useState<number>(0);
+
+  // 현재 시간에 있는 구간 반환
+  const getCurrSection = useCallback(() => {
+    let result: VideoSection | undefined;
+    const time = currentTime;
+
+    if (sectionList) {
+      result = sectionList.find((item) => time >= item.start && time < item.end);
+    }
+
+    return result ?? { id: 0, start: 0, end: 0 };
+  }, [currentTime, sectionList]);
+
+  // 현재 구간 인덱스 설정
+  useEffect(() => {
+    setCurrSectionIdx(getCurrSection().id);
+  }, [getCurrSection, currentTime]);
 
   return (
     <Container>
@@ -20,7 +43,7 @@ const SectionButtonList = ({ sectionList, parentWidth, clickHandler }: SectionBu
             key={section.id}
             time={section.start}
             isSmall={parentWidth < 100}
-            active={section.id === currentSection().id}
+            active={section.id === currSectionIdx}
             onClick={() => clickHandler(section)}
           ></SectionButton>
         );

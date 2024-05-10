@@ -3,15 +3,23 @@ import { shorts } from "../apis/shorts";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import ModalComponent from "../components/modal/ModalComponent";
 
-const MainPage = () => {
+const VideoTrimPageTmp = () => {
   const navigate = useNavigate();
+  const handleShowModal = (id: number) => setClickId(id);
+  const handleCloseModal = () => setClickId(-1);
 
-  const goToDetail = (shortNo: number) => {
-    navigate(`/shorts/${shortNo}`);
+  const goToLearnMode = () => {
+    navigate("/learn");
+  };
+
+  const goToChallengeMode = () => {
+    navigate("/challenge");
   };
 
   const [shortsList, setShortsList] = useState<shorts[]>([]);
+  const [clickId, setClickId] = useState<number>(-1);
 
   useEffect(() => {
     axios
@@ -30,12 +38,24 @@ const MainPage = () => {
       <GridContainer>
         {shortsList.map((shorts) => (
           <VideoItem key={shorts.shortsNo}>
-            <VideoBox onClick={() => goToDetail(shorts.shortsNo)}>
+            <VideoBox onClick={() => handleShowModal(shorts.shortsNo)}>
               <video
                 src={shorts.shortsLink}
                 crossOrigin="anonymous"
               ></video>
             </VideoBox>
+            <ModalComponent
+              title={shorts.shortsTitle}
+              body={
+                <ModalVideoBox>
+                  <video src={shorts.shortsLink} autoPlay loop crossOrigin='anonymous'></video>
+                </ModalVideoBox>
+              }
+              showModal={clickId === shorts.shortsNo}
+              handleCloseModal={handleCloseModal}
+              goToLearnMode={goToLearnMode}
+              goToChallengeMode={goToChallengeMode}
+            />
             <VideoTitle>{shorts.shortsTitle}</VideoTitle>
           </VideoItem>
         ))}
@@ -44,7 +64,7 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default VideoTrimPageTmp;
 
 // Component 로 나중에 빼자
 const Header = styled.header`
@@ -64,12 +84,8 @@ const Container = styled.div`
 const GridContainer = styled.div`
   position: relative;
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(2, 1fr);
-
-  @media (orientation: landscape) {
-    grid-template-columns: repeat(4, minmax(162px, 1fr));
-  }
+  grid-template-columns: repeat(4, minmax(162px, 1fr));
+  gap: 16px 16px;
 `
 
 const VideoItem = styled.div`
@@ -88,6 +104,23 @@ const VideoItem = styled.div`
 const VideoBox = styled.div`
   position: relative;
   width: 100%;
+  max-width: 286px;
+  border-radius: 8px;
+  overflow: hidden;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const ModalVideoBox = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   max-width: 286px;
   border-radius: 8px;
   overflow: hidden;
