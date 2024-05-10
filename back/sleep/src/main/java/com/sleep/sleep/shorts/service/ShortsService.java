@@ -4,7 +4,10 @@ import com.sleep.sleep.shorts.dto.ShortsDto;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
 import java.util.List;
 public interface ShortsService {
-    //예측 리스트 조회
+
+    //특정 쇼츠 조회
+    public ShortsDto getShortsInfo(int shortsNo);
+    //리스트 조회
      public List<ShortsDto> getShortList();
 
      //사용자의 업로드한 쇼츠 리스트

@@ -29,7 +29,26 @@ public class ShortsServiceImpl implements ShortsService{
     private final UploadShortsRepository uploadShortsRepository;
     private final MemberRepository memberRepository;
 
-    //예측 리스트 조회
+    //특정 쇼츠 조회
+    public ShortsDto getShortsInfo(int shortsNo) {
+        Shorts shorts = shortsRepository.findByShortsNo(shortsNo);
+
+        ShortsDto shortsInfo = new ShortsDto();
+
+        shortsInfo.setShortsNo(shorts.getShortsNo());
+        shortsInfo.setShortsUrl(shorts.getShortsUrl());
+        shortsInfo.setShortsTitle(shorts.getShortsTitle());
+        shortsInfo.setShortsDirector(shorts.getShortsDirector());
+        shortsInfo.setShortsChallengers(shorts.getShortsChallengers());
+        shortsInfo.setShortsTime(shorts.getShortsTime());
+        shortsInfo.setShortsLink(shorts.getShortsLink());
+        shortsInfo.setShortDate(shorts.getShortDate());
+
+        return shortsInfo;
+    }
+
+
+    //리스트 조회
     public List<ShortsDto> getShortList() {
         List<Shorts> shorts = shortsRepository.findShortList();
 
