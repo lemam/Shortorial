@@ -64,8 +64,12 @@ const Container = styled.div`
 const GridContainer = styled.div`
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, minmax(162px, 1fr));
-  gap: 16px 16px;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+
+  @media (orientation: landscape) {
+    grid-template-columns: repeat(4, minmax(162px, 1fr));
+  }
 `
 
 const VideoItem = styled.div`
