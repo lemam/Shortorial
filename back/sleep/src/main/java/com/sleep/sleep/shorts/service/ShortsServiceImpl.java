@@ -69,12 +69,24 @@ public class ShortsServiceImpl implements ShortsService{
         return shortsList;
     }
 
-    public List<UploadShortsDto> getUploadShortsList(String memberId){
-        List<UploadShorts> shorts = uploadShortsRepository.findUploadShortList(memberId);
+    public List<UploadShortsDto> getUploadShortsList(String username){
+        int memberNo = memberRepository.findByMemberId(username)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found")).getMemberIndex();
+
+        List<UploadShorts> shorts = uploadShortsRepository.findUploadShortList(memberNo);
 
         List<UploadShortsDto> uploadShorts = new ArrayList<>();
 
+        for(UploadShorts value : shorts){
+            UploadShortsDto UploadShortsDto = new UploadShortsDto();
+            UploadShortsDto.setUploadNo(value.getUploadNo());
+            UploadShortsDto.setMemberNo(memberNo);
+            UploadShortsDto.setUploadUrl(value.getUploadUrl());
+            UploadShortsDto.setUploadTitle(value.getUploadTitle());
+            UploadShortsDto.setUploadDate(value.getUploadDate().toString());
 
+            uploadShorts.add(UploadShortsDto);
+        }
         return uploadShorts;
     }
 

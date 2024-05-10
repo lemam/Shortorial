@@ -12,8 +12,8 @@ import java.util.List;
 public interface UploadShortsRepository extends JpaRepository<UploadShorts,Integer> {
 //    UploadShorts findByUploadNo(int uploadNo);
 
-    @Query(nativeQuery = true, value = "select * from upload_shorts where memberId = :someValue")
-    List<UploadShorts> findUploadShortList(@Param("someValue") String memberId);
+    @Query(nativeQuery = true, value = "select * from upload_shorts where member_no = :someValue")
+    List<UploadShorts> findUploadShortList(@Param("someValue") int memberNo);
 
 
 }
