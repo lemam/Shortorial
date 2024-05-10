@@ -53,8 +53,11 @@ export default function MotionCamera({
     // 카메라가 있으면 작동 - 페이지 접근시 바로 카메라 켜지고 화면에 보이도록 설정
     if (isGetUserMedia() && webcam) {
       // getUsermedia parameters.
-      const constraints = {
-        video: true,
+      const constraints: MediaStreamConstraints = {
+        video: {
+          aspectRatio: 9 / 16,
+        },
+        audio: false,
       };
 
       // 카메라 스트리밍 시작 + 모션인식
@@ -64,6 +67,7 @@ export default function MotionCamera({
           // while (!poseLandmarker) console.log("loading poselandmarker");
           webcam.addEventListener("loadeddata", () =>
             predictWebcam(
+              "learn",
               webcam,
               canvasCtx,
               canvasElement,
