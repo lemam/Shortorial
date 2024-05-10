@@ -13,7 +13,6 @@ const LearnPageTest = () => {
   const READY_TIMER = 3;
   const PLAY_SPEEDS = [1, 0.75, 0.5];
 
-  const cameraRef = useRef<HTMLVideoElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const video = videoRef.current;
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -34,29 +33,6 @@ const LearnPageTest = () => {
 
   const [sectionList, setSectionList] = useState<VideoSection[]>([]);
   const [currentTime, setCurrentTime] = useState<number>(0);
-
-  // 카메라 설정 초기화
-  const initCamera = useCallback(() => {
-    // 미디어 설정
-    const constraints: MediaStreamConstraints = {
-      video: {
-        aspectRatio: 9 / 16,
-        facingMode: "user", // 전면 카메라 사용
-      },
-      audio: false,
-    };
-
-    // 카메라 권한 요청
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then((stream: MediaStream) => {
-        if (cameraRef.current) cameraRef.current.srcObject = stream;
-      })
-      .catch((error: Error) => {
-        alert("카메라 권한을 찾을 수 없습니다.");
-        console.error("Media device access error:", error);
-      });
-  }, []);
 
   // 카메라 크기 초기화
   const initVideoSize = () => {
@@ -107,10 +83,7 @@ const LearnPageTest = () => {
   // READY 상태로 변경
   const changeStateReady = () => {
     // 타이머 1초씩 카운트다운
-    intervalRef.current = setInterval(
-      () => setCurrTimer((prev) => prev - 1),
-      1000
-    );
+    intervalRef.current = setInterval(() => setCurrTimer((prev) => prev - 1), 1000);
     setState("READY");
   };
 
@@ -160,7 +133,6 @@ const LearnPageTest = () => {
 
   // 카메라 초기화
   useEffect(() => {
-    initCamera();
     initVideoSize();
 
     window.addEventListener("resize", initVideoSize);
@@ -168,7 +140,7 @@ const LearnPageTest = () => {
     return () => {
       window.removeEventListener("resize", initVideoSize);
     };
-  }, [initCamera]);
+  }, []);
 
   // 타이머 감시
   useEffect(() => {
@@ -184,17 +156,13 @@ const LearnPageTest = () => {
   useEffect(() => {
     if (video) {
       video.addEventListener("ended", changeStatePause);
-      video.addEventListener("timeupdate", () =>
-        setCurrentTime(video.currentTime)
-      );
+      video.addEventListener("timeupdate", () => setCurrentTime(video.currentTime));
     }
 
     return () => {
       if (video) {
         video.removeEventListener("ended", changeStatePause);
-        video.removeEventListener("timeupdate", () =>
-          setCurrentTime(video.currentTime)
-        );
+        video.removeEventListener("timeupdate", () => setCurrentTime(video.currentTime));
       }
     };
   }, [changeStatePause, video]);
@@ -212,11 +180,12 @@ const LearnPageTest = () => {
         break;
     }
     setBtn("none");
-  }, [btn]);
+  }, [btn, setBtn]);
 
   useEffect(() => {
     setBtnInfo();
   }, [cameraSize.width]);
+
   return (
     <Container>
       <LeftSection ref={(el) => measuredRef(el)}>
