@@ -9,6 +9,7 @@ import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 // import VideoResizePage from "./pages/VideoResizePage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import LearnPageTmp from "./pages/LearnPageTmp";
+import LoginForm from "./pages/LoginForm";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage />} />
+          <Route path="/login" element={<LoginForm/>}/>
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/learn2" element={<LearnPageTmp />} />
           <Route path="/challenge" element={<ChallengePage />} />
