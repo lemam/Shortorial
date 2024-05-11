@@ -531,7 +531,9 @@ const Timer = styled.div`
 
 const VideoMotionButtonList = styled.div`
   position: absolute;
-  top: 2%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   right: 0;
   display: flex;
   flex-direction: column;

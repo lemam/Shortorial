@@ -64,7 +64,6 @@ export function btn_with_landmark_challenge(
     if (handLandmarker.y >= visibleBtnSize.top && handLandmarker.y <= visibleBtnSize.bottom) {
       if (visible_count >= SMALL_COUNT) {
         setBtn("visible");
-        //useMotionDetectionStore.getState().setVisibleCount(0);
       } else {
         visible_count++;
         useMotionDetectionStore.getState().setVisibleCount((visible_count / SMALL_COUNT) * 100);
@@ -85,7 +84,6 @@ export function btn_with_landmark_challenge(
     ) {
       if (timer_count >= SMALL_COUNT) {
         setBtn("timer");
-        //useMotionDetectionStore.getState().setTimerCount(0);
       } else {
         setBtn("none");
         visible_count = 0;
@@ -107,7 +105,6 @@ export function btn_with_landmark_challenge(
     ) {
       if (record_count >= SMALL_COUNT) {
         setBtn("record");
-        //useMotionDetectionStore.getState().setRecordCount(0);
       } else {
         setBtn("none");
         visible_count = 0;
@@ -144,9 +141,7 @@ export function btn_with_landmark_challenge(
       handLandmarker.y <= learnBtnSize.bottom
     ) {
       if (learn_count >= SMALL_COUNT) {
-        // console.log("mode");
         setBtn("learn");
-        //useMotionDetectionStore.getState().setLearnCount(0);
       } else {
         setBtn("none");
         visible_count = 0;
@@ -167,9 +162,7 @@ export function btn_with_landmark_challenge(
       handLandmarker.y <= rsltBtnSize.bottom
     ) {
       if (rslt_count == SMALL_COUNT) {
-        console.log("rslt");
         setBtn("rslt");
-        //useMotionDetectionStore.getState().setResultCount(0);
       } else {
         setBtn("none");
         visible_count = 0;
@@ -227,10 +220,15 @@ function btn_with_landmark_learn(
         // console.log("B");
         setBtn("none");
         play_count++;
+        useMotionDetectionStore.getState().setPlayCount((play_count / SMALL_COUNT) * 100);
         challenge_count = 0;
+        useMotionDetectionStore.getState().setChallengeCount(0);
         repeat_count = 0;
+        useMotionDetectionStore.getState().setRepeatCount(0);
         flip_count = 0;
+        useMotionDetectionStore.getState().setFlipCount(0);
         speed_count = 0;
+        useMotionDetectionStore.getState().setSpeedCount(0);
       }
     } else if (
       challengeSize &&
@@ -242,10 +240,15 @@ function btn_with_landmark_learn(
       } else {
         setBtn("none");
         play_count = 0;
+        useMotionDetectionStore.getState().setPlayCount(0);
         challenge_count++;
+        useMotionDetectionStore.getState().setChallengeCount((challenge_count / SMALL_COUNT) * 100);
         repeat_count = 0;
+        useMotionDetectionStore.getState().setRepeatCount(0);
         flip_count = 0;
+        useMotionDetectionStore.getState().setFlipCount(0);
         speed_count = 0;
+        useMotionDetectionStore.getState().setSpeedCount(0);
       }
     } else if (
       repeatSize &&
@@ -257,10 +260,15 @@ function btn_with_landmark_learn(
       } else {
         setBtn("none");
         play_count = 0;
+        useMotionDetectionStore.getState().setPlayCount(0);
         challenge_count = 0;
+        useMotionDetectionStore.getState().setChallengeCount(0);
         repeat_count++;
+        useMotionDetectionStore.getState().setRepeatCount((repeat_count / SMALL_COUNT) * 100);
         flip_count = 0;
+        useMotionDetectionStore.getState().setFlipCount(0);
         speed_count = 0;
+        useMotionDetectionStore.getState().setSpeedCount(0);
       }
     } else if (
       flipSize &&
@@ -272,10 +280,15 @@ function btn_with_landmark_learn(
       } else {
         setBtn("none");
         play_count = 0;
+        useMotionDetectionStore.getState().setPlayCount(0);
         challenge_count = 0;
+        useMotionDetectionStore.getState().setChallengeCount(0);
         repeat_count = 0;
+        useMotionDetectionStore.getState().setRepeatCount(0);
         flip_count++;
+        useMotionDetectionStore.getState().setFlipCount((flip_count / SMALL_COUNT) * 100);
         speed_count = 0;
+        useMotionDetectionStore.getState().setSpeedCount(0);
       }
     } else if (
       speedSize &&
@@ -287,19 +300,29 @@ function btn_with_landmark_learn(
       } else {
         setBtn("none");
         play_count = 0;
+        useMotionDetectionStore.getState().setPlayCount(0);
         challenge_count = 0;
+        useMotionDetectionStore.getState().setChallengeCount(0);
         repeat_count = 0;
+        useMotionDetectionStore.getState().setRepeatCount(0);
         flip_count = 0;
+        useMotionDetectionStore.getState().setFlipCount(0);
         speed_count++;
+        useMotionDetectionStore.getState().setSpeedCount((speed_count / SMALL_COUNT) * 100);
       }
     }
   } else {
     setBtn("none");
     play_count = 0;
+    useMotionDetectionStore.getState().setPlayCount(0);
     challenge_count = 0;
+    useMotionDetectionStore.getState().setChallengeCount(0);
     repeat_count = 0;
+    useMotionDetectionStore.getState().setRepeatCount(0);
     flip_count = 0;
+    useMotionDetectionStore.getState().setFlipCount(0);
     speed_count = 0;
+    useMotionDetectionStore.getState().setSpeedCount(0);
   }
 }
 
@@ -332,7 +355,7 @@ function action_with_landmark(
   }
 }
 
-const createPoseLandmarker = async () => {
+export const createPoseLandmarker = async () => {
   const vision = await FilesetResolver.forVisionTasks(
     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
   );

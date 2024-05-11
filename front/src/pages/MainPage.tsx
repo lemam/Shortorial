@@ -1,89 +1,86 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import danceVideo from "../assets/sample.mp4";
+import { useEffect, useState } from "react";
+import { shorts } from "../apis/shorts";
+import { axios } from "../utils/axios";
 import styled from "styled-components";
-import ModalComponent from "../components/modal/ModalComponent";
+import { useNavigate } from "react-router-dom";
 
-export default function MainPage() {
+const MainPage = () => {
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
-  const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
 
-  const goToLearnMode = () => {
-    navigate("/learn");
+  const goToDetail = (shortNo: number) => {
+    navigate(`/shorts/${shortNo}`);
   };
 
-  const goToChallengeMode = () => {
-    navigate("/challenge");
-  };
+  const [shortsList, setShortsList] = useState<shorts[]>([]);
+
+  useEffect(() => {
+    axios
+      .get<shorts[]>("http://localhost:8080/api/shorts")
+      .then((response) => {
+        setShortsList(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
 
   return (
-    <>
-      <h1>Let's DANCE</h1>
-      <div
-        style={{
-          position: "relative",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(162px, 1fr))",
-          gap: "16px 16px",
-        }}
-      >
-        <div>
-          <VideoBox onClick={handleShowModal}>
-            <video src={danceVideo}></video>
-          </VideoBox>
-          <ModalComponent
-            title="아픈 건 딱 질색이니까"
-            body={
-              <VideoBox>
-                <video src={danceVideo} autoPlay loop></video>
-              </VideoBox>
-            }
-            showModal={showModal}
-            handleCloseModal={handleCloseModal}
-            goToLearnMode={goToLearnMode}
-            goToChallengeMode={goToChallengeMode}
-          />
-        </div>
-        <div>
-          <VideoBox onClick={handleShowModal}>
-            <video src={danceVideo}></video>
-          </VideoBox>
-          <ModalComponent
-            title="아픈 건 딱 질색이니까"
-            body={
-              <VideoBox>
-                <video src={danceVideo} autoPlay loop></video>
-              </VideoBox>
-            }
-            showModal={showModal}
-            handleCloseModal={handleCloseModal}
-            goToLearnMode={goToLearnMode}
-            goToChallengeMode={goToChallengeMode}
-          />
-        </div>
-        <div>
-          <VideoBox onClick={handleShowModal}>
-            <video src={danceVideo}></video>
-          </VideoBox>
-          <ModalComponent
-            title="아픈 건 딱 질색이니까"
-            body={
-              <VideoBox>
-                <video src={danceVideo} autoPlay loop></video>
-              </VideoBox>
-            }
-            showModal={showModal}
-            handleCloseModal={handleCloseModal}
-            goToLearnMode={goToLearnMode}
-            goToChallengeMode={goToChallengeMode}
-          />
-        </div>
-      </div>
-    </>
+    <Container>
+      <Header>Let's DANCE</Header>
+      <GridContainer>
+        {shortsList.map((shorts) => (
+          <VideoItem key={shorts.shortsNo}>
+            <VideoBox onClick={() => goToDetail(shorts.shortsNo)}>
+              <video src={shorts.shortsLink} crossOrigin="anonymous"></video>
+            </VideoBox>
+            <VideoTitle>{shorts.shortsTitle}</VideoTitle>
+          </VideoItem>
+        ))}
+      </GridContainer>
+    </Container>
   );
-}
+};
+
+export default MainPage;
+
+// Component 로 나중에 빼자
+const Header = styled.header`
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const Container = styled.div`
+  box-sizing: border-box;
+`;
+
+const GridContainer = styled.div`
+  position: relative;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+
+  @media (orientation: landscape) {
+    grid-template-columns: repeat(4, minmax(162px, 1fr));
+  }
+`;
+
+const VideoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  // align-items: center;
+  width: 100%; // 비디오 박스의 최대 너비를 고려
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
 
 const VideoBox = styled.div`
   position: relative;
@@ -97,4 +94,12 @@ const VideoBox = styled.div`
     height: 100%;
     object-fit: cover;
   }
+`;
+
+// 쇼츠 제목
+const VideoTitle = styled.div`
+  font-weight: bold;
+  white-space: nowrap; /* 줄 바꿈 방지 */
+  overflow: hidden; /* 넘침 숨김 */
+  text-overflow: ellipsis; /* 넘침시 생략 부호(...) 표시 */
 `;
