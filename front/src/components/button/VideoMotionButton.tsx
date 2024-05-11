@@ -1,26 +1,45 @@
+import { MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface VideoMotionButtonProps {
+  id?: string;
   toolTip?: string;
   icon?: JSX.Element | undefined;
   text?: string;
   imgSrc?: string;
   link?: string;
   onClick?: () => void;
+  progress?: number;
 }
 
 const VideoMotionButton = ({
+  id,
   icon,
   text,
   imgSrc,
   toolTip,
   onClick,
   link = "",
+  progress,
 }: VideoMotionButtonProps) => {
+  const handleLinkClick = (e: MouseEvent) => {
+    if (!link) e.preventDefault();
+  };
+
   return (
-    <Link to={link}>
-      <Container onClick={onClick}>
+    <Link to={link} onClick={handleLinkClick}>
+      <Container id={id} onClick={onClick}>
+        <ProgressContainer>
+          <CircularProgress
+            variant="determinate"
+            value={progress}
+            size={55}
+            thickness={4}
+            sx={{ color: "#FB2576" }}
+          />
+        </ProgressContainer>
         {icon}
         {imgSrc && <img src={imgSrc} alt="" />}
         <div className="text">{text}</div>
@@ -68,6 +87,17 @@ const Container = styled.button`
   &:active .tooltipText {
     visibility: visible;
   }
+`;
+
+const ProgressContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
 `;
 
 export default VideoMotionButton;

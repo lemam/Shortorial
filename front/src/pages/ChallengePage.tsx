@@ -1,40 +1,54 @@
 import { useCallback, useRef, useState, useEffect } from "react";
-import styled from "styled-components";
-import danceVideo from "../assets/sample.mp4";
 import { useNavigate } from "react-router-dom";
+import styled, { keyframes } from "styled-components";
+import danceVideo from "../assets/sample.mp4";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import LoadingModalComponent from "../components/modal/LoadingModalComponent";
-import VideoButton from "../components/button/VideoButton";
 import axios from "axios";
 import { predictWebcam, setBtnInfo } from "../modules/Motion";
 import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
-import { useBtnStore } from "../store/useMotionStore";
+import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
+import VideoMotionButton from "../components/button/VideoMotionButton";
+import {
+  Flip,
+  RadioButtonChecked,
+  TimerRounded,
+  DirectionsRun,
+  DoDisturb,
+  Save,
+  Movie,
+} from "@mui/icons-material";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
   const ffmpeg = createFFmpeg({ log: false });
+
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
+
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [show, setShow] = useState(false);
-  const [isVisible, setIsVisible] = useState(true); // 토글
   const [recording, setRecording] = useState(false); // 녹화 진행
   const initialTimer = parseInt(localStorage.getItem("timer") || "3");
   const [timer, setTimer] = useState<number>(initialTimer); // 타이머
-  const [timerPath, setTimerPath] = useState(`src/assets/challenge/${timer}sec.svg`); // 타이머 이미지 경로
   const [loadPath, setLoadPath] = useState("src/assets/challenge/loading.gif"); // 로딩 이미지 경로
   const [ffmpegLog, setFfmpegLog] = useState("");
+  const [isFlipped, setIsFlipped] = useState<boolean>(false);
+
+  type LearnState = "RECORD" | "READY";
+  const [state, setState] = useState<LearnState>("READY");
+
+  const { visibleCount, timerCount, recordCount, learnCount, resultCount } =
+    useMotionDetectionStore();
 
   const handleShowModal = () => {
-    setShow(true);
+    setShow(true); // 모달 열기
     stopRecording();
   };
   const handleCloseModal = () => setShow(false);
-
-  const showVideoButtonContainer = () => setIsVisible(!isVisible);
   const showRecordButton = () => setRecording(false);
-  const showCancleButton = () => setRecording(true);
+  const showCancelButton = () => setRecording(true); // 타이머 useEffect 시작
 
   const goToLearnMode = () => {
     stream?.getTracks().forEach((track) => track.stop());
@@ -46,14 +60,14 @@ const ChallengePage = () => {
   };
 
   const changeTimer = () => {
-    var nextTimer = timer == 3 ? 5 : timer == 5 ? 10 : 3;
+    const nextTimer = timer == 3 ? 5 : timer == 5 ? 10 : 3;
 
     localStorage.setItem("timer", nextTimer.toString());
     setTimer(nextTimer);
-    setTimerPath(`src/assets/challenge/${nextTimer}sec.svg`);
   };
 
   const cancelRecording = () => {
+    setState("READY");
     showRecordButton();
     if (danceVideoRef.current) {
       danceVideoRef.current.pause();
@@ -69,6 +83,8 @@ const ChallengePage = () => {
   };
 
   const startRecording = () => {
+    setState("RECORD");
+
     if (!stream) {
       alert("카메라 접근을 허용해주세요.");
       return;
@@ -186,7 +202,7 @@ const ChallengePage = () => {
   const makeDownloadURL = async (userVideoFinalBlob: Blob) => {
     try {
       await s3Upload(userVideoFinalBlob);
-      setTimeout(handleCloseModal, 100000);
+      setTimeout(handleCloseModal, 2000);
     } catch (error) {
       console.error("비디오 저장 중 오류 발생:", error);
     }
@@ -202,7 +218,7 @@ const ChallengePage = () => {
       const uploadResponse = await axios.post("http://localhost:8089/s3/upload", formData, {
         headers: {
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTE1MTUxOCwiZXhwIjoxNzE1MTUzMzE4fQ.PGF6vM4wRzjA-fb2B5mxzdrBMns3dUMSc4d2wWU_aBU",
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTI5OTkwNSwiZXhwIjoxNzE1MzAxNzA1fQ.l6ocWQuHfwSmLw2UNYX_7UQGLUYvdRv58WiRHvC30w4",
         },
       });
 
@@ -211,7 +227,8 @@ const ChallengePage = () => {
       console.log("s3 upload success", uploadResponse.data);
     } catch (error) {
       setLoadPath("src/assets/challenge/uncomplete.svg");
-      if (error instanceof Error && error.stack) setFfmpegLog(error.stack);
+      //if (error instanceof Error && error.stack) setFfmpegLog(error.stack);
+      setFfmpegLog("저장 실패");
       console.error("s3 upload fail", error);
     }
   };
@@ -257,9 +274,9 @@ const ChallengePage = () => {
   if (canvasElement) canvasCtx = canvasElement.getContext("2d");
   if (canvasCtx) drawingUtils = new DrawingUtils(canvasCtx);
 
-  let lastWebcamTime = -1;
-  let before_handmarker: NormalizedLandmark | null = null;
-  let curr_handmarker: NormalizedLandmark | null = null;
+  const lastWebcamTime = -1;
+  const before_handmarker: NormalizedLandmark | null = null;
+  const curr_handmarker: NormalizedLandmark | null = null;
 
   // camera가 있을 HTML
   const setInit = useCallback(async () => {
@@ -280,6 +297,7 @@ const ChallengePage = () => {
         userVideoRef.current.addEventListener("loadeddata", () => {
           console.log("이벤트 삽입 완");
           predictWebcam(
+            "challenge",
             userVideoRef.current,
             canvasCtx,
             canvasElement,
@@ -333,34 +351,34 @@ const ChallengePage = () => {
   useEffect(() => {
     switch (btn) {
       case "visible":
-        showVideoButtonContainer();
+        console.log("record");
+        if (state === "READY") {
+          showCancelButton();
+        } else {
+          cancelRecording();
+        }
         break;
       case "timer":
         console.log("timer");
-        if (isVisible) changeTimer();
-        break;
-      case "record":
-        if (isVisible) {
-          if (recording) cancelRecording();
-          else showCancleButton();
-        }
-        break;
-      case "save":
-        if (isVisible) {
+        if (state === "READY") {
+          changeTimer();
+        } else {
           handleShowModal();
         }
         break;
-      case "mode":
-        if (isVisible) {
-          goToLearnMode();
-        }
+      case "record":
+        console.log("flip");
+        setIsFlipped(!isFlipped);
+        break;
+      case "learn":
+        console.log("learn");
+        goToLearnMode();
         break;
       case "rslt":
-        if (isVisible) {
-          goToResult();
-        }
+        console.log("result");
+        goToResult();
+        break;
     }
-    setBtn("none");
   }, [btn]);
 
   useEffect(() => {
@@ -374,71 +392,74 @@ const ChallengePage = () => {
         src={danceVideo}
         playsInline
         onEnded={handleShowModal}
+        className={isFlipped ? "flip" : ""}
       ></VideoContainer>
-      <div id="dom" style={{ position: "relative" }}>
+      <UserContainer id="dom">
         <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
-        <VideoToggleContainer>
-          <VideoButton
-            path="src/assets/challenge/open.svg"
-            id="visible"
-            text="감추기"
-            onClick={showVideoButtonContainer}
-            isVisible={isVisible}
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/close.svg"
-            id="visible"
-            text="보기"
-            onClick={showVideoButtonContainer}
-            isVisible={!isVisible}
-          ></VideoButton>
-        </VideoToggleContainer>
-        <Timer>{timer}</Timer>
-        <VideoButtonContainer>
-          <VideoButton
-            path={timerPath}
-            id="timer"
-            text="타이머"
-            isVisible={isVisible}
-            onClick={changeTimer}
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/stop.svg"
-            id="timer"
-            text="취소"
-            onClick={cancelRecording}
-            isVisible={isVisible && recording} // isVisible, recording 일 때 보임
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/record.svg"
-            id="record"
-            text="녹화"
-            onClick={showCancleButton}
-            isVisible={isVisible && !recording} // isVisible, not recording 일 때 보임
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/save.svg"
-            id="save"
-            text="저장"
-            isVisible={isVisible}
-            onClick={handleShowModal}
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/learn.svg"
-            id="mode"
-            text="연습모드"
-            onClick={goToLearnMode}
-            isVisible={isVisible}
-          ></VideoButton>
-          <VideoButton
-            path="src/assets/challenge/mine.svg"
-            id="rslt"
-            text="나의 챌린지"
-            onClick={goToResult}
-            isVisible={isVisible}
-          ></VideoButton>
-        </VideoButtonContainer>
-      </div>
+        {state === "READY" ? (
+          <Timer>{timer}</Timer>
+        ) : (
+          <Recording src="src/assets/challenge/recording.svg" />
+        )}
+        <VideoMotionButtonList>
+          {state === "READY" ? (
+            <div className="foldList">
+              <VideoMotionButton
+                icon={<RadioButtonChecked />}
+                toolTip="녹화"
+                onClick={showCancelButton}
+                id="visible"
+                progress={visibleCount}
+              />
+              <VideoMotionButton
+                icon={<TimerRounded />}
+                toolTip="타이머"
+                onClick={changeTimer}
+                id="timer"
+                progress={timerCount}
+              />
+              <VideoMotionButton
+                icon={<Flip />}
+                toolTip="거울 모드"
+                onClick={() => setIsFlipped(!isFlipped)}
+                id="record"
+                progress={recordCount}
+              />
+              <VideoMotionButton
+                icon={<DirectionsRun />}
+                toolTip="연습 모드로 이동"
+                onClick={goToLearnMode}
+                id="learn"
+                progress={learnCount}
+              />
+              <VideoMotionButton
+                icon={<Movie />}
+                toolTip="결과 확인"
+                onClick={goToResult}
+                id="rslt"
+                progress={resultCount}
+              />
+            </div>
+          ) : (
+            <div className="foldList">
+              <VideoMotionButton
+                icon={<DoDisturb />}
+                toolTip="취소"
+                onClick={cancelRecording}
+                id="visible"
+                progress={visibleCount}
+              />
+              <VideoMotionButton
+                icon={<Save />}
+                toolTip="저장"
+                onClick={handleShowModal}
+                id="timer"
+                progress={recordCount}
+              />
+            </div>
+          )}
+        </VideoMotionButtonList>
+      </UserContainer>
       <LoadingModalComponent
         progress={ffmpegLog}
         showModal={show}
@@ -453,6 +474,10 @@ const VideoContainer = styled.video`
   position: relative;
   display: none;
 
+  &.flip {
+    transform: scaleX(-1);
+  }
+
   @media screen and (min-width: 1024) {
     display: flex;
   }
@@ -460,6 +485,10 @@ const VideoContainer = styled.video`
   @media screen and (orientation: landscape) {
     display: flex;
   }
+`;
+
+const UserContainer = styled.div`
+  position: relative;
 `;
 
 const UserVideoContainer = styled.video`
@@ -476,35 +505,55 @@ const ChallengeContainer = styled.div`
   justify-content: center;
 `;
 
-const VideoToggleContainer = styled.div`
-  position: absolute !important;
-  right: 0 !important;
-  top: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  z-index: 1;
-  min-width: 120px;
+const blinkEffect = keyframes`
+  50% {
+    opacity: 0;
 `;
 
-const VideoButtonContainer = styled.div`
-  position: absolute !important;
-  right: 0 !important;
-  top: 90px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+const Recording = styled.img`
+  position: absolute;
+  left: 5%;
+  top: 4%;
+  width: 15px;
+  height: 15px;
   z-index: 1;
-  min-width: 120px;
+  animation: ${blinkEffect} 1s step-end infinite;
 `;
 
 const Timer = styled.div`
-  position: absolute !important;
-  top: 0;
+  position: absolute;
   left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
-  font-size: 50px;
+  font-size: 130px;
+`;
+
+const VideoMotionButtonList = styled.div`
+  position: absolute;
+  top: 2%;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 8px;
+
+  .foldList {
+    display: flex;
+    flex-direction: column;
+  }
+
+  button {
+    display: inline-block;
+    margin-bottom: 24px;
+  }
+
+  @media screen and (min-width: 768px) {
+    button {
+      width: 55px;
+      height: 55px;
+      margin-bottom: 36px;
+    }
+  }
 `;
 
 export default ChallengePage;
