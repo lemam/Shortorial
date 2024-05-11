@@ -15,7 +15,7 @@ const MainPage = () => {
 
   useEffect(() => {
     axios
-      .get<shorts[]>("http://localhost:8080/api/shorts")
+      .get<shorts[]>("/api/shorts")
       .then((response) => {
         setShortsList(response.data);
       })

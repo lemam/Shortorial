@@ -14,8 +14,12 @@ public class UploadSns {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int snsNo;
-    private String snsName;
-    @OneToMany(mappedBy = "uploadNo")
 
-    private List<UploadShorts> uploadNo;
+    private String youtubeUrl;
+    private String ticktokUrl;
+    private String instaUrl;
+
+    @OneToOne
+    @JoinColumn(name = "uploadNo")
+    private UploadShorts uploadNo;
 }
