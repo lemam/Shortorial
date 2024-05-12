@@ -156,10 +156,11 @@ const LearnPage = () => {
   const pauseVideo = useCallback(() => {
     if (video) {
       video.pause();
+      initInterval();
       moveVideoTime(currentSection.start); // 현재 구간 시작 시간으로 이동
       setState("PAUSE");
     }
-  }, [currentSection.start, moveVideoTime, video]);
+  }, [currentSection.start, initInterval, moveVideoTime, video]);
   ``;
 
   // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
