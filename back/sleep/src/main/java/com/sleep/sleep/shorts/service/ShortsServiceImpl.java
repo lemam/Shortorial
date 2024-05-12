@@ -100,19 +100,20 @@ public class ShortsServiceImpl implements ShortsService{
                 .build());;
     }
 
-    public void putTitle(String oldTitle, String newTitle, String newURL){
-        // 엔티티를 찾습니다.
-        UploadShorts uploadShorts = uploadShortsRepository.findByUploadTitle(oldTitle);
+    public void putTitle(int uploadNo, String oldTitle, String newTitle, String newURL){
+        UploadShorts uploadShorts = uploadShortsRepository.findByUploadTitle(uploadNo, oldTitle);
 
-        // 엔티티가 존재하면 업데이트를 수행합니다.
         if (uploadShorts != null) {
-            uploadShortsRepository.save(UploadShorts.builder()
-                    .memberIndex(uploadShorts.getMemberIndex())
-                    .uploadTitle(newTitle)
-                    .uploadUrl(newURL)
-                    .build());
+
+            uploadShorts.update(newTitle, newURL);
+
+            uploadShortsRepository.save(uploadShorts);
         }
 
+    }
+
+    public boolean isNameExists(String title){
+        return uploadShortsRepository.existsByUploadTitle(title);
     }
 
 
