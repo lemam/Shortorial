@@ -8,7 +8,7 @@ import { setBtnInfo } from "../modules/Motion";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
 import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
-import SectionButtonList from "../components/ButtonList/SectionButtonList";
+import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
 

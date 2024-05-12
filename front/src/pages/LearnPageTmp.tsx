@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import VideoMotionButton from "../components/button/VideoMotionButton";
 import { VideoSection } from "../constants/types";
-import SectionButtonList from "../components/ButtonList/SectionButtonList";
+import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import { useBtnStore } from "../store/useMotionStore";
 import { setBtnInfo } from "../modules/Motion";
@@ -110,10 +110,7 @@ const LearnPageTest = () => {
   // READY 상태로 변경
   const changeStateReady = () => {
     // 타이머 1초씩 카운트다운
-    intervalRef.current = setInterval(
-      () => setCurrTimer((prev) => prev - 1),
-      1000
-    );
+    intervalRef.current = setInterval(() => setCurrTimer((prev) => prev - 1), 1000);
     setState("READY");
   };
 
@@ -187,17 +184,13 @@ const LearnPageTest = () => {
   useEffect(() => {
     if (video) {
       video.addEventListener("ended", changeStatePause);
-      video.addEventListener("timeupdate", () =>
-        setCurrentTime(video.currentTime)
-      );
+      video.addEventListener("timeupdate", () => setCurrentTime(video.currentTime));
     }
 
     return () => {
       if (video) {
         video.removeEventListener("ended", changeStatePause);
-        video.removeEventListener("timeupdate", () =>
-          setCurrentTime(video.currentTime)
-        );
+        video.removeEventListener("timeupdate", () => setCurrentTime(video.currentTime));
       }
     };
   }, [changeStatePause, video]);
