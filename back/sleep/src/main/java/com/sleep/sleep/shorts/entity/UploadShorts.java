@@ -31,7 +31,9 @@ public class UploadShorts {
 
     @Builder
     public UploadShorts(Member memberIndex, String uploadUrl, String uploadTitle) {
-        this.memberIndex = memberIndex;
+        if (memberIndex != null) {
+            this.memberIndex = memberIndex;
+        }
         this.uploadUrl = uploadUrl;
         this.uploadTitle = uploadTitle;
     }
