@@ -12,6 +12,7 @@ import LearnPageTmp from "./pages/LearnPageTmp";
 import MyPage from "./pages/MyPage";
 import ShortsDetailPage from "./pages/ShortsDetailPage";
 import LearnPageTest from "./pages/LearnPageTest";
+import FeedPage from "./pages/FeedPage";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           {/* <Route path="/video-resize" element={<VideoResizePage />} /> */}
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/shorts/:shortsNo" element={<ShortsDetailPage />} />
+          <Route path="/feed" element={<FeedPage />} />
         </Routes>
       </BrowserRouter>
     </>
