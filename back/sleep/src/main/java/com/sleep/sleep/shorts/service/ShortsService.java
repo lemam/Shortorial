@@ -15,4 +15,7 @@ public interface ShortsService {
 
      //사용자가 업로드한 영상 DB에 넣기
     public void upload(UploadShortsDto dto,String username);
+
+    //사용자가 업로드한 영상 이름 변경
+    public void putTitle(String oldTitle, String newTitle, String newURL);
 }

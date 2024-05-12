@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,7 +50,7 @@ public class S3Controller {
         }
     }
 
-    @Operation(summary = "동영상 다운로드", description ="추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
+    @Operation(summary = "동영상 링크 보기", description ="추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
     @GetMapping("/s3/download/{fileName}")
     public ResponseEntity<?> downloadFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
         try {
@@ -85,12 +86,10 @@ public class S3Controller {
 
     @Operation(summary = "동영상 파일 다운로드", description = "추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
     @GetMapping("/s3/download/file/{fileName}")
-    public ResponseEntity<?> downloadStaticFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
+    public ResponseEntity<?> downloadStaticFile(@PathVariable String fileName) {
         try {
-            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
-            System.out.println("username : " + username);
 
-            InputStreamResource resource = new InputStreamResource(s3Service.downloadFile(username + "/" + fileName));
+            InputStreamResource resource = new InputStreamResource(s3Service.downloadFile(fileName));
 
             // 파일명 인코딩
             String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
@@ -101,6 +100,28 @@ public class S3Controller {
                     .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                     .contentType(MediaType.parseMediaType("video/mp4"))
                     .body(resource);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "동영상 파일 이름 변경", description = "헤더에 accessToken넣기. requestBody에 oldTitle, newTitle 이름 넣기")
+    @PutMapping("/s3/rename")
+    public ResponseEntity<?> updateTitle(@RequestHeader("Authorization") String accessToken, @RequestBody Map<String, String> data) {
+        try {
+            String oldTitle = data.get("oldTitle");
+            String newTitle = data.get("newTitle");
+
+            // oldTitle과 newTitle 사용
+            System.out.println("Old Title: " + oldTitle);
+            System.out.println("New Title: " + newTitle);
+
+            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+
+            //s3와 db 업데이트하는 것
+            s3Service.reaname(oldTitle,username+"/"+newTitle);
+
+            return new ResponseEntity<String>("Successfully update!",HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

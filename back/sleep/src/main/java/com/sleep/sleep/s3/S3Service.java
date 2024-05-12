@@ -1,10 +1,7 @@
 package com.sleep.sleep.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.*;
 import com.sleep.sleep.member.entity.Member;
 import com.sleep.sleep.member.repository.MemberRepository;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
@@ -66,4 +63,17 @@ public class S3Service {
         return s3Object.getObjectContent();
     }
 
+    public void reaname(String oldTitle, String newTitle) {
+        // 객체 복사 요청 생성
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(bucketName, oldTitle, bucketName, newTitle);
+        // 객체 복사 수행
+        amazonS3.copyObject(copyObjectRequest);
+        // 기존 객체 삭제
+        amazonS3.deleteObject(new DeleteObjectRequest(bucketName, oldTitle));
+        // 새로운 URL 반환
+        String newURL =  getPath(newTitle);
+
+        shortsService.putTitle(oldTitle, newTitle, newURL);
+
+    }
 }

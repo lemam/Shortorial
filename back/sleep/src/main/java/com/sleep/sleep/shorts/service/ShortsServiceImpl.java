@@ -100,5 +100,20 @@ public class ShortsServiceImpl implements ShortsService{
                 .build());;
     }
 
+    public void putTitle(String oldTitle, String newTitle, String newURL){
+        // 엔티티를 찾습니다.
+        UploadShorts uploadShorts = uploadShortsRepository.findByUploadTitle(oldTitle);
+
+        // 엔티티가 존재하면 업데이트를 수행합니다.
+        if (uploadShorts != null) {
+            uploadShortsRepository.save(UploadShorts.builder()
+                    .memberIndex(uploadShorts.getMemberIndex())
+                    .uploadTitle(newTitle)
+                    .uploadUrl(newURL)
+                    .build());
+        }
+
+    }
+
 
 }
