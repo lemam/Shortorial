@@ -141,10 +141,15 @@ const LearnPage = () => {
   // 영상 재생
   const playVideo = useCallback(() => {
     if (video) {
+      if (video.ended) {
+        video.currentTime = 0;
+        setCurrentTime(0);
+      }
+
       video.play();
       setState("PLAY");
     }
-  }, [video]);
+  }, [setCurrentTime, video]);
 
   // 영상 일시정지
   const pauseVideo = useCallback(() => {
@@ -155,19 +160,28 @@ const LearnPage = () => {
     }
   }, [currentSection.start, moveVideoTime, video]);
   ``;
+
   // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
   const handleTimeUpdate = useCallback(() => {
     if (video) {
-      setCurrentTime(video.currentTime);
+      // 반복하지 않는 경우
+      if (!isLooping) {
+        setCurrentTime(video.currentTime);
+        if (video.ended) setState("PAUSE");
+        return;
+      }
 
+      // 반복하는 경우
       if (isLooping && loopSection) {
         if (video.currentTime >= loopSection.end || video.ended) {
           video.currentTime = loopSection.start;
-          setCurrentTime(video.currentTime);
+          setCurrentTime(loopSection.start);
+          if (video.ended) playVideo();
+          return;
         }
       }
     }
-  }, [isLooping, loopSection, setCurrentTime, video]);
+  }, [isLooping, loopSection, playVideo, setCurrentTime, video]);
 
   // 구간 반복 토글
   const toggleLooping = () => {
