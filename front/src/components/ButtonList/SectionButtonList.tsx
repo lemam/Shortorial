@@ -8,6 +8,7 @@ interface SectionButtonListProps {
   sectionList: VideoSection[] | null;
   parentWidth: number | undefined;
   currentTime: number;
+  isLooping?: boolean;
   clickHandler: (section: VideoSection) => void;
 }
 
@@ -15,12 +16,17 @@ const SectionButtonList = ({
   sectionList = [],
   parentWidth = 0,
   currentTime = 0,
+  isLooping = false,
   clickHandler,
 }: SectionButtonListProps) => {
-  const [currentSection, setCurrentSection] = useLearnStore((state) => [
-    state.currentSection,
-    state.setCurrentSection,
-  ]);
+  const [currentSection, loopSection, setCurrentSection, setLoopSection] = useLearnStore(
+    (state) => [
+      state.currentSection,
+      state.loopSection,
+      state.setCurrentSection,
+      state.setLoopSection,
+    ]
+  );
 
   // 현재 시간에 있는 구간 반환
   const loadCurrSection = useCallback(() => {
@@ -34,8 +40,8 @@ const SectionButtonList = ({
     result = result ?? { id: 0, start: 0, end: 0 };
     setCurrentSection(result);
 
-    return result;
-  }, [currentTime, sectionList, setCurrentSection]);
+    if (isLooping) setLoopSection(result);
+  }, [currentTime, isLooping, sectionList, setCurrentSection, setLoopSection]);
 
   // 현재 구간 인덱스 설정
   useEffect(() => {
@@ -51,6 +57,7 @@ const SectionButtonList = ({
             time={section.start}
             isSmall={parentWidth < 100}
             active={section.id === currentSection.id}
+            isLooping={(isLooping && section.id === loopSection?.id) ?? -1}
             onClick={() => clickHandler(section)}
           ></SectionButton>
         );

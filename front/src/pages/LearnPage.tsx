@@ -268,6 +268,7 @@ const LearnPage = () => {
               sectionList={sectionList}
               parentWidth={getComponentSize(leftSectionRef.current).width}
               currentTime={currentTime}
+              isLooping={isLooping}
               clickHandler={(section) => moveVideoTime(section.start)}
             />
           </LeftSection>
