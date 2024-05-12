@@ -180,6 +180,28 @@ const LearnPage = () => {
     }
   };
 
+  // 다음 구간으로 이동
+  const goNextSection = () => {
+    if (currentSection.id >= sectionList.length - 1) return;
+
+    if (video) {
+      const nextTime = sectionList[currentSection.id + 1].start;
+      video.currentTime = nextTime;
+      setCurrentTime(nextTime);
+    }
+  };
+
+  // 이전 구간으로 이동
+  const goPrevSection = () => {
+    if (currentSection.id <= 0) return;
+
+    if (video) {
+      const nextTime = sectionList[currentSection.id - 1].start;
+      video.currentTime = nextTime;
+      setCurrentTime(nextTime);
+    }
+  };
+
   // 컴포넌트가 처음 마운트될 때 실행
   useEffect(() => {
     loadVideo();
@@ -250,18 +272,7 @@ const LearnPage = () => {
   return (
     <Container>
       {state === "LOADING" ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            height: "100%",
-            color: "white",
-          }}
-        >
-          Loading...
-        </div>
+        <LoadingText>Loading...</LoadingText>
       ) : (
         <>
           <LeftSection ref={leftSectionRef}>
@@ -457,6 +468,16 @@ const VideoMotionButtonList = styled.div`
     display: flex;
     flex-direction: column;
   }
+`;
+
+const LoadingText = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 24px;
+  color: #fff;
 `;
 
 export default LearnPage;
