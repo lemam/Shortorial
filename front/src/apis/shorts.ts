@@ -9,18 +9,16 @@ export async function postUploadShorts(file: File, fileName: string) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
 
-    const data = await axios.post(
-      REST_SHORTS_URL,
-      {
-        file: file,
-        fileName: fileName,
+    const formData = new FormData(); // FormData 객체 생성
+    formData.append("file", file); // 파일 추가
+    formData.append("fileName", fileName); // 파일 이름 추가
+
+    const data = await axios.post(REST_SHORTS_URL, formData, {
+      headers: {
+        Authorization: token,
+        "Content-Type": "multipart/form-data", // 파일 업로드 시 Content-Type 설정
       },
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
+    });
 
     return data.data;
   } catch (error) {
@@ -79,6 +77,29 @@ export async function getUploadedShorts() {
     });
 
     return data.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+//사용자가 저장한 쇼츠 이름 수정
+export async function putUpdateTitle(oldTitle: string, newTitle: string, uploadNo: number) {
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+
+    const data = {
+      uploadNo: uploadNo,
+      oldTitle: oldTitle,
+      newTitle: newTitle,
+    };
+
+    const response = await axios.put(`${REST_MYPAGE_URL}/rename`, data, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);
   }
