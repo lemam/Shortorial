@@ -22,7 +22,7 @@ const VideoMotionButton = ({
   toolTip,
   onClick,
   link = "",
-  progress,
+  progress = 0,
 }: VideoMotionButtonProps) => {
   const handleLinkClick = (e: MouseEvent) => {
     if (!link) e.preventDefault();
