@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import { VideoSection } from "../constants/types";
 import { getComponentSize } from "../modules/componentSize";
-import useVideoStore from "../store/useVideoStore";
+import { setBtnInfo } from "../modules/Motion";
+import { getShortsInfo } from "../apis/shorts";
+import useLearnStore from "../store/useLearnStore";
+import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
 import SectionButtonList from "../components/ButtonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
-import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
-import { setBtnInfo } from "../modules/Motion";
-import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
-import { useNavigate } from "react-router-dom";
-import { getShortsInfo } from "../apis/shorts";
 
 const LearnPage = () => {
   type LearnState = "LOADING" | "PAUSE" | "READY" | "PLAY";
@@ -29,32 +29,32 @@ const LearnPage = () => {
   const [sectionList, setSectionList] = useState<VideoSection[]>([]);
   const [cameraSize, setCameraSize] = useState({ width: 0, height: 0 });
 
-  const [currentTime, setCurrentTime] = useVideoStore((state) => [
+  const [currentTime, setCurrentTime] = useLearnStore((state) => [
     state.currentTime,
     state.setCurrentTime,
   ]);
 
-  const [timer, resetTimer, countdownTimer] = useVideoStore((state) => [
+  const [timer, resetTimer, countdownTimer] = useLearnStore((state) => [
     state.timer,
     state.resetTimer,
     state.countdownTimer,
   ]);
 
-  const [isLooping, loopSection, setIsLooping, setLoopSection] = useVideoStore((state) => [
+  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore((state) => [
     state.isLooping,
     state.loopSection,
     state.setIsLooping,
     state.setLoopSection,
   ]);
 
-  const [isFlipped, setIsFlipped] = useVideoStore((state) => [state.isFlipped, state.setIsFlipped]);
+  const [isFlipped, setIsFlipped] = useLearnStore((state) => [state.isFlipped, state.setIsFlipped]);
 
-  const [playSpeed, changePlaySpeed] = useVideoStore((state) => [
+  const [playSpeed, changePlaySpeed] = useLearnStore((state) => [
     state.playSpeed,
     state.changePlaySpeed,
   ]);
 
-  const currentSection = useVideoStore((state) => state.currentSection);
+  const currentSection = useLearnStore((state) => state.currentSection);
 
   const btn = useBtnStore((state) => state.btn);
 

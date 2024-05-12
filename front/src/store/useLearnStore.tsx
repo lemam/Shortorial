@@ -26,7 +26,7 @@ interface test {
   changePlaySpeed: () => void;
 }
 
-const useVideoStore = create<test>((set, get) => ({
+const useLearnStore = create<test>((set, get) => ({
   currentTime: 0,
   currentSection: { id: 0, start: 0, end: 0 },
   isLooping: false,
@@ -51,4 +51,4 @@ const useVideoStore = create<test>((set, get) => ({
   },
 }));
 
-export default useVideoStore;
+export default useLearnStore;

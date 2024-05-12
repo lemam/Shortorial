@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { VideoSection } from "../../constants/types";
 import SectionButton from "../button/SectionButton";
 import { useCallback, useEffect } from "react";
-import useVideoStore from "../../store/useVideoStore";
+import useLearnStore from "../../store/useLearnStore";
 
 interface SectionButtonListProps {
   sectionList: VideoSection[] | null;
@@ -17,7 +17,10 @@ const SectionButtonList = ({
   currentTime = 0,
   clickHandler,
 }: SectionButtonListProps) => {
-  const { currentSection, setCurrentSection } = useVideoStore();
+  const [currentSection, setCurrentSection] = useLearnStore((state) => [
+    state.currentSection,
+    state.setCurrentSection,
+  ]);
 
   // 현재 시간에 있는 구간 반환
   const loadCurrSection = useCallback(() => {
