@@ -1,7 +1,8 @@
-import { MouseEvent } from "react";
+import { MouseEvent, useRef } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import CircularProgress from "@mui/material/CircularProgress";
+import { getComponentSize } from "../../modules/componentSize";
 
 interface VideoMotionButtonProps {
   id?: string;
@@ -24,18 +25,20 @@ const VideoMotionButton = ({
   link = "",
   progress = 0,
 }: VideoMotionButtonProps) => {
+  const containerRef = useRef<HTMLButtonElement>(null);
+
   const handleLinkClick = (e: MouseEvent) => {
     if (!link) e.preventDefault();
   };
 
   return (
     <Link to={link} onClick={handleLinkClick}>
-      <Container id={id} onClick={onClick}>
+      <Container id={id} onClick={onClick} ref={containerRef}>
         <ProgressContainer>
           <CircularProgress
             variant="determinate"
             value={progress}
-            size={55}
+            size={getComponentSize(containerRef.current).width}
             thickness={4}
             sx={{ color: "#FB2576" }}
           />
@@ -59,6 +62,7 @@ const Container = styled.button`
   align-items: center;
   background-color: #35353580;
   border-radius: 50%;
+  margin-bottom: 24px;
 
   &:hover,
   &:active {
@@ -68,6 +72,11 @@ const Container = styled.button`
   .text {
     font-weight: bold;
     font-size: 14px;
+  }
+
+  img {
+    width: 24px;
+    height: 24px;
   }
 
   .tooltipText {
@@ -86,6 +95,25 @@ const Container = styled.button`
   &:hover .tooltipText,
   &:active .tooltipText {
     visibility: visible;
+  }
+
+  @media screen and (min-width: 768px) {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 50px;
+
+    .text {
+      font-size: 18px;
+    }
+
+    svg {
+      font-size: 32px;
+    }
+
+    img {
+      width: 32px;
+      height: 32px;
+    }
   }
 `;
 

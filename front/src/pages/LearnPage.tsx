@@ -454,19 +454,6 @@ const VideoMotionButtonList = styled.div`
     display: flex;
     flex-direction: column;
   }
-
-  button {
-    display: inline-block;
-    margin-bottom: 24px;
-  }
-
-  @media screen and (min-width: 768px) {
-    button {
-      width: 55px;
-      height: 55px;
-      margin-bottom: 36px;
-    }
-  }
 `;
 
 export default LearnPage;
