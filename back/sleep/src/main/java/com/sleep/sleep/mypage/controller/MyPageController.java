@@ -45,7 +45,7 @@ public class MyPageController {
         }
     }
 
-    @Operation(summary = "사용자의 업로드한 영상 리스트", description ="사용자의 엑세스 토큰을 넣어서 사용자가 ")
+    @Operation(summary = "사용자의 업로드한 영상 리스트", description ="사용자의 엑세스 토큰 필요함")
     @GetMapping("/upload-shorts")
     public ResponseEntity<List<UploadShortsDto>> selectUploadShortList(@RequestHeader("Authorization") String accessToken) {
         //사용자 찾기
