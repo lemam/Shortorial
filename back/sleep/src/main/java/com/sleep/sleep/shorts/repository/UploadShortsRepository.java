@@ -15,7 +15,11 @@ public interface UploadShortsRepository extends JpaRepository<UploadShorts,Integ
     @Query(nativeQuery = true, value = "select * from upload_shorts where member_no = :someValue")
     List<UploadShorts> findUploadShortList(@Param("someValue") int memberNo);
 
-    UploadShorts findByUploadTitle(String uploadTitle);
+    @Query(nativeQuery = true, value = "select * from upload_shorts where upload_no = :uploadNo and upload_title = :uploadTitle")
+    UploadShorts findByUploadTitle(@Param("uploadNo") int uploadNo, @Param("uploadTitle") String uploadTitle);
+
+    @Query("SELECT COUNT(u) > 0 FROM UploadShorts u WHERE u.uploadTitle = :uploadTitle")
+    boolean existsByUploadTitle(@Param("uploadTitle") String uploadTitle);
 
 
 }
