@@ -155,13 +155,30 @@ const LearnPage = () => {
     }
   }, [currentSection.start, moveVideoTime, video]);
 
-  // 카운트다운이 끝나면 영상 재생
-  useEffect(() => {
-    if (interval && timer <= 0) {
-      initInterval();
-      playVideo();
+  // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
+  const handleTimeUpdate = useCallback(() => {
+    if (video) {
+      setCurrentTime(video.currentTime);
+
+      if (isLooping && loopSection) {
+        if (video.currentTime >= loopSection.end || video.ended) {
+          video.currentTime = loopSection.start;
+          setCurrentTime(video.currentTime);
+        }
+      }
     }
-  }, [initInterval, interval, playVideo, timer]);
+  }, [isLooping, loopSection, setCurrentTime, video]);
+
+  // 구간 반복 토글
+  const toggleLooping = () => {
+    if (isLooping) {
+      setIsLooping(false);
+      setLoopSection(null);
+    } else {
+      setIsLooping(true);
+      setLoopSection(currentSection);
+    }
+  };
 
   // 컴포넌트가 처음 마운트될 때 실행
   useEffect(() => {
@@ -182,19 +199,13 @@ const LearnPage = () => {
     }
   }, [cameraSize, initInterval, sectionList, state, videoInfo]);
 
-  // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
-  const handleTimeUpdate = useCallback(() => {
-    if (video) {
-      setCurrentTime(video.currentTime);
-
-      if (isLooping && loopSection) {
-        if (video.currentTime >= loopSection.end || video.ended) {
-          video.currentTime = loopSection.start;
-          setCurrentTime(video.currentTime);
-        }
-      }
+  // 카운트다운이 끝나면 영상 재생
+  useEffect(() => {
+    if (interval && timer <= 0) {
+      initInterval();
+      playVideo();
     }
-  }, [isLooping, loopSection, setCurrentTime, video]);
+  }, [initInterval, interval, playVideo, timer]);
 
   // 영상에 timeupdate 이벤트 추가
   useEffect(() => {
@@ -210,17 +221,7 @@ const LearnPage = () => {
     setBtnInfo();
   }, [cameraSize.width]);
 
-  // 구간 반복 토글
-  const toggleLooping = () => {
-    if (isLooping) {
-      setIsLooping(false);
-      setLoopSection(null);
-    } else {
-      setIsLooping(true);
-      setLoopSection(currentSection);
-    }
-  };
-
+  // 영상 버튼 모션 액션 감지
   useEffect(() => {
     console.log(btn);
     switch (btn) {
@@ -445,8 +446,9 @@ const Timer = styled.div`
 
 const VideoMotionButtonList = styled.div`
   position: absolute;
-  top: 0;
+  top: 50%;
   right: 0;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   margin: 8px;
