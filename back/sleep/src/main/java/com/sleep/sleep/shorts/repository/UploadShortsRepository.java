@@ -10,10 +10,12 @@ import java.util.List;
 
 @Repository
 public interface UploadShortsRepository extends JpaRepository<UploadShorts,Integer> {
-//    UploadShorts findByUploadNo(int uploadNo);
+    UploadShorts findByUploadNo(int uploadNo);
 
     @Query(nativeQuery = true, value = "select * from upload_shorts where member_no = :someValue")
     List<UploadShorts> findUploadShortList(@Param("someValue") int memberNo);
+
+    UploadShorts findByUploadTitle(String uploadTitle);
 
 
 }
