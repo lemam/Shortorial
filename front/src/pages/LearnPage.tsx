@@ -154,7 +154,7 @@ const LearnPage = () => {
       setState("PAUSE");
     }
   }, [currentSection.start, moveVideoTime, video]);
-
+  ``;
   // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
   const handleTimeUpdate = useCallback(() => {
     if (video) {
@@ -245,23 +245,22 @@ const LearnPage = () => {
 
   // 영상 버튼 모션 액션 감지
   useEffect(() => {
-    console.log(btn);
     switch (btn) {
       case "play":
         if (state === "PAUSE") startCountdown();
         else pauseVideo();
         break;
       case "challenge":
-        navigate("/challenge");
+        if (state === "PAUSE") navigate("/challenge");
         break;
       case "repeat":
-        toggleLooping();
+        if (state === "PAUSE") toggleLooping();
         break;
       case "flip":
-        setIsFlipped(!isFlipped);
+        if (state === "PAUSE") setIsFlipped(!isFlipped);
         break;
       case "speed":
-        changePlaySpeed();
+        if (state === "PAUSE") changePlaySpeed();
         break;
       default:
         break;
@@ -319,14 +318,7 @@ const LearnPage = () => {
                     progress={playCount}
                   />
                 )}
-                <div className="foldList">
-                  <VideoMotionButton
-                    id="challenge"
-                    icon={<Videocam />}
-                    toolTip="챌린지 모드로 이동"
-                    link="/challenge"
-                    progress={challengeCount}
-                  />
+                <FoldList>
                   {isLooping ? (
                     <VideoMotionButton
                       id="repeat"
@@ -334,6 +326,7 @@ const LearnPage = () => {
                       toolTip="구간 반복 해제"
                       onClick={toggleLooping}
                       progress={repeatCount}
+                      isVisible={state === "PAUSE"}
                     />
                   ) : (
                     <VideoMotionButton
@@ -342,6 +335,7 @@ const LearnPage = () => {
                       toolTip="구간 반복"
                       onClick={toggleLooping}
                       progress={repeatCount}
+                      isVisible={state === "PAUSE"}
                     />
                   )}
                   <VideoMotionButton
@@ -350,6 +344,7 @@ const LearnPage = () => {
                     toolTip="거울 모드"
                     onClick={() => setIsFlipped(!isFlipped)}
                     progress={flipCount}
+                    isVisible={state === "PAUSE"}
                   />
                   <VideoMotionButton
                     id="speed"
@@ -357,8 +352,17 @@ const LearnPage = () => {
                     toolTip="재생 속도"
                     onClick={changePlaySpeed}
                     progress={speedCount}
+                    isVisible={state === "PAUSE"}
                   />
-                </div>
+                  <VideoMotionButton
+                    id="challenge"
+                    icon={<Videocam />}
+                    toolTip="챌린지 모드로 이동"
+                    link="/challenge"
+                    progress={challengeCount}
+                    isVisible={state === "PAUSE"}
+                  />
+                </FoldList>
               </VideoMotionButtonList>
               {state === "READY" && <Timer>{timer}</Timer>}
             </VideoContainer>
@@ -463,11 +467,11 @@ const VideoMotionButtonList = styled.div`
   display: flex;
   flex-direction: column;
   margin: 8px;
+`;
 
-  .foldList {
-    display: flex;
-    flex-direction: column;
-  }
+const FoldList = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 const LoadingText = styled.div`

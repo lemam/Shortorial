@@ -13,6 +13,7 @@ interface VideoMotionButtonProps {
   link?: string;
   onClick?: () => void;
   progress?: number;
+  isVisible?: boolean;
 }
 
 const VideoMotionButton = ({
@@ -24,6 +25,7 @@ const VideoMotionButton = ({
   onClick,
   link = "",
   progress = 0,
+  isVisible = true,
 }: VideoMotionButtonProps) => {
   const containerRef = useRef<HTMLButtonElement>(null);
 
@@ -33,7 +35,13 @@ const VideoMotionButton = ({
 
   return (
     <Link to={link} onClick={handleLinkClick}>
-      <Container id={id} onClick={onClick} ref={containerRef} $progress={progress}>
+      <Container
+        id={id}
+        onClick={onClick}
+        ref={containerRef}
+        $progress={progress}
+        $isVisible={isVisible}
+      >
         <ProgressContainer>
           <CircularProgress
             variant="determinate"
@@ -52,7 +60,7 @@ const VideoMotionButton = ({
   );
 };
 
-const Container = styled.button<{ $progress: number }>`
+const Container = styled.button<{ $progress: number; $isVisible: boolean }>`
   position: relative;
   color: #fff;
   display: flex;
@@ -63,6 +71,10 @@ const Container = styled.button<{ $progress: number }>`
   background-color: #35353580;
   border-radius: 50%;
   margin-bottom: 24px;
+  visibility: ${(props) => (props.$isVisible ? "visible" : "hidden !important")};
+  opacity: ${(props) => (props.$isVisible ? "1" : "0")};
+  transition-property: opacity, visibility;
+  transition-duration: 0.5s;
 
   &:hover,
   &:active {
