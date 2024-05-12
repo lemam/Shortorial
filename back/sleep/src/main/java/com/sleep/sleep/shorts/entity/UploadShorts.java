@@ -2,6 +2,7 @@ package com.sleep.sleep.shorts.entity;
 
 import com.sleep.sleep.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "upload_shorts")
 @Entity
@@ -37,4 +40,10 @@ public class UploadShorts {
         this.uploadUrl = uploadUrl;
         this.uploadTitle = uploadTitle;
     }
+
+    public void update(String newTitle, String newUrl) {
+        this.uploadTitle = newTitle;
+        this.uploadUrl = newUrl;
+    }
+
 }
