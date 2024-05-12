@@ -146,10 +146,11 @@ const LearnPage = () => {
         setCurrentTime(0);
       }
 
+      video.playbackRate = playSpeed;
       video.play();
       setState("PLAY");
     }
-  }, [setCurrentTime, video]);
+  }, [playSpeed, setCurrentTime, video]);
 
   // 영상 일시정지
   const pauseVideo = useCallback(() => {
