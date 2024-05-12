@@ -109,6 +109,7 @@ public class S3Controller {
     @PutMapping("/s3/rename")
     public ResponseEntity<?> updateTitle(@RequestHeader("Authorization") String accessToken, @RequestBody Map<String, String> data) {
         try {
+            int uploadNo = Integer.parseInt(data.get("uploadNo"));
             String oldTitle = data.get("oldTitle");
             String newTitle = data.get("newTitle");
 
@@ -119,7 +120,7 @@ public class S3Controller {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
 
             //s3와 db 업데이트하는 것
-            s3Service.reaname(oldTitle,username+"/"+newTitle);
+            s3Service.reaname(uploadNo, oldTitle,username+"/"+newTitle);
 
             return new ResponseEntity<String>("Successfully update!",HttpStatus.OK);
         } catch (Exception e) {
