@@ -49,7 +49,6 @@ public class MyPageController {
     @GetMapping("/upload-shorts")
     public ResponseEntity<List<UploadShortsDto>> selectUploadShortList(@RequestHeader("Authorization") String accessToken) {
         //사용자 찾기
-        System.out.println(accessToken.toString());
         String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
         System.out.println("username : "+ username);
 
