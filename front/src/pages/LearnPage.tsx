@@ -161,7 +161,6 @@ const LearnPage = () => {
       setState("PAUSE");
     }
   }, [currentSection.start, initInterval, moveVideoTime, video]);
-  ``;
 
   // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
   const handleTimeUpdate = useCallback(() => {
