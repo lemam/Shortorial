@@ -63,7 +63,7 @@ public class S3Service {
         return s3Object.getObjectContent();
     }
 
-    public void reaname(String oldTitle, String newTitle) {
+    public void reaname(int uploadNo,String oldTitle, String newTitle) {
         // 객체 복사 요청 생성
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest(bucketName, oldTitle, bucketName, newTitle);
         // 객체 복사 수행
@@ -73,7 +73,7 @@ public class S3Service {
         // 새로운 URL 반환
         String newURL =  getPath(newTitle);
 
-        shortsService.putTitle(oldTitle, newTitle, newURL);
+        shortsService.putTitle(uploadNo,oldTitle, newTitle, newURL);
 
     }
 }
