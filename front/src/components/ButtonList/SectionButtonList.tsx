@@ -79,7 +79,7 @@ const Container = styled.div`
     margin: 8px 0;
   }
 
-  @media screen and (max-width: 479px) {
+  @media screen and (orientation: portrait) {
     flex-direction: row;
     justify-content: start;
     align-items: flex-start;

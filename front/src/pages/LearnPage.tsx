@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { VideoSection } from "../constants/types";
 import { getComponentSize } from "../modules/componentSize";
 import { setBtnInfo } from "../modules/Motion";
+import useVideoSize from "../hooks/useVideoSize";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
 import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
@@ -18,6 +19,7 @@ const LearnPage = () => {
   const leftSectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const video = videoRef.current;
+  const [centerSectionSize, centerSectionRef] = useVideoSize();
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const interval = intervalRef.current;
@@ -27,7 +29,6 @@ const LearnPage = () => {
   const [state, setState] = useState<LearnState>("LOADING");
   const [videoInfo, setVideoInfo] = useState({ id: 0, url: "", length: 0 });
   const [sectionList, setSectionList] = useState<VideoSection[]>([]);
-  const [cameraSize, setCameraSize] = useState({ width: 0, height: 0 });
 
   const [currentTime, setCurrentTime] = useLearnStore((state) => [
     state.currentTime,
@@ -92,25 +93,6 @@ const LearnPage = () => {
     }
 
     setSectionList(result);
-  };
-
-  // 카메라 크기 초기화
-  const initVideoSize = () => {
-    let height = 0;
-    let width = 0;
-
-    // 모바일 세로인 경우
-    if (window.innerWidth < 480) {
-      height = window.innerHeight * 0.8;
-      width = Math.floor((height * 9) / 16);
-    }
-    // 모바일 가로 또는 가로 길이 480 이상인 경우
-    else {
-      height = window.innerHeight - 1;
-      width = Math.floor((height * 9) / 16);
-    }
-
-    setCameraSize({ width, height });
   };
 
   // 영상 시간 옮기기
@@ -220,21 +202,17 @@ const LearnPage = () => {
   // 컴포넌트가 처음 마운트될 때 실행
   useEffect(() => {
     loadVideo();
-    initVideoSize();
-
-    window.addEventListener("resize", initVideoSize);
-    return () => window.removeEventListener("resize", initVideoSize);
   }, [loadVideo]);
 
   // 화면의 준비가 모두 완료했을 때 실행
   useEffect(() => {
     if (state === "LOADING") {
-      if (videoInfo && sectionList && cameraSize) {
+      if (videoInfo && sectionList && centerSectionSize) {
         initInterval();
         setState("PAUSE");
       }
     }
-  }, [cameraSize, initInterval, sectionList, state, videoInfo]);
+  }, [centerSectionSize, initInterval, sectionList, state, videoInfo]);
 
   // 카운트다운이 끝나면 영상 재생
   useEffect(() => {
@@ -256,7 +234,7 @@ const LearnPage = () => {
   // 영상 버튼 정보 가져오기
   useEffect(() => {
     setBtnInfo();
-  }, [cameraSize.width]);
+  }, [centerSectionSize]);
 
   // 영상 버튼 모션 액션 감지
   useEffect(() => {
@@ -298,11 +276,11 @@ const LearnPage = () => {
               clickHandler={(section) => moveVideoTime(section.start)}
             />
           </LeftSection>
-          <CenterSection>
+          <CenterSection ref={centerSectionRef}>
             <VideoContainer>
               <video
-                width={cameraSize.width}
-                height={cameraSize.height}
+                width={centerSectionSize.width}
+                height={centerSectionSize.height}
                 src="src/assets/sample.mp4"
                 ref={videoRef}
                 className={isFlipped ? "flip" : ""}
@@ -310,8 +288,8 @@ const LearnPage = () => {
             </VideoContainer>
             <VideoContainer id="dom">
               <MotionCamera
-                width={cameraSize.width}
-                height={cameraSize.height}
+                width={centerSectionSize.width}
+                height={centerSectionSize.height}
                 className="camera flip"
                 autoPlay
               ></MotionCamera>
@@ -396,7 +374,7 @@ const Container = styled.div`
   display: flex;
   background-color: #000;
 
-  @media screen and (max-width: 479px) {
+  @media screen and (orientation: portrait) {
     display: flex;
     flex-direction: column-reverse;
   }
@@ -411,7 +389,7 @@ const RightSection = styled(Section)`
   flex: 1;
   margin: 8px;
 
-  @media screen and (max-width: 479px) {
+  @media screen and (orientation: portrait) {
     display: none;
   }
 `;
@@ -422,6 +400,11 @@ const CenterSection = styled(Section)`
   align-items: center;
   width: 100%;
   height: 100%;
+
+  @media screen and (orientation: portrait) {
+    height: 80%;
+    flex: auto;
+  }
 `;
 
 const LeftSection = styled(Section)`
@@ -431,8 +414,10 @@ const LeftSection = styled(Section)`
   margin: 8px;
   color: #fff;
 
-  @media screen and (max-width: 479px) {
-    align-items: start;
+  @media screen and (orientation: portrait) {
+    align-items: center;
+    height: 20%;
+    flex: auto;
   }
 `;
 
@@ -450,7 +435,7 @@ const VideoContainer = styled.div`
     transform: scaleX(-1);
   }
 
-  @media screen and (max-width: 479px) {
+  @media screen and (orientation: portrait) {
     .camera {
       display: none;
     }
