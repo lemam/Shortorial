@@ -33,7 +33,7 @@ const VideoMotionButton = ({
 
   return (
     <Link to={link} onClick={handleLinkClick}>
-      <Container id={id} onClick={onClick} ref={containerRef}>
+      <Container id={id} onClick={onClick} ref={containerRef} $progress={progress}>
         <ProgressContainer>
           <CircularProgress
             variant="determinate"
@@ -52,7 +52,7 @@ const VideoMotionButton = ({
   );
 };
 
-const Container = styled.button`
+const Container = styled.button<{ $progress: number }>`
   position: relative;
   color: #fff;
   display: flex;
@@ -93,7 +93,8 @@ const Container = styled.button`
   }
 
   &:hover .tooltipText,
-  &:active .tooltipText {
+  &:active .tooltipText,
+  ${(props) => props.$progress > 0 && ".tooltipText"} {
     visibility: visible;
   }
 
