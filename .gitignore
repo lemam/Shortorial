@@ -39,3 +39,4 @@ out/
 *.yml
 *.properties
 *.yaml
+*.node_modules

@@ -51,7 +51,6 @@ const ChallengeResultPage = () => {
   // 비디오 유튜브 업로드
   const uploadVideo = () => {
     (() => setShare(true))();
-    console.log(share);
 
     axios
       .get(`http://localhost:3001/authenticate?fileName=minji`) // node 서버로 요청 보냄
@@ -59,6 +58,8 @@ const ChallengeResultPage = () => {
         window.location.href = response.data.authUrl; // 응답 받은 authUrl로 이동
       })
       .catch((error) => console.error("Error:", error));
+
+    (() => setShare(false))();
   };
 
   return (

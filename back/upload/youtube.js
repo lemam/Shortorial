@@ -125,7 +125,7 @@ function getFilePath(auth, fileName) {
       {
         headers: {
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTUzMDE3OCwiZXhwIjoxNzE1NTMxOTc4fQ.o7HHIpTM_9euX1vsurFYcksFUB96SswC0hDNzJvS8jU",
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTU1NzU1NiwiZXhwIjoxNzE1NTU5MzU2fQ.k-UonjytB1aMlkorUC2O4vcSo2m66VDL6uGnkM_XQU8",
         },
       }
     )
