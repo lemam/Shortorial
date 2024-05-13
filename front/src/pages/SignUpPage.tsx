@@ -148,6 +148,7 @@ const TotalPage = styled.div`
   justify-content: center;
   align-items: center;
   background-color: #f2f2f2;
+  padding-bottom: 10%;
 
   @media screen and (max-width: 479px) {
     padding-bottom: 20%;
