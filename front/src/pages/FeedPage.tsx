@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import { shorts } from "../apis/shorts";
+import { Shorts } from "../constants/types";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
-
-
 const FeedPage = () => {
   const navigate = useNavigate();
-  
-  const [shortsList, setShortsList] = useState<shorts[]>([]);
+
+  const [shortsList, setShortsList] = useState<Shorts[]>([]);
 
   const goToLearnMode = (shortNo: number) => {
     navigate(`/learn/${shortNo}`);
@@ -22,16 +20,16 @@ const FeedPage = () => {
 
   useEffect(() => {
     axios
-    .get<shorts[]>("/api/shorts")
-    .then((response) => {
-      setShortsList(response.data);
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
-    });
+      .get<Shorts[]>("/api/shorts")
+      .then((response) => {
+        setShortsList(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
 
     axios
-      .get<shorts[]>("/api/shorts")
+      .get<Shorts[]>("/api/shorts")
       .then((response) => {
         setShortsList(response.data);
       })
@@ -47,7 +45,7 @@ const FeedPage = () => {
         {shortsList.map((shorts) => (
           <VideoItem key={shorts.shortsNo}>
             <VideoBox>
-              <video src={shorts.shortsLink} crossOrigin="anonymous" controls/>
+              <video src={shorts.shortsLink} crossOrigin="anonymous" controls />
             </VideoBox>
             <DetailItem>
               <Label>제목</Label>
@@ -70,12 +68,12 @@ const FeedPage = () => {
                 연습 모드
               </Button>
               <Button variant="primary" onClick={() => goToChallengeMode(shorts.shortsNo)}>
-                  챌린지 모드
+                챌린지 모드
               </Button>
             </ButtonList>
           </VideoItem>
         ))}
-       </ShortsDetailContainer>
+      </ShortsDetailContainer>
     </Container>
   );
 };
@@ -87,7 +85,7 @@ const Header = styled.header`
   width: 100%;
   background-color: #f8f9fa;
   padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -101,16 +99,15 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
-//   & > * {
-//     margin-bottom: 50px;
-//   }
-`
+
+  //   & > * {
+  //     margin-bottom: 50px;
+  //   }
+`;
 const ShortsDetailContainer = styled.div`
   @media (orientation: landscape) {
-    
   }
-`
+`;
 
 const VideoBox = styled.div`
   position: relative;
@@ -141,7 +138,7 @@ const VideoItem = styled.div`
   align-items: center;
   width: 100%; // 비디오 박스의 최대 너비를 고려
   padding: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   white-space: nowrap;
   overflow: hidden;
@@ -163,15 +160,14 @@ const VideoItem = styled.div`
 //   }
 // `
 
-
 const DetailItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: start;
   width: 100%;
   padding: 2px 40px;
-//   background-color: #f4f4f4;
-//   border-bottom: 1px solid #ddd;
+  //   background-color: #f4f4f4;
+  //   border-bottom: 1px solid #ddd;
   font-size: 16px;
 
   &:last-child {
