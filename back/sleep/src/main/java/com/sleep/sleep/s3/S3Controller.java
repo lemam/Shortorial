@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/s3")
 @RequiredArgsConstructor
 @Slf4j
 public class S3Controller {
@@ -28,7 +29,7 @@ public class S3Controller {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Operation(summary = "동영상 업로드", description ="추후 사용자별 업로드로 수정 예정; param: 업로드할 파일이름")
-    @PostMapping("/s3/upload")
+    @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestHeader("Authorization") String accessToken, @RequestParam("file") MultipartFile file, @RequestParam("fileName") String fileName) {
         try {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
@@ -51,7 +52,7 @@ public class S3Controller {
     }
 
     @Operation(summary = "동영상 링크 보기", description ="추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
-    @GetMapping("/s3/download/{fileName}")
+    @GetMapping("/download/{fileName}")
     public ResponseEntity<?> downloadFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
         try {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
@@ -66,7 +67,7 @@ public class S3Controller {
     }
 
     @Operation(summary = "동영상 삭제", description ="uploadNo, title")
-    @DeleteMapping("/s3/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<?> deleteFile(@RequestHeader("Authorization") String accessToken,@RequestBody Map<String,String> data){
         try {
             int uploadNo = Integer.parseInt(data.get("uploadNo"));
@@ -88,7 +89,7 @@ public class S3Controller {
     }
 
     @Operation(summary = "동영상 파일 다운로드", description = "추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
-    @GetMapping("/s3/download/file/{fileName}")
+    @GetMapping("/download/file/{fileName}")
     public ResponseEntity<?> downloadStaticFile(@PathVariable String fileName) {
         try {
 
@@ -109,7 +110,7 @@ public class S3Controller {
     }
 
     @Operation(summary = "동영상 파일 이름 변경", description = "헤더에 accessToken넣기. requestBody에 oldTitle, newTitle 이름 넣기")
-    @PutMapping("/s3/rename")
+    @PutMapping("/rename")
     public ResponseEntity<?> updateTitle(@RequestHeader("Authorization") String accessToken, @RequestBody Map<String, String> data) {
         try {
             int uploadNo = Integer.parseInt(data.get("uploadNo"));

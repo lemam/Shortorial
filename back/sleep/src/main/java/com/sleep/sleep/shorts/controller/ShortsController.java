@@ -15,6 +15,7 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/api/shorts")
 @RestController
 public class ShortsController {
 
@@ -22,7 +23,7 @@ public class ShortsController {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Operation(summary = "쇼츠 목록 조회")
-    @GetMapping("/api/shorts")
+    @GetMapping
     public ResponseEntity<List<ShortsDto>> selectShortList() {
 
         List<ShortsDto> shortsList = shortsService.getShortList();
@@ -31,13 +32,13 @@ public class ShortsController {
     }
 
     @Operation(summary = "특정 쇼츠 조회")
-    @GetMapping("/api/shorts/{shortsNo}")
+    @GetMapping("/{shortsNo}")
     public ResponseEntity<ShortsDto> selectUserPrediction(@PathVariable int shortsNo) {
         return ResponseEntity.ok(shortsService.getShortsInfo(shortsNo));
     }
 
     @Operation(summary = "동영상 파일 이름 중복검사", description = "헤더에 accessToken 넣기, RequestParam으로 title 받기. true면 이미 있는 이름; false면 사용 가능한 이름 ")
-    @GetMapping("/api/shorts/checkName")
+    @GetMapping("/checkName")
     public ResponseEntity<?> checkName(@RequestHeader("Authorization") String accessToken, @RequestBody Map<String, String> data) {
         try {
             String title = data.get("title");
