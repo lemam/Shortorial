@@ -14,5 +14,5 @@ public class JoinDto {
     String memberId;
     String memberPass;
     String memberNickname;
-    String memberProfile;
+//    String memberProfile;
 }
