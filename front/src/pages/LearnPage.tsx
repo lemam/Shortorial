@@ -1,33 +1,43 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { VideoSection } from "../constants/types";
+import noRepeat from "/src/assets/icon/repeat-off.svg";
+import { useNavigate, useParams } from "react-router-dom";
+import { VideoSection, Shorts } from "../constants/types";
 import { setBtnInfo } from "../modules/Motion";
-import useComponentSize from "../hooks/useComponentSize";
-import useVideoSize from "../hooks/useVideoSize";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
 import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
 import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
+import { getComponentSize, getVideoSize } from "../modules/componentSize";
 
 const LearnPage = () => {
   type LearnState = "LOADING" | "PAUSE" | "READY" | "PLAY";
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const video = videoRef.current;
-  const [leftSectionSize, leftSectionRef] = useComponentSize();
-  const [centerSectionSize, centerSectionRef] = useVideoSize();
+  const leftSectionRef = useRef<HTMLDivElement>(null);
+  const centerSectionRef = useRef<HTMLDivElement>(null);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const interval = intervalRef.current;
 
   const navigate = useNavigate();
+  const params = useParams();
 
   const [state, setState] = useState<LearnState>("LOADING");
-  const [videoInfo, setVideoInfo] = useState({ id: 0, url: "", length: 0 });
+  const [videoInfo, setVideoInfo] = useState<Shorts>({
+    shortsNo: 0,
+    shortsUrl: "",
+    shortsTitle: "",
+    shortsDirector: "",
+    shortsTime: 0,
+    shortsChallengers: 0,
+    shortsLink: "",
+    shortsDate: "",
+  });
   const [sectionList, setSectionList] = useState<VideoSection[]>([]);
 
   const [currentTime, setCurrentTime] = useLearnStore((state) => [
@@ -71,12 +81,13 @@ const LearnPage = () => {
 
   // 영상 정보 가져오기
   const loadVideo = useCallback(async () => {
-    const data = await getShortsInfo(1);
+    const data: Shorts = await getShortsInfo(Number(params.shortsNo));
+
     if (data) {
       setVideoInfo(data);
-      initSectionList(data.length);
+      initSectionList(data.shortsTime);
     }
-  }, []);
+  }, [params.shortsNo]);
 
   // 구간 리스트 초기화
   const initSectionList = (videoLength: number) => {
@@ -207,12 +218,12 @@ const LearnPage = () => {
   // 화면의 준비가 모두 완료했을 때 실행
   useEffect(() => {
     if (state === "LOADING") {
-      if (videoInfo && sectionList && centerSectionSize) {
+      if (videoInfo && sectionList && centerSectionRef) {
         initInterval();
         setState("PAUSE");
       }
     }
-  }, [centerSectionSize, initInterval, sectionList, state, videoInfo]);
+  }, [centerSectionRef, initInterval, sectionList, state, videoInfo]);
 
   // 카운트다운이 끝나면 영상 재생
   useEffect(() => {
@@ -234,7 +245,7 @@ const LearnPage = () => {
   // 영상 버튼 정보 가져오기
   useEffect(() => {
     setBtnInfo();
-  }, [centerSectionSize]);
+  }, [centerSectionRef]);
 
   // 영상 버튼 모션 액션 감지
   useEffect(() => {
@@ -270,7 +281,7 @@ const LearnPage = () => {
           <LeftSection ref={leftSectionRef}>
             <SectionButtonList
               sectionList={sectionList}
-              parentWidth={leftSectionSize.width}
+              parentWidth={getComponentSize(leftSectionRef.current).width}
               currentTime={currentTime}
               isLooping={isLooping}
               clickHandler={(section) => moveVideoTime(section.start)}
@@ -279,17 +290,18 @@ const LearnPage = () => {
           <CenterSection ref={centerSectionRef}>
             <VideoContainer>
               <video
-                width={centerSectionSize.width}
-                height={centerSectionSize.height}
-                src="src/assets/sample.mp4"
+                width={getVideoSize(centerSectionRef.current).width}
+                height={getVideoSize(centerSectionRef.current).height}
+                src={videoInfo.shortsLink}
                 ref={videoRef}
                 className={isFlipped ? "flip" : ""}
+                crossOrigin="anonymous"
               ></video>
             </VideoContainer>
             <VideoContainer id="dom">
               <MotionCamera
-                width={centerSectionSize.width}
-                height={centerSectionSize.height}
+                width={getVideoSize(centerSectionRef.current).width}
+                height={getVideoSize(centerSectionRef.current).height}
                 className="camera flip"
                 autoPlay
               ></MotionCamera>
@@ -324,7 +336,7 @@ const LearnPage = () => {
                   ) : (
                     <VideoMotionButton
                       id="repeat"
-                      imgSrc="src/assets/icon/repeat-off.svg"
+                      imgSrc={noRepeat}
                       toolTip="구간 반복"
                       onClick={toggleLooping}
                       progress={repeatCount}
