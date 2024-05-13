@@ -13,6 +13,7 @@ import MyPage from "./pages/MyPage";
 import ShortsDetailPage from "./pages/ShortsDetailPage";
 import FeedPage from "./pages/FeedPage";
 import "bootstrap/dist/css/bootstrap.min.css";
+import SignUp from "./pages/SignUpPage";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/shorts/:shortsNo" element={<ShortsDetailPage />} />
           <Route path="/feed" element={<FeedPage />} />
+          <Route path="/sign-up" element={<SignUp />} />
         </Routes>
       </BrowserRouter>
     </>
