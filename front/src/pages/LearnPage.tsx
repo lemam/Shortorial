@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { VideoSection } from "../constants/types";
-import { getComponentSize } from "../modules/componentSize";
 import { setBtnInfo } from "../modules/Motion";
+import useComponentSize from "../hooks/useComponentSize";
 import useVideoSize from "../hooks/useVideoSize";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
@@ -16,9 +16,9 @@ import VideoMotionButton from "../components/button/VideoMotionButton";
 const LearnPage = () => {
   type LearnState = "LOADING" | "PAUSE" | "READY" | "PLAY";
 
-  const leftSectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const video = videoRef.current;
+  const [leftSectionSize, leftSectionRef] = useComponentSize();
   const [centerSectionSize, centerSectionRef] = useVideoSize();
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -270,7 +270,7 @@ const LearnPage = () => {
           <LeftSection ref={leftSectionRef}>
             <SectionButtonList
               sectionList={sectionList}
-              parentWidth={getComponentSize(leftSectionRef.current).width}
+              parentWidth={leftSectionSize.width}
               currentTime={currentTime}
               isLooping={isLooping}
               clickHandler={(section) => moveVideoTime(section.start)}

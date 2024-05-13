@@ -1,8 +1,8 @@
-import { MouseEvent, useRef } from "react";
+import { MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import CircularProgress from "@mui/material/CircularProgress";
-import { getComponentSize } from "../../modules/componentSize";
+import useComponentSize from "../../hooks/useComponentSize";
 
 interface VideoMotionButtonProps {
   id?: string;
@@ -27,7 +27,8 @@ const VideoMotionButton = ({
   progress = 0,
   isVisible = true,
 }: VideoMotionButtonProps) => {
-  const containerRef = useRef<HTMLButtonElement>(null);
+  // const containerRef = useRef<HTMLButtonElement>(null);
+  const [containerSize, containerRef] = useComponentSize();
 
   const handleLinkClick = (e: MouseEvent) => {
     if (!link) e.preventDefault();
@@ -46,7 +47,7 @@ const VideoMotionButton = ({
           <CircularProgress
             variant="determinate"
             value={progress}
-            size={getComponentSize(containerRef.current).width}
+            size={containerSize.width}
             thickness={4}
             sx={{ color: "#FB2576" }}
           />
