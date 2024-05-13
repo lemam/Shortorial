@@ -18,14 +18,15 @@ import java.time.LocalDateTime;
 public class UploadShorts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private int uploadNo;
+
     @ManyToOne
     @JoinColumn(name = "member_no")
     private Member memberIndex;
     private String uploadUrl;
     private String uploadTitle;
-    private LocalDateTime uploadDate = LocalDateTime.now();
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime uploadDate;
 
 
     @OneToOne
@@ -39,11 +40,18 @@ public class UploadShorts {
         }
         this.uploadUrl = uploadUrl;
         this.uploadTitle = uploadTitle;
+        this.uploadDate = LocalDateTime.now(); // 현재 날짜와 시간 할당
     }
 
     public void update(String newTitle, String newUrl) {
         this.uploadTitle = newTitle;
         this.uploadUrl = newUrl;
+    }
+
+
+    @PrePersist
+    protected void onCreate() {
+        this.uploadDate = LocalDateTime.now();
     }
 
 }
