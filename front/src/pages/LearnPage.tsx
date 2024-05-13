@@ -251,6 +251,8 @@ const LearnPage = () => {
 
   // 영상 이동 액션 감지
   useEffect(() => {
+    if (state !== "PAUSE") return;
+
     switch (action) {
       case "prev":
         if (canAction) {
