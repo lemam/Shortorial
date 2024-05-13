@@ -21,4 +21,7 @@ public interface ShortsService {
 
     //사용자가 업로드한 영상 이름 중복 검사
     public boolean isNameExists(String title);
+
+    //사용자가 업로드한 영상 db삭제
+    public void deleteUploadShorts(int uploadNo, String fileName);
 }

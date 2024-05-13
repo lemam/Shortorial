@@ -65,14 +65,17 @@ public class S3Controller {
 
     }
 
-    @Operation(summary = "동영상 삭제", description ="추후 사용자별 다운로드로 수정 예정; param: 삭제할 파일이름")
-    @DeleteMapping("/s3/delete/{fileName}")
-    public ResponseEntity<?> deleteFile(@RequestHeader("Authorization") String accessToken,@PathVariable String fileName){
+    @Operation(summary = "동영상 삭제", description ="uploadNo, title")
+    @DeleteMapping("/s3/delete")
+    public ResponseEntity<?> deleteFile(@RequestHeader("Authorization") String accessToken,@RequestBody Map<String,String> data){
         try {
+            int uploadNo = Integer.parseInt(data.get("uploadNo"));
+            String fileName = data.get("title");
+
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
             System.out.println("username : "+ username);
 
-            s3Service.deleteFile(username+"/"+fileName);
+            s3Service.deleteFile(uploadNo, fileName);
             return new ResponseEntity<String>("Successfully delete!",HttpStatus.OK);
         }catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

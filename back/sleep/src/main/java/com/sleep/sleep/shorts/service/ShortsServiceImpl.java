@@ -116,5 +116,12 @@ public class ShortsServiceImpl implements ShortsService{
         return uploadShortsRepository.existsByUploadTitle(title);
     }
 
+    public void deleteUploadShorts(int uploadNo, String fileName){
+        UploadShorts uploadShorts = uploadShortsRepository.findByUploadTitle(uploadNo, fileName);
+        if (uploadShorts != null) {
+            uploadShortsRepository.delete(uploadShorts);
+        }
+    }
+
 
 }

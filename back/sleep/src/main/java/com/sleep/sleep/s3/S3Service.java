@@ -46,8 +46,9 @@ public class S3Service {
         return s3Url;
     }
 
-    public void deleteFile(String fileName) {
+    public void deleteFile(int uploadNo,String fileName) {
         amazonS3.deleteObject(new DeleteObjectRequest(bucketName,fileName));
+        shortsService.deleteUploadShorts(uploadNo,fileName);
     }
 
     private File convertMultiPartFileToFile(MultipartFile multipartFile) throws IOException {
