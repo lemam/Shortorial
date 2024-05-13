@@ -8,7 +8,11 @@ import useComponentSize from "../hooks/useComponentSize";
 import useVideoSize from "../hooks/useVideoSize";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
-import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
+import {
+  useActionStore,
+  useBtnStore,
+  useMotionDetectionStore,
+} from "../store/useMotionStore";
 import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
@@ -23,6 +27,8 @@ const LearnPage = () => {
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const interval = intervalRef.current;
+  const intervalRef2 = useRef<NodeJS.Timeout | null>(null);
+  const [canAction, setCanAction] = useState(true);
 
   const navigate = useNavigate();
 
@@ -41,14 +47,19 @@ const LearnPage = () => {
     state.countdownTimer,
   ]);
 
-  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore((state) => [
-    state.isLooping,
-    state.loopSection,
-    state.setIsLooping,
-    state.setLoopSection,
-  ]);
+  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore(
+    (state) => [
+      state.isLooping,
+      state.loopSection,
+      state.setIsLooping,
+      state.setLoopSection,
+    ]
+  );
 
-  const [isFlipped, setIsFlipped] = useLearnStore((state) => [state.isFlipped, state.setIsFlipped]);
+  const [isFlipped, setIsFlipped] = useLearnStore((state) => [
+    state.isFlipped,
+    state.setIsFlipped,
+  ]);
 
   const [playSpeed, changePlaySpeed] = useLearnStore((state) => [
     state.playSpeed,
@@ -58,16 +69,16 @@ const LearnPage = () => {
   const currentSection = useLearnStore((state) => state.currentSection);
 
   const btn = useBtnStore((state) => state.btn);
+  const action = useActionStore((state) => state.action);
 
-  const [playCount, challengeCount, repeatCount, flipCount, speedCount] = useMotionDetectionStore(
-    (state) => [
+  const [playCount, challengeCount, repeatCount, flipCount, speedCount] =
+    useMotionDetectionStore((state) => [
       state.playCount,
       state.challengeCount,
       state.repeatCount,
       state.flipCount,
       state.speedCount,
-    ]
-  );
+    ]);
 
   // 영상 정보 가져오기
   const loadVideo = useCallback(async () => {
@@ -178,26 +189,28 @@ const LearnPage = () => {
   };
 
   // 다음 구간으로 이동
-  // const goNextSection = () => {
-  //   if (currentSection.id >= sectionList.length - 1) return;
+  const goNextSection = () => {
+    console.log("next");
+    if (currentSection.id >= sectionList.length - 1) return;
 
-  //   if (video) {
-  //     const nextTime = sectionList[currentSection.id + 1].start;
-  //     video.currentTime = nextTime;
-  //     setCurrentTime(nextTime);
-  //   }
-  // };
+    if (video) {
+      const nextTime = sectionList[currentSection.id + 1].start;
+      video.currentTime = nextTime;
+      setCurrentTime(nextTime);
+    }
+  };
 
   // 이전 구간으로 이동
-  // const goPrevSection = () => {
-  //   if (currentSection.id <= 0) return;
+  const goPrevSection = () => {
+    console.log("prev");
+    if (currentSection.id <= 0) return;
 
-  //   if (video) {
-  //     const nextTime = sectionList[currentSection.id - 1].start;
-  //     video.currentTime = nextTime;
-  //     setCurrentTime(nextTime);
-  //   }
-  // };
+    if (video) {
+      const nextTime = sectionList[currentSection.id - 1].start;
+      video.currentTime = nextTime;
+      setCurrentTime(nextTime);
+    }
+  };
 
   // 컴포넌트가 처음 마운트될 때 실행
   useEffect(() => {
@@ -235,6 +248,26 @@ const LearnPage = () => {
   useEffect(() => {
     setBtnInfo();
   }, [centerSectionSize]);
+
+  // 영상 이동 액션 감지
+  useEffect(() => {
+    switch (action) {
+      case "prev":
+        if (canAction) {
+          console.log("액션함");
+          goPrevSection();
+          setCanAction(false);
+          setTimeout(() => {
+            console.log("액션 쉬어");
+            setCanAction(true);
+          }, 1000);
+        }
+        break;
+      case "next":
+        // goNextSection();
+        break;
+    }
+  }, [action]);
 
   // 영상 버튼 모션 액션 감지
   useEffect(() => {
