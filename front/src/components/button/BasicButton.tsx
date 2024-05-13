@@ -63,7 +63,8 @@ const Button = styled.button<{ color: string; hoverColor: string }>`
 
   @media screen and (max-width: 479px) {
     font-size: 80%;
-    width: 80%;
-    height: 50%;
+    width: 12rem;
+    height: 2rem;
+    border-radius: 7px;
   }
 `;
