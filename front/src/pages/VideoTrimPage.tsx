@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { shorts } from "../apis/shorts";
+import { Shorts } from "../constants/types";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
@@ -11,11 +11,11 @@ const VideoTrimPage = () => {
     navigate(`/shorts/${shortNo}`);
   };
 
-  const [shortsList, setShortsList] = useState<shorts[]>([]);
+  const [shortsList, setShortsList] = useState<Shorts[]>([]);
 
   useEffect(() => {
     axios
-      .get<shorts[]>("/api/shorts")
+      .get<Shorts[]>("/api/shorts")
       .then((response) => {
         setShortsList(response.data);
       })
@@ -31,10 +31,7 @@ const VideoTrimPage = () => {
         {shortsList.map((shorts) => (
           <VideoItem key={shorts.shortsNo}>
             <VideoBox onClick={() => goToDetail(shorts.shortsNo)}>
-              <video
-                src={shorts.shortsLink}
-                crossOrigin="anonymous"
-              ></video>
+              <video src={shorts.shortsLink} crossOrigin="anonymous"></video>
             </VideoBox>
             <VideoTitle>{shorts.shortsTitle}</VideoTitle>
           </VideoItem>
@@ -51,7 +48,7 @@ const Header = styled.header`
   width: 100%;
   background-color: #f8f9fa;
   padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -70,7 +67,7 @@ const GridContainer = styled.div`
   @media (orientation: landscape) {
     grid-template-columns: repeat(4, minmax(162px, 1fr));
   }
-`
+`;
 
 const VideoItem = styled.div`
   display: flex;
@@ -78,7 +75,7 @@ const VideoItem = styled.div`
   // align-items: center;
   width: 100%; // 비디오 박스의 최대 너비를 고려
   padding: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   white-space: nowrap;
   overflow: hidden;
