@@ -150,7 +150,13 @@ const TotalPage = styled.div`
   background-color: #f2f2f2;
 
   @media screen and (max-width: 479px) {
-    padding-bottom: 10%;
+    padding-bottom: 20%;
+  }
+
+  @media screen and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+    justify-content: flex-start;
+    height: auto;
+    padding: 5% 0%;
   }
 `;
 
@@ -164,6 +170,10 @@ const Title = styled.div`
   @media screen and (max-width: 479px) {
     font-size: 24px; /* 화면 너비가 479px 이하 또는 뷰포트의 절반 이하일 때 적용됩니다. */
     height: 15%;
+  }
+
+  @media screen and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+    padding-bottom: 3%;
   }
 `;
 

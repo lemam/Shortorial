@@ -61,23 +61,23 @@ const InputForm = styled.div<{ text: string }>`
   }
 `;
 
-const Content = styled.div`
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 19px;
-  text-align: center;
+// const Content = styled.div`
+//   font-family: "Inter";
+//   font-style: normal;
+//   font-weight: 700;
+//   font-size: 16px;
+//   line-height: 19px;
+//   text-align: center;
 
-  color: #000000;
+//   color: #000000;
 
-  flex: none;
-  order: 0;
-  flex-grow: 0;
-  @media screen and (max-width: 479px) {
-    font-size: 13px;
-  }
-`;
+//   flex: none;
+//   order: 0;
+//   flex-grow: 0;
+//   @media screen and (max-width: 479px) {
+//     font-size: 13px;
+//   }
+// `;
 
 const SubContent = styled.div<{ text: string; color: string }>`
   display: ${(props) => (props.text == "" ? "none" : "flex")};
