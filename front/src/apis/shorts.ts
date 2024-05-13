@@ -1,16 +1,17 @@
 import { axios } from "../utils/axios";
 
-const REST_SHORTS_URL = "/s3/upload";
+const REST_SHORTS_URL = "api/s3/upload";
 const REST_SHORTS_LIST_URL = "/api/shorts";
 const REST_MYPAGE_URL = "/api/mypage";
 
 // S3 동영상 업로드
-export async function postUploadShorts(file: File, fileName: string) {
+export async function postUploadShorts(blob: blob, fileName: string) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
 
     const formData = new FormData(); // FormData 객체 생성
-    formData.append("file", file); // 파일 추가
+    // formData.append("file", file); // 파일 추가
+    formData.append("file", blob, `${fileName}.mp4`);
     formData.append("fileName", fileName); // 파일 이름 추가
 
     const data = await axios.post(REST_SHORTS_URL, formData, {
@@ -94,6 +95,26 @@ export async function putUpdateTitle(oldTitle: string, newTitle: string, uploadN
     };
 
     const response = await axios.put(`${REST_MYPAGE_URL}/rename`, data, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+//영상 시도하면 카운트
+export async function getTryCount(shortsNo: number) {
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+    const data = {
+      shortsNo: shortsNo,
+    };
+
+    const response = await axios.put(`${REST_SHORTS_LIST_URL}/addTryCount`, data, {
       headers: {
         Authorization: token,
       },
