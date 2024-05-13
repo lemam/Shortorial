@@ -107,7 +107,7 @@ function listChannels(auth, res, fileName) {
             // `This channel's ID is ${channel.id}. Its title is '${channel.snippet.title}', and it has ${channel.statistics.viewCount} views.`
           );
 
-          getFilePath(auth, fileName);
+          getFilePath(auth, res, fileName);
         }
       } catch (err) {
         console.log("Error processing the YouTube API response:", err);
@@ -117,7 +117,7 @@ function listChannels(auth, res, fileName) {
 }
 
 // 업로드할 파일 경로 가져오기
-function getFilePath(auth, fileName) {
+function getFilePath(auth, res, fileName) {
   axios
     .post(
       `http://localhost:8080/s3/bring/${fileName}`,
@@ -125,13 +125,13 @@ function getFilePath(auth, fileName) {
       {
         headers: {
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTU1NzU1NiwiZXhwIjoxNzE1NTU5MzU2fQ.k-UonjytB1aMlkorUC2O4vcSo2m66VDL6uGnkM_XQU8",
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTYxMDcxMywiZXhwIjoxNzE1NjEyNTEzfQ.swZYSTGTCOQ2w5LEWz_cfODO1wJY7VdhQaSapQIv0O0",
         },
       }
     )
-    .then((res) => {
-      const filePath = res.data;
-      uploadVideo(auth, filePath, fileName);
+    .then((response) => {
+      const filePath = response.data;
+      uploadVideo(auth, filePath, fileName, res);
     })
     .catch((err) => {
       console.log(err);
@@ -139,7 +139,7 @@ function getFilePath(auth, fileName) {
 }
 
 // 유튜브 업로드
-function uploadVideo(auth, filePath, fileName) {
+function uploadVideo(auth, filePath, fileName, res) {
   const service = google.youtube("v3");
 
   service.videos.insert(
@@ -172,6 +172,13 @@ function uploadVideo(auth, filePath, fileName) {
         const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
         console.log(`Uploaded video ID: ${videoId}`);
         console.log(`Video URL: ${videoUrl}`);
+
+        // 업로드 상태 업데이트
+        uploadStatus = {
+          complete: true,
+          videoId: videoId,
+          videoUrl: videoUrl,
+        };
 
         // console.log("Title:", response.data.snippet.title);
         // console.log("Description:", response.data.snippet.description);
@@ -227,13 +234,25 @@ app.get("/oauth2callback", (req, res) => {
       oauth2Client.credentials = token;
       storeToken(token); // 토큰 저장
 
-      const fileName = req.query.state;
-      listChannels(oauth2Client, fileName, res); // 유튜브 채널 조희
+      // 원래 url로 리다이렉트
+      res.redirect("http://localhost:3000/challenge/result");
     });
   });
 });
 
+// 유튜브 업로드 상태를 저장할 변수
+let uploadStatus = {
+  complete: false,
+  videoId: null,
+  videoUrl: null,
+};
+
+// 업로드 상태 체크
+app.get("/checkUploadStatus", (req, res) => {
+  res.json(uploadStatus);
+});
+
 // 위치 중요! 라우터 다 설정하고 쓸 수 있음
-app.listen(port, "0.0.0.0", () => {
+app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
