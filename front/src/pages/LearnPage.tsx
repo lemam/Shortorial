@@ -86,6 +86,7 @@ const LearnPage = () => {
     if (data) {
       setVideoInfo(data);
       initSectionList(data.shortsTime);
+      setState("PAUSE");
     }
   }, [params.shortsNo]);
 
@@ -220,7 +221,6 @@ const LearnPage = () => {
     if (state === "LOADING") {
       if (videoInfo && sectionList && centerSectionRef) {
         initInterval();
-        setState("PAUSE");
       }
     }
   }, [centerSectionRef, initInterval, sectionList, state, videoInfo]);
