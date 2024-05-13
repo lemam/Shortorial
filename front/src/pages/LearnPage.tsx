@@ -247,7 +247,7 @@ const LearnPage = () => {
   // 영상 버튼 정보 가져오기
   useEffect(() => {
     setBtnInfo();
-  }, [centerSectionRef]);
+  }, [videoInfo]);
 
   // 영상 이동 액션 감지
   useEffect(() => {
