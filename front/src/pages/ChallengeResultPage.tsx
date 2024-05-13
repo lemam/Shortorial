@@ -1,16 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
-// import fs from "fs";
-// import readline from "readline";
-// import { google } from "googleapis";
-import { Check, Create, Download } from "@mui/icons-material";
-// import { relative } from "path";
+import { Check, Create, Download, IosShare, YouTube } from "@mui/icons-material";
 
 const ChallengeResultPage = () => {
   const [title, setTitle] = useState<string>("minji");
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
+  const [share, setShare] = useState<boolean>(false);
+  const [link, setLink] = useState<string | null>(null);
 
   const saveTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
@@ -21,11 +19,12 @@ const ChallengeResultPage = () => {
   const startDownload = () => setDownload(true);
   const completeDownload = () => setDownload(false);
 
+  // 비디오 로컬 다운로드
   const downloadVideo = () => {
     startDownload();
 
     axios
-      .get("http://localhost:8080/s3/download/file/minji", {
+      .get("http://localhost:8080/s3/download/file/제목제목", {
         responseType: "blob",
         headers: {
           Authorization:
@@ -50,6 +49,38 @@ const ChallengeResultPage = () => {
       .catch((err) => console.log(err));
   };
 
+  // 비디오 유튜브 업로드
+  const uploadVideo = () => {
+    (() => setShare(true))();
+
+    axios
+      .get(`http://localhost:3001/authenticate?fileName=minji`) // node 서버로 요청 보냄
+      .then((response) => {
+        window.location.href = response.data.authUrl; // 응답 받은 authUrl로 이동
+      })
+      .catch((error) => console.error("Error:", error));
+
+    (() => setShare(false))();
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      axios
+        .get("http://localhost:3001/checkUploadStatus")
+        .then((response) => {
+          console.log(response.data);
+          if (response.data.complete) {
+            setShare(false);
+            setLink(response.data.videoUrl);
+            clearInterval(interval); // 업로드가 완료되면 인터벌 종료
+          }
+        })
+        .catch((error) => console.error("Error checking upload status:", error));
+    }, 5000); // 5초마다 체크
+
+    return () => clearInterval(interval); // 컴포넌트가 언마운트되면 인터벌 종료
+  }, []);
+
   return (
     <ResultContainer>
       <VideoContainer>
@@ -58,6 +89,11 @@ const ChallengeResultPage = () => {
           src="https://ssafy2024-dance.s3.ap-northeast-2.amazonaws.com/string/minji"
           controls
         ></Video>
+        {!share && !link && <IosShareIcon onClick={uploadVideo} fontSize="large"></IosShareIcon>}
+        {!share && link && (
+          <YoutubeIcon fontSize="large" onClick={() => (window.location.href = link)}></YoutubeIcon>
+        )}
+        {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>}
         {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
         {download && <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>}
       </VideoContainer>
@@ -100,20 +136,43 @@ const Video = styled.video`
   object-fit: cover;
 `;
 
+const IosShareIcon = styled(IosShare)`
+  position: absolute;
+  right: 0;
+  top: 1%;
+  cursor: pointer;
+`;
+
+const SharingIcon = styled.img`
+  position: absolute;
+  right: 0;
+  top: 1%;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+`;
+
+const YoutubeIcon = styled(YouTube)`
+  position: absolute;
+  right: 0;
+  top: 1%;
+  cursor: pointer;
+`;
+
 const DownloadIcon = styled(Download)`
   position: absolute;
   right: 0;
-  top: 0;
+  top: 8%;
   cursor: pointer;
 `;
 
 const DownloadingIcon = styled.img`
   position: absolute;
   right: 0;
-  top: 0;
+  top: 8%;
   cursor: pointer;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
 `;
 
 const TitleContainer = styled.div`

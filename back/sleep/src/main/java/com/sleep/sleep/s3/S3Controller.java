@@ -12,11 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 @RestController
 @RequiredArgsConstructor
@@ -101,6 +102,34 @@ public class S3Controller {
                     .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                     .contentType(MediaType.parseMediaType("video/mp4"))
                     .body(resource);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/s3/bring/{fileName}")
+    public ResponseEntity<?> BringFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
+        try {
+            // 토큰에서 사용자 이름 추출 (이 코드는 사용자가 직접 구현해야 함)
+            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+            //String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+
+            // S3에서 파일 다운로드
+            InputStream inputStream = s3Service.downloadFile(username + "/" + fileName);
+
+            // 임시 파일 생성
+            File tempFile = File.createTempFile("downloaded-", ".mp4", new File(System.getProperty("java.io.tmpdir")));
+            //tempFile.deleteOnExit();  // 프로그램 종료 시 파일 삭제
+
+            // 파일로 스트림 복사
+            Files.copy(inputStream, Paths.get(tempFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+
+            // 작업 완료 로그
+            System.out.println("File downloaded and saved to temporary directory: " + tempFile.getAbsolutePath());
+
+            // 클라이언트에 반환할 필요 없음
+            return ResponseEntity.ok()
+                    .body(tempFile.getAbsolutePath());
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
