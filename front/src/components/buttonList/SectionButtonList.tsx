@@ -2,12 +2,13 @@ import styled from "styled-components";
 import { VideoSection } from "../../constants/types";
 import SectionButton from "../button/SectionButton";
 import { useCallback, useEffect } from "react";
-import useVideoStore from "../../store/useVideoStore";
+import useLearnStore from "../../store/useLearnStore";
 
 interface SectionButtonListProps {
   sectionList: VideoSection[] | null;
   parentWidth: number | undefined;
   currentTime: number;
+  isLooping?: boolean;
   clickHandler: (section: VideoSection) => void;
 }
 
@@ -15,9 +16,17 @@ const SectionButtonList = ({
   sectionList = [],
   parentWidth = 0,
   currentTime = 0,
+  isLooping = false,
   clickHandler,
 }: SectionButtonListProps) => {
-  const { currentSection, setCurrentSection } = useVideoStore();
+  const [currentSection, loopSection, setCurrentSection, setLoopSection] = useLearnStore(
+    (state) => [
+      state.currentSection,
+      state.loopSection,
+      state.setCurrentSection,
+      state.setLoopSection,
+    ]
+  );
 
   // 현재 시간에 있는 구간 반환
   const loadCurrSection = useCallback(() => {
@@ -31,8 +40,8 @@ const SectionButtonList = ({
     result = result ?? { id: 0, start: 0, end: 0 };
     setCurrentSection(result);
 
-    return result;
-  }, [currentTime, sectionList, setCurrentSection]);
+    if (isLooping) setLoopSection(result);
+  }, [currentTime, isLooping, sectionList, setCurrentSection, setLoopSection]);
 
   // 현재 구간 인덱스 설정
   useEffect(() => {
@@ -48,6 +57,7 @@ const SectionButtonList = ({
             time={section.start}
             isSmall={parentWidth < 100}
             active={section.id === currentSection.id}
+            isLooping={(isLooping && section.id === loopSection?.id) ?? -1}
             onClick={() => clickHandler(section)}
           ></SectionButton>
         );
@@ -69,7 +79,7 @@ const Container = styled.div`
     margin: 8px 0;
   }
 
-  @media screen and (max-width: 479px) {
+  @media screen and (orientation: portrait) {
     flex-direction: row;
     justify-content: start;
     align-items: flex-start;

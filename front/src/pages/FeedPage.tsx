@@ -2,31 +2,38 @@ import { useEffect, useState } from "react";
 import { shorts } from "../apis/shorts";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
 
 
-const ShortsDetailPage = () => {
+const FeedPage = () => {
   const navigate = useNavigate();
   
-  const goToLearnMode = () => {
-    navigate("/learn");
+  const [shortsList, setShortsList] = useState<shorts[]>([]);
+
+  const goToLearnMode = (shortNo: number) => {
+    navigate(`/learn/${shortNo}`);
   };
 
-  const goToChallengeMode = () => {
-    navigate("/challenge");
+  const goToChallengeMode = (shortNo: number) => {
+    navigate(`/challenge/${shortNo}`);
   };
-
-  const params = useParams();
-
-  const [shortsInfo, setShortsInfo] = useState<shorts>();
 
   useEffect(() => {
     axios
-      .get(`/api/shorts/${params.shortsNo}`)
+    .get<shorts[]>("/api/shorts")
+    .then((response) => {
+      setShortsList(response.data);
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+    });
+
+    axios
+      .get<shorts[]>("/api/shorts")
       .then((response) => {
-        setShortsInfo(response.data);
+        setShortsList(response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -37,39 +44,43 @@ const ShortsDetailPage = () => {
     <Container>
       <Header>Let's DANCE</Header>
       <ShortsDetailContainer>
-        <VideoBox>
-          <video src={shortsInfo?.shortsLink} crossOrigin="anonymous" autoPlay loop controls/>
-        </VideoBox>
-        <DetailItem>
-          <Label>제목</Label>
-          <Value>{shortsInfo?.shortsTitle}</Value>
-        </DetailItem>
-        <DetailItem>
-          <Label>챌린저</Label>
-          <Value>{shortsInfo?.shortsDirector}</Value>
-        </DetailItem>
-        <DetailItem>
-          <Label>시간</Label>
-          <Value>{shortsInfo?.shortsTime}</Value>
-        </DetailItem>
-        <DetailItem>
-          <Label>참여 인원</Label>
-          <Value>{shortsInfo?.shortsChallengers}</Value>
-        </DetailItem>
-        <ButtonList>
-          <Button variant="secondary" onClick={goToLearnMode}>
-            연습 모드
-          </Button>
-          <Button variant="primary" onClick={goToChallengeMode}>
-              챌린지 모드
-          </Button>
-        </ButtonList>
+        {shortsList.map((shorts) => (
+          <VideoItem key={shorts.shortsNo}>
+            <VideoBox>
+              <video src={shorts.shortsLink} crossOrigin="anonymous" controls/>
+            </VideoBox>
+            <DetailItem>
+              <Label>제목</Label>
+              <Value>{shorts.shortsTitle}</Value>
+            </DetailItem>
+            <DetailItem>
+              <Label>챌린저</Label>
+              <Value>{shorts.shortsDirector}</Value>
+            </DetailItem>
+            <DetailItem>
+              <Label>시간</Label>
+              <Value>{shorts.shortsTime}</Value>
+            </DetailItem>
+            <DetailItem>
+              <Label>참여 인원</Label>
+              <Value>{shorts.shortsChallengers}</Value>
+            </DetailItem>
+            <ButtonList>
+              <Button variant="secondary" onClick={() => goToLearnMode(shorts.shortsNo)}>
+                연습 모드
+              </Button>
+              <Button variant="primary" onClick={() => goToChallengeMode(shorts.shortsNo)}>
+                  챌린지 모드
+              </Button>
+            </ButtonList>
+          </VideoItem>
+        ))}
        </ShortsDetailContainer>
     </Container>
   );
 };
 
-export default ShortsDetailPage;
+export default FeedPage;
 
 // Component 로 나중에 빼자
 const Header = styled.header`
@@ -122,6 +133,19 @@ const VideoBox = styled.div`
       object-fit: cover;
     }
   }
+`;
+
+const VideoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%; // 비디오 박스의 최대 너비를 고려
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 // // 쇼츠 제목

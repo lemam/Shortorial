@@ -109,7 +109,7 @@ export const useMotionDetectionStore = create<MotionDetection>((set) => ({
   setTimerCount: (newTimerCount: number) => set({ timerCount: newTimerCount }),
   setRecordCount: (newRecordCount: number) => set({ recordCount: newRecordCount }),
   setLearnCount: (newLearnCount: number) => set({ learnCount: newLearnCount }),
-  setResultCount: (newRsltCount: number) => set({ resultCount: newRsltCount }),
+  setResultCount: (newResultCount: number) => set({ resultCount: newResultCount }),
   setPlayCount: (newPlayCount: number) => set({ playCount: newPlayCount }),
   setChallengeCount: (newChallengeCount: number) => set({ challengeCount: newChallengeCount }),
   setRepeatCount: (newRepeatCount: number) => set({ repeatCount: newRepeatCount }),
