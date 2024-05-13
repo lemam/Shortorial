@@ -2,6 +2,7 @@ package com.sleep.sleep.shorts.entity;
 
 import com.sleep.sleep.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,12 +16,21 @@ public class TryShorts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int tryNo;
+
     @ManyToOne
     @JoinColumn(name = "shorts_no")
     private Shorts shortsNo;
+
     @ManyToOne
     @JoinColumn(name = "member_no")
     private Member memberIndex;
     private int tryYn;
+
+    @Builder
+    public TryShorts(Shorts shortsNo, Member memberIndex, int tryYn) {
+        this.shortsNo = shortsNo;
+        this.memberIndex = memberIndex;
+        this.tryYn = tryYn;
+    }
 
 }
