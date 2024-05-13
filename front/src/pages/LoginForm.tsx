@@ -2,11 +2,11 @@ import useLoginStore from "../store/useLoginStore";
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getMemberInfo, postLogin } from "../apis/login";
-import WarningIcon from "@mui/icons-material/Warning";
+// import WarningIcon from "@mui/icons-material/Warning";
 import { styled } from "styled-components";
 import InputComponent from "../components/signUp/InputComponent";
-import ButtonAsset from "../components/button/ButtonAsset";
-import VerticalDivider from "../components/login/VerticalDivider";
+// import ButtonAsset from "../components/button/ButtonAsset";
+// import VerticalDivider from "../components/login/VerticalDivider";
 import BasicButton from "../components/button/BasicButton";
 
 export default function LoginForm() {
@@ -17,8 +17,8 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
 
   //로그인 실패 확인
-  const [hasError, setHasError] = useState(false);
-
+  // const [hasError, setHasError] = useState(false);
+  const [, setHasError] = useState(false);
   const navigate = useNavigate();
 
   async function handleSubmit(e: FormEvent) {

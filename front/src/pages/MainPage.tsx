@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { shorts } from "../apis/shorts";
+import { Shorts } from "../constants/types";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
@@ -11,11 +11,11 @@ const MainPage = () => {
     navigate(`/shorts/${shortNo}`);
   };
 
-  const [shortsList, setShortsList] = useState<shorts[]>([]);
+  const [shortsList, setShortsList] = useState<Shorts[]>([]);
 
   useEffect(() => {
     axios
-      .get<shorts[]>("/api/shorts")
+      .get<Shorts[]>("/api/shorts")
       .then((response) => {
         setShortsList(response.data);
       })
