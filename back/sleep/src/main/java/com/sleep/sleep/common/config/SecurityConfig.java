@@ -63,10 +63,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         //Make the below setting as * to allow connection from any hos
-        corsConfiguration.setAllowedOrigins(List.of("*"));
-        corsConfiguration.setAllowedMethods(List.of("GET", "POST","OPTIONS","PUT"));
+        corsConfiguration.addAllowedOriginPattern("*");
+        corsConfiguration.addAllowedMethod("*");
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
