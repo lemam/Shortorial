@@ -1,21 +1,26 @@
 import { useEffect, useState } from "react";
-import { shorts } from "../apis/shorts";
+import { getTryCount, shorts } from "../apis/shorts";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
-
-
 const ShortsDetailPage = () => {
   const navigate = useNavigate();
-  
+
   const goToLearnMode = () => {
     navigate("/learn");
   };
 
-  const goToChallengeMode = () => {
-    navigate("/challenge");
+  const goToChallengeMode = async () => {
+    if (shortsInfo) {
+      const shortsNo = Number(params.shortsNo); // 숫자로 변환
+      if (!isNaN(shortsNo)) {
+        console.log("shortsNo", shortsNo);
+        await getTryCount(shortsNo);
+        navigate("/challenge");
+      }
+    }
   };
 
   const params = useParams();
@@ -35,34 +40,46 @@ const ShortsDetailPage = () => {
 
   return (
     <Container>
-        <Header>Let's DANCE</Header>
-        <VideoBox>
-            <video src={shortsInfo?.shortsLink} crossOrigin="anonymous" autoPlay loop controls/>
-        </VideoBox>
-        <DetailItem>
-      <Label>제목</Label>
-      <Value>{shortsInfo?.shortsTitle}</Value>
-    </DetailItem>
-    <DetailItem>
-      <Label>작가</Label>
-      <Value>{shortsInfo?.shortsDirector}</Value>
-    </DetailItem>
-    <DetailItem>
-      <Label>시간</Label>
-      <Value>{shortsInfo?.shortsTime}</Value>
-    </DetailItem>
-    <DetailItem>
-      <Label>참여 인원</Label>
-      <Value>{shortsInfo?.shortsChallengers}</Value>
-    </DetailItem>
-        <ButtonList>
-            <Button variant="secondary" onClick={goToLearnMode}>
-                연습 모드
-            </Button>
-            <Button variant="primary" onClick={goToChallengeMode}>
-                챌린지 모드
-            </Button>
-        </ButtonList>
+      <Header>Let's DANCE</Header>
+      <VideoBox>
+        <video
+          src={shortsInfo?.shortsLink}
+          crossOrigin="anonymous"
+          autoPlay
+          loop
+          controls
+        />
+      </VideoBox>
+      <DetailItem>
+        <Label>제목</Label>
+        <Value>{shortsInfo?.shortsTitle}</Value>
+      </DetailItem>
+      <DetailItem>
+        <Label>작가</Label>
+        <Value>{shortsInfo?.shortsDirector}</Value>
+      </DetailItem>
+      <DetailItem>
+        <Label>시간</Label>
+        <Value>{shortsInfo?.shortsTime}</Value>
+      </DetailItem>
+      <DetailItem>
+        <Label>참여 인원</Label>
+        <Value>{shortsInfo?.shortsChallengers}</Value>
+      </DetailItem>
+      <ButtonList>
+        <Button
+          variant="secondary"
+          onClick={goToLearnMode}
+        >
+          연습 모드
+        </Button>
+        <Button
+          variant="primary"
+          onClick={goToChallengeMode}
+        >
+          챌린지 모드
+        </Button>
+      </ButtonList>
     </Container>
   );
 };
@@ -74,7 +91,7 @@ const Header = styled.header`
   width: 100%;
   background-color: #f8f9fa;
   padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -88,11 +105,11 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
-//   & > * {
-//     margin-bottom: 50px;
-//   }
-`
+
+  //   & > * {
+  //     margin-bottom: 50px;
+  //   }
+`;
 
 const VideoBox = styled.div`
   position: relative;
@@ -124,15 +141,14 @@ const VideoBox = styled.div`
 //   }
 // `
 
-
 const DetailItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: start;
   width: 100%;
   padding: 2px 40px;
-//   background-color: #f4f4f4;
-//   border-bottom: 1px solid #ddd;
+  //   background-color: #f4f4f4;
+  //   border-bottom: 1px solid #ddd;
   font-size: 16px;
 
   &:last-child {
