@@ -309,6 +309,7 @@ function btn_with_landmark_learn(
         useMotionDetectionStore.getState().setFlipCount(0);
         speed_count++;
         useMotionDetectionStore.getState().setSpeedCount((speed_count / SMALL_COUNT) * 100);
+        console.log(speed_count);
       }
     }
   } else {
