@@ -11,7 +11,6 @@ import { useActionStore, useBtnStore, useMotionDetectionStore } from "../store/u
 import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
-import { getComponentSize, getVideoSize } from "../modules/componentSize";
 
 const LearnPage = () => {
   type LearnState = "LOADING" | "PAUSE" | "READY" | "PLAY";
@@ -21,14 +20,18 @@ const LearnPage = () => {
   const leftSectionRef = useRef<HTMLDivElement>(null);
   const centerSectionRef = useRef<HTMLDivElement>(null);
 
+  const [videoSize, setVideoSize] = useState({ width: 0, height: 0 });
+  const [centerSectionSize, setCenterSectionSize] = useState({ width: 0, height: 0 });
+  const [leftSectionWidth, setLeftSectionWidth] = useState(0);
+
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const interval = intervalRef.current;
-  const [canAction, setCanAction] = useState(true);
 
   const navigate = useNavigate();
   const params = useParams();
 
   const [state, setState] = useState<LearnState>("LOADING");
+
   const [videoInfo, setVideoInfo] = useState<Shorts>({
     shortsNo: 0,
     shortsUrl: "",
@@ -39,6 +42,7 @@ const LearnPage = () => {
     shortsLink: "",
     shortsDate: "",
   });
+
   const [sectionList, setSectionList] = useState<VideoSection[]>([]);
 
   const [currentTime, setCurrentTime] = useLearnStore((state) => [
@@ -70,6 +74,7 @@ const LearnPage = () => {
 
   const btn = useBtnStore((state) => state.btn);
   const action = useActionStore((state) => state.action);
+  const [canAction, setCanAction] = useState(true);
 
   const [playCount, challengeCount, repeatCount, flipCount, speedCount] = useMotionDetectionStore(
     (state) => [
@@ -109,7 +114,7 @@ const LearnPage = () => {
     setSectionList(result);
   };
 
-  // 영상 시간 옮기기
+  // 영상 시간 이동하기
   const moveVideoTime = useCallback(
     (startTime: number) => {
       if (video) {
@@ -218,6 +223,35 @@ const LearnPage = () => {
     loadVideo();
   }, [loadVideo]);
 
+  // 비디오 크기 초기화
+  const initVideoSize = useCallback(() => {
+    const height = centerSectionSize.height;
+    const width = Math.floor((centerSectionSize.height * 9) / 16);
+    setVideoSize({ width, height });
+  }, [centerSectionSize.height]);
+
+  // 화면 크기 바뀔 때마다 실행 - videoSize, leftSectionWidth 초기화
+  const handleResize = useCallback(() => {
+    if (centerSectionRef.current) {
+      const { width, height } = centerSectionRef.current.getBoundingClientRect();
+      setCenterSectionSize({ width, height });
+      initVideoSize();
+    }
+
+    if (leftSectionRef.current) {
+      const { width } = leftSectionRef.current.getBoundingClientRect();
+      setLeftSectionWidth(width);
+    }
+  }, [initVideoSize]);
+
+  // window resize 이벤트 추가
+  useEffect(() => {
+    setTimeout(handleResize, 200);
+    window.addEventListener("resize", () => setTimeout(handleResize, 200));
+
+    return () => window.removeEventListener("resize", () => setTimeout(handleResize, 200));
+  }, [handleResize, initVideoSize]);
+
   // 화면의 준비가 모두 완료했을 때 실행
   useEffect(() => {
     if (state === "LOADING") {
@@ -247,7 +281,7 @@ const LearnPage = () => {
   // 영상 버튼 정보 가져오기
   useEffect(() => {
     setBtnInfo();
-  }, [videoInfo]);
+  }, [centerSectionSize]);
 
   // 영상 이동 액션 감지
   useEffect(() => {
@@ -310,7 +344,7 @@ const LearnPage = () => {
           <LeftSection ref={leftSectionRef}>
             <SectionButtonList
               sectionList={sectionList}
-              parentWidth={getComponentSize(leftSectionRef.current).width}
+              parentWidth={leftSectionWidth}
               currentTime={currentTime}
               isLooping={isLooping}
               clickHandler={(section) => moveVideoTime(section.start)}
@@ -319,8 +353,8 @@ const LearnPage = () => {
           <CenterSection ref={centerSectionRef}>
             <VideoContainer>
               <video
-                width={getVideoSize(centerSectionRef.current).width}
-                height={getVideoSize(centerSectionRef.current).height}
+                width={videoSize.width}
+                height={videoSize.height}
                 src={videoInfo.shortsLink}
                 ref={videoRef}
                 className={isFlipped ? "flip" : ""}
@@ -329,8 +363,8 @@ const LearnPage = () => {
             </VideoContainer>
             <VideoContainer id="dom">
               <MotionCamera
-                width={getVideoSize(centerSectionRef.current).width}
-                height={getVideoSize(centerSectionRef.current).height}
+                width={videoSize.width}
+                height={videoSize.height}
                 className="camera flip"
                 autoPlay
               ></MotionCamera>
