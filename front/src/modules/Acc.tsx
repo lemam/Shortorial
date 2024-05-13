@@ -45,7 +45,7 @@ export function Acc(
 
     const norm_v1 = l2_norm(v1);
     const norm_v2 = l2_norm(v2);
-    let tempSum =
+    const tempSum =
       diffConfidence > 0.5
         ? 0
         : similarity(norm_v1, norm_v2) * (1 - diffConfidence);
@@ -67,14 +67,14 @@ const l2_norm = (kpt: mark) => {
 
 function similarity(vector1: mark, vector2: mark): number {
   // Dot product
-  let dotProduct =
+  const dotProduct =
     vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
 
   // Magnitudes
-  let magnitude1 = Math.sqrt(
+  const magnitude1 = Math.sqrt(
     vector1.x * vector1.x + vector1.y * vector1.y + vector1.z * vector1.z
   );
-  let magnitude2 = Math.sqrt(
+  const magnitude2 = Math.sqrt(
     vector2.x * vector2.x + vector2.y * vector2.y + vector2.z * vector2.z
   );
 

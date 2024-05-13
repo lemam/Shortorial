@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import VideoMotionButton from "../components/button/VideoMotionButton";
 import { VideoSection } from "../constants/types";
-import SectionButtonList from "../components/ButtonList/SectionButtonList";
+import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import { useBtnStore } from "../store/useMotionStore";
 import { setBtnInfo } from "../modules/Motion";

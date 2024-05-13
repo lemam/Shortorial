@@ -3,11 +3,11 @@ import styled from "styled-components";
 import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import VideoMotionButton from "../components/button/VideoMotionButton";
 import { VideoSection } from "../constants/types";
-import SectionButtonList from "../components/ButtonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import { useBtnStore } from "../store/useMotionStore";
 import { setBtnInfo } from "../modules/Motion";
 import { useNavigate } from "react-router-dom";
+import SectionButtonList from "../components/buttonList/SectionButtonList";
 
 const LearnPageTest = () => {
   type LearnState = "PAUSE" | "READY" | "PLAY";
@@ -110,10 +110,7 @@ const LearnPageTest = () => {
   // READY 상태로 변경
   const changeStateReady = () => {
     // 타이머 1초씩 카운트다운
-    intervalRef.current = setInterval(
-      () => setCurrTimer((prev) => prev - 1),
-      1000
-    );
+    intervalRef.current = setInterval(() => setCurrTimer((prev) => prev - 1), 1000);
     setState("READY");
   };
 
@@ -183,21 +180,17 @@ const LearnPageTest = () => {
   }, [changeStatePlay, currTimer, initInterval]);
 
   // 동영상 감시
-  const { btn, setBtn } = useBtnStore();
+  const { btn } = useBtnStore();
   useEffect(() => {
     if (video) {
       video.addEventListener("ended", changeStatePause);
-      video.addEventListener("timeupdate", () =>
-        setCurrentTime(video.currentTime)
-      );
+      video.addEventListener("timeupdate", () => setCurrentTime(video.currentTime));
     }
 
     return () => {
       if (video) {
         video.removeEventListener("ended", changeStatePause);
-        video.removeEventListener("timeupdate", () =>
-          setCurrentTime(video.currentTime)
-        );
+        video.removeEventListener("timeupdate", () => setCurrentTime(video.currentTime));
       }
     };
   }, [changeStatePause, video]);
@@ -226,6 +219,7 @@ const LearnPageTest = () => {
         handlePlaySpeedButtonClick();
         break;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [btn]);
 
   useEffect(() => {

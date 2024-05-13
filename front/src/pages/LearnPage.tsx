@@ -11,7 +11,7 @@ import {
 } from "@mui/icons-material";
 import IconButton from "../components/button/IconButton";
 import useLearnVideoStore from "../store/useLearnVideoStore";
-import SectionButtonList from "../components/ButtonList/SectionButtonList";
+import SectionButtonList from "../components/buttonList/SectionButtonList";
 import { VideoSection } from "../constants/types";
 
 const LearnPageTest = () => {
@@ -155,6 +155,7 @@ const LearnPageTest = () => {
           sectionList={sectionList}
           parentWidth={leftSectionWidth}
           clickHandler={handleClickSectionButton}
+          currentTime={0}
         />
       </LeftSection>
       <CenterSection>
