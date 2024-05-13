@@ -1,7 +1,7 @@
 import { NormalizedLandmark, DrawingUtils } from "@mediapipe/tasks-vision";
 import { useEffect } from "react";
 import { createPoseLandmarker, predictWebcam } from "../../modules/Motion";
-import { useBtnStore } from "../../store/useMotionStore";
+import { useBtnStore, useActionStore } from "../../store/useMotionStore";
 
 interface MotionCameraType {
   width: number;
@@ -17,6 +17,7 @@ export default function MotionCamera({
   autoPlay,
 }: MotionCameraType) {
   const { setBtn } = useBtnStore();
+  const { setAction } = useActionStore();
 
   useEffect(() => {
     // 모드 분류
@@ -75,13 +76,14 @@ export default function MotionCamera({
               lastWebcamTime,
               before_handmarker,
               curr_handmarker,
-              setBtn
+              setBtn,
+              setAction
             )
           );
         }
       });
     }
-  }, [setBtn]);
+  }, [setBtn, setAction]);
 
   return (
     <div id="motion">
@@ -93,7 +95,7 @@ export default function MotionCamera({
         className={className}
         autoPlay={autoPlay}
         playsInline
-        style={{}}
+        // style={{}}
       ></video>
       {/* <canvas
         id="output_canvas"
