@@ -4,6 +4,7 @@ import com.sleep.sleep.common.JWT.JwtTokenUtil;
 import com.sleep.sleep.mypage.dto.MyPageDto;
 import com.sleep.sleep.mypage.service.MyPageService;
 import com.sleep.sleep.shorts.dto.ShortsDto;
+import com.sleep.sleep.shorts.dto.TryShortsDto;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
 import com.sleep.sleep.shorts.service.ShortsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +54,18 @@ public class MyPageController {
         System.out.println("username : "+ username);
 
         List<UploadShortsDto> shortsList = shortsService.getUploadShortsList(username);
+
+        return ResponseEntity.ok(shortsList);
+    }
+
+    @Operation(summary = "사용자가 시도한 영상 리스트", description ="사용자의 엑세스 토큰 필요함")
+    @GetMapping("/try-shorts")
+    public ResponseEntity<List<TryShortsDto>> selectTryShortList(@RequestHeader("Authorization") String accessToken) {
+        //사용자 찾기
+        String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+        System.out.println("username : "+ username);
+
+        List<TryShortsDto> shortsList = shortsService.getTryShortsList(username);
 
         return ResponseEntity.ok(shortsList);
     }
