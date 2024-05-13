@@ -2,7 +2,7 @@ import { MouseEvent, useRef } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import CircularProgress from "@mui/material/CircularProgress";
-import { getComponentSize } from "../../modules/componenSize";
+import { getComponentSize } from "../../modules/componentSize";
 
 interface VideoMotionButtonProps {
   id?: string;

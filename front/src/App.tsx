@@ -1,20 +1,18 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import MainPage from "./pages/MainPage";
-// import LearnPage from "./pages/LearnPage";
 import GlobalStyle from "./GlobalStyle";
+import MainPage from "./pages/MainPage";
+import LoginForm from "./pages/LoginForm";
+import LearnPage from "./pages/LearnPage";
+import LearnPageTmp from "./pages/LearnPageTmp";
 import ChallengePage from "./pages/ChallengePage";
 import ChallengeResultPage from "./pages/ChallengeResultPage";
 import VideoTrimPage from "./pages/VideoTrimPage";
 import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 // import VideoResizePage from "./pages/VideoResizePage";
-import "bootstrap/dist/css/bootstrap.min.css";
-import LearnPageTmp from "./pages/LearnPageTmp";
 import MyPage from "./pages/MyPage";
 import ShortsDetailPage from "./pages/ShortsDetailPage";
-import LearnPageTest from "./pages/LearnPageTest";
 import FeedPage from "./pages/FeedPage";
-import LoginForm from "./pages/LoginForm";
-import LearnPage from "./pages/LearnPageTmp";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   return (
@@ -23,8 +21,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="/learn" element={<LearnPageTest />} />
-          <Route path="/login" element={<LoginForm/>}/>
+          <Route path="/login" element={<LoginForm />} />
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/learn2" element={<LearnPageTmp />} />
           <Route path="/challenge" element={<ChallengePage />} />
