@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { UploadShorts, getUploadedShorts } from "../../apis/shorts";
 import styled from "styled-components";
+import ChallengeResultPage from "./ChallengeComponent";
 
 export default function UploadList() {
   const [shortsList, setShortsList] = useState<UploadShorts[]>([]);
@@ -20,24 +21,13 @@ export default function UploadList() {
 
   return (
     <div>
-      <h1>UploadList 부분</h1>
       {Array.from({ length: Math.ceil(shortsList.length / 4) }, (_, index) => index * 4).map(
         (startIndex) => (
           <div key={startIndex}>
             {/* 4개씩 묶어서 렌더링 */}
             <div style={{ display: "flex" }}>
               {shortsList.slice(startIndex, startIndex + 4).map((uploadShorts) => (
-                <VideoContainer
-                  key={uploadShorts.uploadNo}
-                  style={{ width: "25%" }}
-                >
-                  <video
-                    src={uploadShorts.uploadUrl}
-                    crossOrigin="anonymous"
-                    style={{ width: "100%", height: "auto" }}
-                  />
-                  <div>{uploadShorts.uploadTitle}</div>
-                </VideoContainer>
+                <ChallengeResultPage uploadShorts={uploadShorts} />
               ))}
             </div>
           </div>

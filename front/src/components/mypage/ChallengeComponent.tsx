@@ -4,7 +4,7 @@ import axios from "axios";
 import { Check, Create, Download } from "@mui/icons-material";
 import { UploadShorts } from "../../apis/shorts";
 
-const ChallengeResultPage = (uploadShorts: UploadShorts) => {
+const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) => {
   const [title, setTitle] = useState<string>(uploadShorts.uploadTitle);
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
