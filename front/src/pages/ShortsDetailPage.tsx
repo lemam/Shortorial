@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
-import { shorts } from "../apis/shorts";
+import { Shorts } from "../constants/types";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
-
-
 const ShortsDetailPage = () => {
   const navigate = useNavigate();
-  
+
   const goToLearnMode = () => {
-    navigate("/learn");
+    navigate(`/learn/${params.shortsNo}`);
   };
 
   const goToChallengeMode = () => {
@@ -20,7 +18,7 @@ const ShortsDetailPage = () => {
 
   const params = useParams();
 
-  const [shortsInfo, setShortsInfo] = useState<shorts>();
+  const [shortsInfo, setShortsInfo] = useState<Shorts>();
 
   useEffect(() => {
     axios
@@ -38,7 +36,7 @@ const ShortsDetailPage = () => {
       <Header>Let's DANCE</Header>
       <ShortsDetailContainer>
         <VideoBox>
-          <video src={shortsInfo?.shortsLink} crossOrigin="anonymous" autoPlay loop controls/>
+          <video src={shortsInfo?.shortsLink} crossOrigin="anonymous" autoPlay loop controls />
         </VideoBox>
         <DetailItem>
           <Label>제목</Label>
@@ -61,10 +59,10 @@ const ShortsDetailPage = () => {
             연습 모드
           </Button>
           <Button variant="primary" onClick={goToChallengeMode}>
-              챌린지 모드
+            챌린지 모드
           </Button>
         </ButtonList>
-       </ShortsDetailContainer>
+      </ShortsDetailContainer>
     </Container>
   );
 };
@@ -76,7 +74,7 @@ const Header = styled.header`
   width: 100%;
   background-color: #f8f9fa;
   padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,16 +88,16 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
-//   & > * {
-//     margin-bottom: 50px;
-//   }
-`
+
+  //   & > * {
+  //     margin-bottom: 50px;
+  //   }
+`;
+
 const ShortsDetailContainer = styled.div`
   @media (orientation: landscape) {
-    
   }
-`
+`;
 
 const VideoBox = styled.div`
   position: relative;
@@ -139,15 +137,14 @@ const VideoBox = styled.div`
 //   }
 // `
 
-
 const DetailItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: start;
   width: 100%;
   padding: 2px 40px;
-//   background-color: #f4f4f4;
-//   border-bottom: 1px solid #ddd;
+  //   background-color: #f4f4f4;
+  //   border-bottom: 1px solid #ddd;
   font-size: 16px;
 
   &:last-child {

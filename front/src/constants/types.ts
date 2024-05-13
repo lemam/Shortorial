@@ -11,3 +11,13 @@ export default interface Member {
   memberPassword: string;
   memberProfile: string;
 }
+export interface Shorts {
+  shortsNo: number;
+  shortsUrl: string;
+  shortsTitle: string;
+  shortsDirector: string;
+  shortsTime: number;
+  shortsChallengers: number;
+  shortsLink: string;
+  shortsDate: string;
+}
