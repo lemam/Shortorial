@@ -27,7 +27,6 @@ const LearnPage = () => {
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const interval = intervalRef.current;
-  const intervalRef2 = useRef<NodeJS.Timeout | null>(null);
   const [canAction, setCanAction] = useState(true);
 
   const navigate = useNavigate();
@@ -264,7 +263,15 @@ const LearnPage = () => {
         }
         break;
       case "next":
-        // goNextSection();
+        if (canAction) {
+          console.log("액션함");
+          goNextSection();
+          setCanAction(false);
+          setTimeout(() => {
+            console.log("액션 쉬어");
+            setCanAction(true);
+          }, 1000);
+        }
         break;
     }
   }, [action]);
