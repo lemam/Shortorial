@@ -12,12 +12,12 @@ const FeedPage = () => {
   
   const [shortsList, setShortsList] = useState<shorts[]>([]);
 
-  const goToLearnMode = () => {
-    navigate("/learn");
+  const goToLearnMode = (shortNo: number) => {
+    navigate(`/learn/${shortNo}`);
   };
 
-  const goToChallengeMode = () => {
-    navigate("/challenge");
+  const goToChallengeMode = (shortNo: number) => {
+    navigate(`/challenge/${shortNo}`);
   };
 
   useEffect(() => {
@@ -29,6 +29,15 @@ const FeedPage = () => {
     .catch((error) => {
       console.error("Error fetching data:", error);
     });
+
+    axios
+      .get<shorts[]>("/api/shorts")
+      .then((response) => {
+        setShortsList(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   }, []);
 
   return (
@@ -38,7 +47,7 @@ const FeedPage = () => {
         {shortsList.map((shorts) => (
           <VideoItem key={shorts.shortsNo}>
             <VideoBox>
-              <video src={shorts.shortsLink} crossOrigin="anonymous" autoPlay loop controls/>
+              <video src={shorts.shortsLink} crossOrigin="anonymous" controls/>
             </VideoBox>
             <DetailItem>
               <Label>제목</Label>
@@ -57,10 +66,10 @@ const FeedPage = () => {
               <Value>{shorts.shortsChallengers}</Value>
             </DetailItem>
             <ButtonList>
-              <Button variant="secondary" onClick={goToLearnMode}>
+              <Button variant="secondary" onClick={() => goToLearnMode(shorts.shortsNo)}>
                 연습 모드
               </Button>
-              <Button variant="primary" onClick={goToChallengeMode}>
+              <Button variant="primary" onClick={() => goToChallengeMode(shorts.shortsNo)}>
                   챌린지 모드
               </Button>
             </ButtonList>
