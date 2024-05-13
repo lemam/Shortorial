@@ -3,3 +3,21 @@ export interface VideoSection {
   start: number;
   end: number;
 }
+
+export default interface Member {
+  memberId: string;
+  memberEmail: string;
+  memberNickname: string;
+  memberPassword: string;
+  memberProfile: string;
+}
+export interface Shorts {
+  shortsNo: number;
+  shortsUrl: string;
+  shortsTitle: string;
+  shortsDirector: string;
+  shortsTime: number;
+  shortsChallengers: number;
+  shortsLink: string;
+  shortsDate: string;
+}

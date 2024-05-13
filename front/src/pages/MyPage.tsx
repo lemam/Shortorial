@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Profile from "../components/mypage/Profile";
 import UploadSnsList from "../components/mypage/UploadSnsList";
 import UploadList from "../components/mypage/UploadList";

@@ -34,9 +34,19 @@ interface DomState {
   setSpeedSize: (newDomSize: DOMRect) => void;
 }
 
+interface ActionState {
+  action: string;
+  setAction: (newAction: string) => void;
+}
+
 export const useBtnStore = create<BtnState>((set) => ({
   btn: "none",
   setBtn: (newBtn: string) => set({ btn: newBtn }),
+}));
+
+export const useActionStore = create<ActionState>((set) => ({
+  action: "none",
+  setAction: (newAction: string) => set({ action: newAction }),
 }));
 
 export const useDomStore = create<DomState>((set) => ({
@@ -55,7 +65,8 @@ export const useDomStore = create<DomState>((set) => ({
   speedSize: null,
 
   setDomSize: (newDomSize: DOMRect) => set({ domSize: newDomSize }),
-  setVisibleBtnSize: (newBtnSize: DOMRect) => set({ visibleBtnSize: newBtnSize }),
+  setVisibleBtnSize: (newBtnSize: DOMRect) =>
+    set({ visibleBtnSize: newBtnSize }),
   setTimeBtnSize: (newBtnSize: DOMRect) => set({ timerBtnSize: newBtnSize }),
   setRecordBtnSize: (newBtnSize: DOMRect) => set({ recordBtnSize: newBtnSize }),
   setSaveBtnSize: (newBtnSize: DOMRect) => set({ saveBtnSize: newBtnSize }),
@@ -105,14 +116,19 @@ export const useMotionDetectionStore = create<MotionDetection>((set) => ({
   flipCount: 0,
   speedCount: 0,
 
-  setVisibleCount: (newVisibleCount: number) => set({ visibleCount: newVisibleCount }),
+  setVisibleCount: (newVisibleCount: number) =>
+    set({ visibleCount: newVisibleCount }),
   setTimerCount: (newTimerCount: number) => set({ timerCount: newTimerCount }),
-  setRecordCount: (newRecordCount: number) => set({ recordCount: newRecordCount }),
+  setRecordCount: (newRecordCount: number) =>
+    set({ recordCount: newRecordCount }),
   setLearnCount: (newLearnCount: number) => set({ learnCount: newLearnCount }),
-  setResultCount: (newRsltCount: number) => set({ resultCount: newRsltCount }),
+  setResultCount: (newResultCount: number) =>
+    set({ resultCount: newResultCount }),
   setPlayCount: (newPlayCount: number) => set({ playCount: newPlayCount }),
-  setChallengeCount: (newChallengeCount: number) => set({ challengeCount: newChallengeCount }),
-  setRepeatCount: (newRepeatCount: number) => set({ repeatCount: newRepeatCount }),
+  setChallengeCount: (newChallengeCount: number) =>
+    set({ challengeCount: newChallengeCount }),
+  setRepeatCount: (newRepeatCount: number) =>
+    set({ repeatCount: newRepeatCount }),
   setFlipCount: (newFlipCount: number) => set({ flipCount: newFlipCount }),
   setSpeedCount: (newSpeedCount: number) => set({ speedCount: newSpeedCount }),
 }));

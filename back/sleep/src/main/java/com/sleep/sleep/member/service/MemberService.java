@@ -59,7 +59,7 @@ public class MemberService {
                 .memberId(dto.getMemberId())
                 .memberPass(passwordEncoder.encode(dto.getMemberPass()))
                 .memberNickname(dto.getMemberNickname())
-                .memberProfile(dto.getMemberProfile())
+//                .memberProfile(dto.getMemberProfile())
                 .memberRole(MemberRole.UESR)
                 .build());
     }

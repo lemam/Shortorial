@@ -40,16 +40,16 @@ let right_count = 0;
 let poseLandmarker: PoseLandmarker | null = null;
 
 const SMALL_COUNT: number = 10;
-const MED_COUNT: number = 15;
-const MAX_COUNT: number = 30;
+// const MED_COUNT: number = 15;
+// const MAX_COUNT: number = 30;
 
 export function btn_with_landmark_challenge(
   handLandmarker: NormalizedLandmark,
   setBtn: (newBtn: string) => void
 ) {
-  // console.log(handLandmarker.x);
-  handLandmarker.x = makeAbsoluteLandmarkX(handLandmarker.x);
-  handLandmarker.y = makeAbsoluteLandmarkY(handLandmarker.y);
+  // console.log(handLandmarkerX);
+  const handLandmarkerX = makeAbsoluteLandmarkX(handLandmarker.x);
+  const handLandmarkerY = makeAbsoluteLandmarkY(handLandmarker.y);
   // if (handLandmarker.visibility > 0.5) {
   //   console.log("X : ", handLandmarker.x);
   //   console.log("Y : ", handLandmarker.y);
@@ -57,16 +57,21 @@ export function btn_with_landmark_challenge(
 
   if (
     visibleBtnSize &&
-    handLandmarker.x <= visibleBtnSize.right &&
-    handLandmarker.x >= visibleBtnSize.left &&
+    handLandmarkerX <= visibleBtnSize.right &&
+    handLandmarkerX >= visibleBtnSize.left &&
     handLandmarker.visibility > 0.5
   ) {
-    if (handLandmarker.y >= visibleBtnSize.top && handLandmarker.y <= visibleBtnSize.bottom) {
+    if (
+      handLandmarkerY >= visibleBtnSize.top &&
+      handLandmarkerY <= visibleBtnSize.bottom
+    ) {
       if (visible_count >= SMALL_COUNT) {
         setBtn("visible");
       } else {
         visible_count++;
-        useMotionDetectionStore.getState().setVisibleCount((visible_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setVisibleCount((visible_count / SMALL_COUNT) * 100);
         timer_count = 0;
         useMotionDetectionStore.getState().setTimerCount(0);
         record_count = 0;
@@ -79,8 +84,8 @@ export function btn_with_landmark_challenge(
       }
     } else if (
       timerBtnSize &&
-      handLandmarker.y >= timerBtnSize.top &&
-      handLandmarker.y <= timerBtnSize.bottom
+      handLandmarkerY >= timerBtnSize.top &&
+      handLandmarkerY <= timerBtnSize.bottom
     ) {
       if (timer_count >= SMALL_COUNT) {
         setBtn("timer");
@@ -89,7 +94,9 @@ export function btn_with_landmark_challenge(
         visible_count = 0;
         useMotionDetectionStore.getState().setVisibleCount(0);
         timer_count++;
-        useMotionDetectionStore.getState().setTimerCount((timer_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setTimerCount((timer_count / SMALL_COUNT) * 100);
         record_count = 0;
         useMotionDetectionStore.getState().setRecordCount(0);
         save_count = 0;
@@ -100,8 +107,8 @@ export function btn_with_landmark_challenge(
       }
     } else if (
       recorderBtnSize &&
-      handLandmarker.y >= recorderBtnSize.top &&
-      handLandmarker.y <= recorderBtnSize.bottom
+      handLandmarkerY >= recorderBtnSize.top &&
+      handLandmarkerY <= recorderBtnSize.bottom
     ) {
       if (record_count >= SMALL_COUNT) {
         setBtn("record");
@@ -112,7 +119,9 @@ export function btn_with_landmark_challenge(
         timer_count = 0;
         useMotionDetectionStore.getState().setTimerCount(0);
         record_count++;
-        useMotionDetectionStore.getState().setRecordCount((record_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setRecordCount((record_count / SMALL_COUNT) * 100);
         save_count = 0;
         learn_count = 0;
         useMotionDetectionStore.getState().setLearnCount(0);
@@ -121,8 +130,8 @@ export function btn_with_landmark_challenge(
       }
     } else if (
       saveBtnSize &&
-      handLandmarker.y >= saveBtnSize.top &&
-      handLandmarker.y <= saveBtnSize.bottom
+      handLandmarkerY >= saveBtnSize.top &&
+      handLandmarkerY <= saveBtnSize.bottom
     ) {
       if (save_count >= SMALL_COUNT) {
         setBtn("save");
@@ -137,8 +146,8 @@ export function btn_with_landmark_challenge(
       }
     } else if (
       learnBtnSize &&
-      handLandmarker.y >= learnBtnSize.top &&
-      handLandmarker.y <= learnBtnSize.bottom
+      handLandmarkerY >= learnBtnSize.top &&
+      handLandmarkerY <= learnBtnSize.bottom
     ) {
       if (learn_count >= SMALL_COUNT) {
         setBtn("learn");
@@ -152,14 +161,16 @@ export function btn_with_landmark_challenge(
         useMotionDetectionStore.getState().setRecordCount(0);
         save_count = 0;
         learn_count++;
-        useMotionDetectionStore.getState().setLearnCount((learn_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setLearnCount((learn_count / SMALL_COUNT) * 100);
         rslt_count = 0;
         useMotionDetectionStore.getState().setResultCount(0);
       }
     } else if (
       rsltBtnSize &&
-      handLandmarker.y >= rsltBtnSize.top &&
-      handLandmarker.y <= rsltBtnSize.bottom
+      handLandmarkerY >= rsltBtnSize.top &&
+      handLandmarkerY <= rsltBtnSize.bottom
     ) {
       if (rslt_count == SMALL_COUNT) {
         setBtn("rslt");
@@ -175,7 +186,9 @@ export function btn_with_landmark_challenge(
         learn_count = 0;
         useMotionDetectionStore.getState().setLearnCount(0);
         rslt_count++;
-        useMotionDetectionStore.getState().setResultCount((rslt_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setResultCount((rslt_count / SMALL_COUNT) * 100);
       }
     }
   } else {
@@ -198,29 +211,31 @@ function btn_with_landmark_learn(
   handLandmarker: NormalizedLandmark,
   setBtn: (newBtn: string) => void
 ) {
-  // console.log(handLandmarker.x);
-  handLandmarker.x = makeAbsoluteLandmarkX(handLandmarker.x);
-  handLandmarker.y = makeAbsoluteLandmarkY(handLandmarker.y);
+  // console.log(handLandmarkerX);
+  const handLandmarkerX = makeAbsoluteLandmarkX(handLandmarker.x);
+  const handLandmarkerY = makeAbsoluteLandmarkY(handLandmarker.y);
   // if (handLandmarker.visibility > 0.5) {
   //   console.log("X : ", handLandmarker.x);
-  //   console.log("Y : ", handLandmarker.y);
+  //   console.log("Y : ", handLandmarkerY);
   // }
 
   if (
     playSize &&
-    handLandmarker.x <= playSize.right &&
-    handLandmarker.x >= playSize.left &&
+    handLandmarkerX <= playSize.right &&
+    handLandmarkerX >= playSize.left &&
     handLandmarker.visibility > 0.5
   ) {
     // console.log("A");
-    if (handLandmarker.y >= playSize.top && handLandmarker.y <= playSize.bottom) {
+    if (handLandmarkerY >= playSize.top && handLandmarkerY <= playSize.bottom) {
       if (play_count >= SMALL_COUNT) {
         setBtn("play");
       } else {
         // console.log("B");
         setBtn("none");
         play_count++;
-        useMotionDetectionStore.getState().setPlayCount((play_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setPlayCount((play_count / SMALL_COUNT) * 100);
         challenge_count = 0;
         useMotionDetectionStore.getState().setChallengeCount(0);
         repeat_count = 0;
@@ -232,8 +247,8 @@ function btn_with_landmark_learn(
       }
     } else if (
       challengeSize &&
-      handLandmarker.y >= challengeSize.top &&
-      handLandmarker.y <= challengeSize.bottom
+      handLandmarkerY >= challengeSize.top &&
+      handLandmarkerY <= challengeSize.bottom
     ) {
       if (challenge_count >= SMALL_COUNT) {
         setBtn("challenge");
@@ -242,7 +257,9 @@ function btn_with_landmark_learn(
         play_count = 0;
         useMotionDetectionStore.getState().setPlayCount(0);
         challenge_count++;
-        useMotionDetectionStore.getState().setChallengeCount((challenge_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setChallengeCount((challenge_count / SMALL_COUNT) * 100);
         repeat_count = 0;
         useMotionDetectionStore.getState().setRepeatCount(0);
         flip_count = 0;
@@ -252,8 +269,8 @@ function btn_with_landmark_learn(
       }
     } else if (
       repeatSize &&
-      handLandmarker.y >= repeatSize.top &&
-      handLandmarker.y <= repeatSize.bottom
+      handLandmarkerY >= repeatSize.top &&
+      handLandmarkerY <= repeatSize.bottom
     ) {
       if (repeat_count >= SMALL_COUNT) {
         setBtn("repeat");
@@ -264,7 +281,9 @@ function btn_with_landmark_learn(
         challenge_count = 0;
         useMotionDetectionStore.getState().setChallengeCount(0);
         repeat_count++;
-        useMotionDetectionStore.getState().setRepeatCount((repeat_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setRepeatCount((repeat_count / SMALL_COUNT) * 100);
         flip_count = 0;
         useMotionDetectionStore.getState().setFlipCount(0);
         speed_count = 0;
@@ -272,8 +291,8 @@ function btn_with_landmark_learn(
       }
     } else if (
       flipSize &&
-      handLandmarker.y >= flipSize.top &&
-      handLandmarker.y <= flipSize.bottom
+      handLandmarkerY >= flipSize.top &&
+      handLandmarkerY <= flipSize.bottom
     ) {
       if (flip_count >= SMALL_COUNT) {
         setBtn("flip");
@@ -286,14 +305,16 @@ function btn_with_landmark_learn(
         repeat_count = 0;
         useMotionDetectionStore.getState().setRepeatCount(0);
         flip_count++;
-        useMotionDetectionStore.getState().setFlipCount((flip_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setFlipCount((flip_count / SMALL_COUNT) * 100);
         speed_count = 0;
         useMotionDetectionStore.getState().setSpeedCount(0);
       }
     } else if (
       speedSize &&
-      handLandmarker.y >= speedSize.top &&
-      handLandmarker.y <= speedSize.bottom
+      handLandmarkerY >= speedSize.top &&
+      handLandmarkerY <= speedSize.bottom
     ) {
       if (speed_count >= SMALL_COUNT) {
         setBtn("speed");
@@ -308,7 +329,10 @@ function btn_with_landmark_learn(
         flip_count = 0;
         useMotionDetectionStore.getState().setFlipCount(0);
         speed_count++;
-        useMotionDetectionStore.getState().setSpeedCount((speed_count / SMALL_COUNT) * 100);
+        useMotionDetectionStore
+          .getState()
+          .setSpeedCount((speed_count / SMALL_COUNT) * 100);
+        // console.log(speed_count);
       }
     }
   } else {
@@ -329,25 +353,34 @@ function btn_with_landmark_learn(
 // 손 움직이면 좌우 인식
 function action_with_landmark(
   before_handLandmarker: NormalizedLandmark,
-  curr_handmarker: NormalizedLandmark
+  curr_handmarker: NormalizedLandmark,
+  minY: number,
+  maxY: number,
+  setAction: (newAction: string) => void
 ) {
-  if (before_handLandmarker.visibility > 0.5 && curr_handmarker.visibility > 0.5) {
+  if (
+    before_handLandmarker.visibility > 0.5 &&
+    curr_handmarker.visibility > 0.5
+  ) {
     // console.log("1 complete");
+    // console.log(before_handLandmarker);
+    // console.log(curr_handmarker);
+    // console.log("---------");
     if (
-      before_handLandmarker.y > 0.3 &&
-      before_handLandmarker.y < 0.8 &&
+      before_handLandmarker.y > minY &&
+      before_handLandmarker.y < maxY &&
       curr_handmarker.y > 0.3 &&
       curr_handmarker.y < 0.8
     ) {
-      //   console.log("2 complete");
+      // console.log("2 complete");
       if (before_handLandmarker.x - curr_handmarker.x < 0) {
         right_count = 0;
         left_count++;
-        if (left_count > 5) console.log("왼쪽");
+        if (left_count > 5) setAction("next");
       } else if (before_handLandmarker.x - curr_handmarker.x > 0) {
         left_count = 0;
         right_count++;
-        if (right_count > 5) console.log("오른쪽");
+        if (right_count > 5) setAction("prev");
       } else {
         left_count = right_count = 0;
       }
@@ -384,7 +417,8 @@ export async function predictWebcam(
   lastWebcamTime: number,
   before_handmarker: NormalizedLandmark | null,
   curr_handmarker: NormalizedLandmark | null,
-  setBtn: (newBtn: string) => void
+  setBtn: (newBtn: string) => void,
+  setAction?: (newAction: string) => void
 ) {
   // console.log("loading...s");
   if (webcam && poseLandmarker) {
@@ -401,7 +435,8 @@ export async function predictWebcam(
 
         for (const landmark of result.landmarks) {
           // 오른손이 우측 상단에 가면 알려주는 함수
-          if (cate == "challenge") btn_with_landmark_challenge(landmark[18], setBtn);
+          if (cate == "challenge")
+            btn_with_landmark_challenge(landmark[18], setBtn);
           else btn_with_landmark_learn(landmark[18], setBtn);
 
           if (!before_handmarker) {
@@ -411,7 +446,16 @@ export async function predictWebcam(
             }
           } else {
             curr_handmarker = landmark[18];
-            action_with_landmark(before_handmarker, curr_handmarker);
+            const minY = landmark[11].y;
+            const maxY = landmark[23].y;
+            if (setAction)
+              action_with_landmark(
+                before_handmarker,
+                curr_handmarker,
+                minY,
+                maxY,
+                setAction
+              );
             // console.log(cnt);
             before_handmarker = curr_handmarker;
           }
@@ -439,7 +483,8 @@ export async function predictWebcam(
       lastWebcamTime,
       before_handmarker,
       curr_handmarker,
-      setBtn
+      setBtn,
+      setAction
     )
   );
   // 뒤로 가기 하면 webcam 멈추기
