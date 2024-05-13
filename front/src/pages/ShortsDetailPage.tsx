@@ -41,45 +41,47 @@ const ShortsDetailPage = () => {
   return (
     <Container>
       <Header>Let's DANCE</Header>
-      <VideoBox>
-        <video
-          src={shortsInfo?.shortsLink}
-          crossOrigin="anonymous"
-          autoPlay
-          loop
-          controls
-        />
-      </VideoBox>
-      <DetailItem>
-        <Label>제목</Label>
-        <Value>{shortsInfo?.shortsTitle}</Value>
-      </DetailItem>
-      <DetailItem>
-        <Label>작가</Label>
-        <Value>{shortsInfo?.shortsDirector}</Value>
-      </DetailItem>
-      <DetailItem>
-        <Label>시간</Label>
-        <Value>{shortsInfo?.shortsTime}</Value>
-      </DetailItem>
-      <DetailItem>
-        <Label>참여 인원</Label>
-        <Value>{shortsInfo?.shortsChallengers}</Value>
-      </DetailItem>
-      <ButtonList>
-        <Button
-          variant="secondary"
-          onClick={goToLearnMode}
-        >
-          연습 모드
-        </Button>
-        <Button
-          variant="primary"
-          onClick={goToChallengeMode}
-        >
-          챌린지 모드
-        </Button>
-      </ButtonList>
+      <ShortsDetailContainer>
+        <VideoBox>
+          <video
+            src={shortsInfo?.shortsLink}
+            crossOrigin="anonymous"
+            autoPlay
+            loop
+            controls
+          />
+        </VideoBox>
+        <DetailItem>
+          <Label>제목</Label>
+          <Value>{shortsInfo?.shortsTitle}</Value>
+        </DetailItem>
+        <DetailItem>
+          <Label>챌린저</Label>
+          <Value>{shortsInfo?.shortsDirector}</Value>
+        </DetailItem>
+        <DetailItem>
+          <Label>시간</Label>
+          <Value>{shortsInfo?.shortsTime}</Value>
+        </DetailItem>
+        <DetailItem>
+          <Label>참여 인원</Label>
+          <Value>{shortsInfo?.shortsChallengers}</Value>
+        </DetailItem>
+        <ButtonList>
+          <Button
+            variant="secondary"
+            onClick={goToLearnMode}
+          >
+            연습 모드
+          </Button>
+          <Button
+            variant="primary"
+            onClick={goToChallengeMode}
+          >
+            챌린지 모드
+          </Button>
+        </ButtonList>
+      </ShortsDetailContainer>
     </Container>
   );
 };
@@ -110,6 +112,10 @@ const Container = styled.div`
   //     margin-bottom: 50px;
   //   }
 `;
+const ShortsDetailContainer = styled.div`
+  @media (orientation: landscape) {
+  }
+`;
 
 const VideoBox = styled.div`
   position: relative;
@@ -123,6 +129,14 @@ const VideoBox = styled.div`
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  @media (orientation: landscape) {
+    video {
+      width: 60%;
+      height: 60%;
+      object-fit: cover;
+    }
   }
 `;
 

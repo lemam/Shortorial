@@ -1,6 +1,6 @@
 import useLoginStore from "../store/useLoginStore";
 import { FormEvent, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getMemberInfo, postLogin } from "../apis/login";
 import WarningIcon from "@mui/icons-material/Warning";
 import { styled } from "styled-components";

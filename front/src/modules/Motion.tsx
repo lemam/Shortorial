@@ -40,8 +40,8 @@ let right_count = 0;
 let poseLandmarker: PoseLandmarker | null = null;
 
 const SMALL_COUNT: number = 10;
-const MED_COUNT: number = 15;
-const MAX_COUNT: number = 30;
+// const MED_COUNT: number = 15;
+// const MAX_COUNT: number = 30;
 
 export function btn_with_landmark_challenge(
   handLandmarker: NormalizedLandmark,
@@ -309,6 +309,7 @@ function btn_with_landmark_learn(
         useMotionDetectionStore.getState().setFlipCount(0);
         speed_count++;
         useMotionDetectionStore.getState().setSpeedCount((speed_count / SMALL_COUNT) * 100);
+        console.log(speed_count);
       }
     }
   } else {

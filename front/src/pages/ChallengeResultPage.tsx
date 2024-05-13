@@ -1,11 +1,11 @@
 import { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import fs from "fs";
-import readline from "readline";
-import { google } from "googleapis";
+// import fs from "fs";
+// import readline from "readline";
+// import { google } from "googleapis";
 import { Check, Create, Download } from "@mui/icons-material";
-import { relative } from "path";
+// import { relative } from "path";
 
 const ChallengeResultPage = () => {
   const [title, setTitle] = useState<string>("minji");

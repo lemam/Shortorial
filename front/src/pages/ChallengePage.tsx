@@ -398,7 +398,10 @@ const ChallengePage = () => {
         {state === "READY" ? (
           <Timer>{timer}</Timer>
         ) : (
-          <Recording src="src/assets/challenge/recording.svg" />
+          <RecordingComponent>
+            <Recording src="src/assets/challenge/recording.svg" />
+            <RecordingTEXT>REC</RecordingTEXT>
+          </RecordingComponent>
         )}
         <VideoMotionButtonList>
           {state === "READY" ? (
@@ -409,6 +412,7 @@ const ChallengePage = () => {
                 onClick={showCancelButton}
                 id="visible"
                 progress={visibleCount}
+                isVisible={state === "READY"}
               />
               <VideoMotionButton
                 icon={<TimerRounded />}
@@ -416,13 +420,15 @@ const ChallengePage = () => {
                 onClick={changeTimer}
                 id="timer"
                 progress={timerCount}
+                isVisible={state === "READY"}
               />
               <VideoMotionButton
                 icon={<Flip />}
-                toolTip="거울 모드"
+                toolTip="화면 반전"
                 onClick={() => setIsFlipped(!isFlipped)}
                 id="record"
                 progress={recordCount}
+                isVisible={state === "READY"}
               />
               <VideoMotionButton
                 icon={<DirectionsRun />}
@@ -430,6 +436,7 @@ const ChallengePage = () => {
                 onClick={goToLearnMode}
                 id="learn"
                 progress={learnCount}
+                isVisible={state === "READY"}
               />
               <VideoMotionButton
                 icon={<Movie />}
@@ -437,6 +444,7 @@ const ChallengePage = () => {
                 onClick={goToResult}
                 id="rslt"
                 progress={resultCount}
+                isVisible={state === "READY"}
               />
             </div>
           ) : (
@@ -447,6 +455,7 @@ const ChallengePage = () => {
                 onClick={cancelRecording}
                 id="visible"
                 progress={visibleCount}
+                isVisible={state === "RECORD"}
               />
               <VideoMotionButton
                 icon={<Save />}
@@ -454,6 +463,7 @@ const ChallengePage = () => {
                 onClick={handleShowModal}
                 id="timer"
                 progress={recordCount}
+                isVisible={state === "RECORD"}
               />
             </div>
           )}
@@ -509,14 +519,30 @@ const blinkEffect = keyframes`
     opacity: 0;
 `;
 
-const Recording = styled.img`
+const RecordingComponent = styled.div`
   position: absolute;
+  top: 5%;
   left: 5%;
-  top: 4%;
+  display: flex;
+`;
+
+const Recording = styled.img`
   width: 15px;
   height: 15px;
   z-index: 1;
   animation: ${blinkEffect} 1s step-end infinite;
+`;
+
+const RecordingTEXT = styled.div`
+  width: 15px;
+  height: 15px;
+  z-index: 1;
+  margin-left: 13px;
+  font-size: 15px;
+  line-height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const Timer = styled.div`
@@ -531,8 +557,7 @@ const Timer = styled.div`
 const VideoMotionButtonList = styled.div`
   position: absolute;
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 10%;
   right: 0;
   display: flex;
   flex-direction: column;
