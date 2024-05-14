@@ -22,7 +22,6 @@ const LearnPage = () => {
 
   const [videoSize, setVideoSize] = useState({ width: 0, height: 0 });
   const [centerSectionSize, setCenterSectionSize] = useState({ width: 0, height: 0 });
-  const [leftSectionWidth, setLeftSectionWidth] = useState(0);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const interval = intervalRef.current;
@@ -230,26 +229,31 @@ const LearnPage = () => {
     setVideoSize({ width, height });
   }, [centerSectionSize.height]);
 
-  // 화면 크기 바뀔 때마다 실행 - videoSize, leftSectionWidth 초기화
+  // Left Section 너비 반환
+  const getLeftSectionWidth = useCallback(() => {
+    if (leftSectionRef.current) {
+      const { width } = leftSectionRef.current.getBoundingClientRect() ?? 0;
+      return width;
+    }
+  }, []);
+
+  // 화면 크기 바뀔 때마다 실행 - videoSize 초기화
   const handleResize = useCallback(() => {
     if (centerSectionRef.current) {
       const { width, height } = centerSectionRef.current.getBoundingClientRect();
       setCenterSectionSize({ width, height });
       initVideoSize();
     }
-
-    if (leftSectionRef.current) {
-      const { width } = leftSectionRef.current.getBoundingClientRect();
-      setLeftSectionWidth(width);
-    }
   }, [initVideoSize]);
 
   // window resize 이벤트 추가
   useEffect(() => {
-    setTimeout(handleResize, 200);
-    window.addEventListener("resize", () => setTimeout(handleResize, 200));
+    setTimeout(handleResize, 100);
+    window.addEventListener("resize", () => setTimeout(handleResize, 100));
 
-    return () => window.removeEventListener("resize", () => setTimeout(handleResize, 200));
+    return () => {
+      window.removeEventListener("resize", () => setTimeout(handleResize, 100));
+    };
   }, [handleResize, initVideoSize]);
 
   // 화면의 준비가 모두 완료했을 때 실행
@@ -344,7 +348,7 @@ const LearnPage = () => {
           <LeftSection ref={leftSectionRef}>
             <SectionButtonList
               sectionList={sectionList}
-              parentWidth={leftSectionWidth}
+              parentWidth={getLeftSectionWidth()}
               currentTime={currentTime}
               isLooping={isLooping}
               clickHandler={(section) => moveVideoTime(section.start)}
