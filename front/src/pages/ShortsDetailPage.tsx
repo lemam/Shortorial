@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getTryCount, shorts } from "../apis/shorts";
+// import { getTryCount, shorts } from "../apis/shorts";
+import { getTryCount } from "../apis/shorts";
 import { Shorts } from "../constants/types";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
@@ -69,16 +70,10 @@ const ShortsDetailPage = () => {
           <Value>{shortsInfo?.shortsChallengers}</Value>
         </DetailItem>
         <ButtonList>
-          <Button
-            variant="secondary"
-            onClick={goToLearnMode}
-          >
+          <Button variant="secondary" onClick={goToLearnMode}>
             연습 모드
           </Button>
-          <Button
-            variant="primary"
-            onClick={goToChallengeMode}
-          >
+          <Button variant="primary" onClick={goToChallengeMode}>
             챌린지 모드
           </Button>
         </ButtonList>
