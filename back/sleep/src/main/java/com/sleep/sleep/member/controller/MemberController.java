@@ -57,9 +57,6 @@ public class MemberController {
         try {
             accessToken = memberService.login(originLoginRequestDto);
             resultMap.put("accessToken", accessToken);
-            Cookie cookie = new Cookie("name", "어드민");
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
 
         } catch (Exception e) {
             log.info(e.getMessage());

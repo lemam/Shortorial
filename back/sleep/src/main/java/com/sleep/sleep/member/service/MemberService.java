@@ -71,6 +71,7 @@ public class MemberService {
         String username = member.getUsername();
         String accessToken = jwtTokenUtil.generateAccessToken(username);
         RefreshToken refreshToken = saveRefreshToken(username);
+        log.info("로그인 성공");
         return TokenInfo.of(accessToken, refreshToken.getRefreshToken());
     }
 
@@ -80,6 +81,7 @@ public class MemberService {
         }
     }
     private RefreshToken saveRefreshToken(String username) {
+        log.info("RefreshToken 등록");
         return refreshTokenRedisRepository.save(RefreshToken.createRefreshToken(username,
                 jwtTokenUtil.generateRefreshToken(username), REFRESH_TOKEN_EXPIRATION_TIME.getValue()));
     }
