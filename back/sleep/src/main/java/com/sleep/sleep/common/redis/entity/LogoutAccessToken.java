@@ -15,9 +15,7 @@ public class LogoutAccessToken {
 
     @Id
     private String id;
-
     private String username;
-
     @TimeToLive
     private Long expiration;
 
