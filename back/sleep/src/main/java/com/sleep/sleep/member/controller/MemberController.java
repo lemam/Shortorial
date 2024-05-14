@@ -86,7 +86,7 @@ public class MemberController {
 
     @Operation(summary = "회원정보조회")
     @GetMapping("/info")
-    public ResponseEntity<Map<String, Object>> memberFind(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<MemberInfoDto> memberFind(@RequestHeader("Authorization") String accessToken) {
         log.info("멤버 정보 조회");
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.OK;
@@ -96,15 +96,15 @@ public class MemberController {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
             System.out.println("username : "+ username);
             memberInfoDto = memberService.getMemberInfo(username);
-            System.out.println("memberInfo : "+ memberInfoDto.getMemberNickname());
-            resultMap.put("memberInfo", memberInfoDto);
+//            System.out.println("memberInfo : "+ memberInfoDto.getMemberNickname());
+//            resultMap.put("memberInfo", memberInfoDto);
         } catch (Exception e) {
             log.info(e.getMessage());
             resultMap.put("message", e.getMessage());
             status = HttpStatus.BAD_REQUEST;
         }
         return ResponseEntity.status(status)
-                .body(resultMap);
+                .body(memberInfoDto);
     }
 
     @Operation(summary = "리프레시토큰 재발급")
