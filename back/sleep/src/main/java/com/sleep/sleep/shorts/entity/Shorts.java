@@ -31,6 +31,7 @@ public class Shorts {
 
     private String shortsDirector;
 
+    @Column(name = "shorts_challengers", nullable = false, columnDefinition = "INT DEFAULT 0")
     private int shortsChallengers;
 
     private String shortsLink;
