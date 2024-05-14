@@ -27,7 +27,7 @@ public interface ShortsService {
     public void deleteUploadShorts(int uploadNo, String fileName);
 
     //사용자가 시도한 영상 카운트
-    public boolean addTryCount(String username, int shortsNo);
+    public void addTryCount(String username, int shortsNo);
 
     //사용자가 시도한 영상 리스트
     public List<ShortsDto> getTryShortsList(String username);
