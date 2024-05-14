@@ -1,6 +1,7 @@
 package com.sleep.sleep.shorts.service;
 
 import com.sleep.sleep.shorts.dto.ShortsDto;
+import com.sleep.sleep.shorts.dto.TryShortsDto;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
 import java.util.List;
 public interface ShortsService {
@@ -15,4 +16,19 @@ public interface ShortsService {
 
      //사용자가 업로드한 영상 DB에 넣기
     public void upload(UploadShortsDto dto,String username);
+
+    //사용자가 업로드한 영상 이름 변경
+    public void putTitle(int uploadNo,String oldTitle, String newTitle, String newURL);
+
+    //사용자가 업로드한 영상 이름 중복 검사
+    public boolean isNameExists(String title);
+
+    //사용자가 업로드한 영상 db삭제
+    public void deleteUploadShorts(int uploadNo, String fileName);
+
+    //사용자가 시도한 영상 카운트
+    public boolean addTryCount(String username, int shortsNo);
+
+    //사용자가 시도한 영상 리스트
+    public List<TryShortsDto> getTryShortsList(String username);
 }

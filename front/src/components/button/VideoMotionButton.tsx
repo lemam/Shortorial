@@ -1,8 +1,7 @@
-import { MouseEvent } from "react";
+import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import CircularProgress from "@mui/material/CircularProgress";
-import useComponentSize from "../../hooks/useComponentSize";
 
 interface VideoMotionButtonProps {
   id?: string;
@@ -27,12 +26,28 @@ const VideoMotionButton = ({
   progress = 0,
   isVisible = true,
 }: VideoMotionButtonProps) => {
-  // const containerRef = useRef<HTMLButtonElement>(null);
-  const [containerSize, containerRef] = useComponentSize();
+  const containerRef = useRef<HTMLButtonElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
 
   const handleLinkClick = (e: MouseEvent) => {
     if (!link) e.preventDefault();
   };
+
+  // 화면 크기 바뀔 때마다 실행
+  const handleResize = useCallback(() => {
+    if (containerRef.current) {
+      const { width } = containerRef.current.getBoundingClientRect();
+      setContainerWidth(width);
+    }
+  }, []);
+
+  // window resize 이벤트 추가
+  useEffect(() => {
+    setTimeout(handleResize, 200);
+    window.addEventListener("resize", () => setTimeout(handleResize, 200));
+
+    return () => window.removeEventListener("resize", () => setTimeout(handleResize, 200));
+  }, [handleResize]);
 
   return (
     <Link to={link} onClick={handleLinkClick}>
@@ -47,7 +62,7 @@ const VideoMotionButton = ({
           <CircularProgress
             variant="determinate"
             value={progress}
-            size={containerSize.width}
+            size={containerWidth}
             thickness={4}
             sx={{ color: "#FB2576" }}
           />

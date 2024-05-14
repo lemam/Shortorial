@@ -12,13 +12,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 @RestController
+@RequestMapping("/api/s3")
 @RequiredArgsConstructor
 @Slf4j
 public class S3Controller {
@@ -27,7 +30,7 @@ public class S3Controller {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Operation(summary = "동영상 업로드", description ="추후 사용자별 업로드로 수정 예정; param: 업로드할 파일이름")
-    @PostMapping("/s3/upload")
+    @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestHeader("Authorization") String accessToken, @RequestParam("file") MultipartFile file, @RequestParam("fileName") String fileName) {
         try {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
@@ -49,8 +52,8 @@ public class S3Controller {
         }
     }
 
-    @Operation(summary = "동영상 다운로드", description ="추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
-    @GetMapping("/s3/download/{fileName}")
+    @Operation(summary = "동영상 링크 보기", description ="추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
+    @GetMapping("/download/{fileName}")
     public ResponseEntity<?> downloadFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
         try {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
@@ -64,14 +67,17 @@ public class S3Controller {
 
     }
 
-    @Operation(summary = "동영상 삭제", description ="추후 사용자별 다운로드로 수정 예정; param: 삭제할 파일이름")
-    @DeleteMapping("/s3/delete/{fileName}")
-    public ResponseEntity<?> deleteFile(@RequestHeader("Authorization") String accessToken,@PathVariable String fileName){
+    @Operation(summary = "동영상 삭제", description ="uploadNo, title")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteFile(@RequestHeader("Authorization") String accessToken,@RequestBody Map<String,String> data){
         try {
+            int uploadNo = Integer.parseInt(data.get("uploadNo"));
+            String fileName = data.get("title");
+
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
             System.out.println("username : "+ username);
 
-            s3Service.deleteFile(username+"/"+fileName);
+            s3Service.deleteFile(uploadNo, fileName);
             return new ResponseEntity<String>("Successfully delete!",HttpStatus.OK);
         }catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
@@ -84,13 +90,11 @@ public class S3Controller {
     }
 
     @Operation(summary = "동영상 파일 다운로드", description = "추후 사용자별 다운로드로 수정 예정; param: 다운로드할 파일이름")
-    @GetMapping("/s3/download/file/{fileName}")
-    public ResponseEntity<?> downloadStaticFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
+    @GetMapping("/download/file/{fileName}")
+    public ResponseEntity<?> downloadStaticFile(@PathVariable String fileName) {
         try {
-            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
-            System.out.println("username : " + username);
 
-            InputStreamResource resource = new InputStreamResource(s3Service.downloadFile(username + "/" + fileName));
+            InputStreamResource resource = new InputStreamResource(s3Service.downloadFile(fileName));
 
             // 파일명 인코딩
             String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
@@ -101,6 +105,56 @@ public class S3Controller {
                     .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                     .contentType(MediaType.parseMediaType("video/mp4"))
                     .body(resource);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "동영상 파일 이름 변경", description = "헤더에 accessToken넣기. requestBody에 oldTitle, newTitle 이름 넣기")
+    @PutMapping("/rename")
+    public ResponseEntity<?> updateTitle(@RequestHeader("Authorization") String accessToken, @RequestBody Map<String, String> data) {
+        try {
+            int uploadNo = Integer.parseInt(data.get("uploadNo"));
+            String oldTitle = data.get("oldTitle");
+            String newTitle = data.get("newTitle");
+
+            // oldTitle과 newTitle 사용
+            System.out.println("Old Title: " + oldTitle);
+            System.out.println("New Title: " + newTitle);
+
+            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+
+            //s3와 db 업데이트하는 것
+            s3Service.reaname(uploadNo, oldTitle, username + "/" + newTitle);
+
+            return new ResponseEntity<String>("Successfully update!", HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/bring/{fileName}")
+    public ResponseEntity<?> BringFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
+        try {
+            // 토큰에서 사용자 이름 추출 (이 코드는 사용자가 직접 구현해야 함)
+            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+            //String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+
+            // S3에서 파일 다운로드
+            InputStream inputStream = s3Service.downloadFile(username + "/" + fileName);
+
+            // 임시 파일 생성
+            File tempFile = File.createTempFile("downloaded-", ".mp4", new File(System.getProperty("java.io.tmpdir")));
+            //tempFile.deleteOnExit();  // 프로그램 종료 시 파일 삭제
+
+            // 파일로 스트림 복사
+            Files.copy(inputStream, Paths.get(tempFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+
+            // 작업 완료 로그
+            System.out.println("File downloaded and saved to temporary directory: " + tempFile.getAbsolutePath());
+
+            // 클라이언트에 반환할 필요 없음
+            return ResponseEntity.ok()
+                    .body(tempFile.getAbsolutePath());
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

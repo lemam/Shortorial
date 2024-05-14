@@ -29,9 +29,4 @@ public class MyPageServiceImpl implements MyPageService{
         return 0;
     }
 
-    //게시한 숏폼 카운트
-    @Override
-    public int uploadShortsCount() {
-        return 0;
-    }
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getTryCount, shorts } from "../apis/shorts";
+import { Shorts } from "../constants/types";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,7 +10,7 @@ const ShortsDetailPage = () => {
   const navigate = useNavigate();
 
   const goToLearnMode = () => {
-    navigate("/learn");
+    navigate(`/learn/${params.shortsNo}`);
   };
 
   const goToChallengeMode = async () => {
@@ -25,7 +26,7 @@ const ShortsDetailPage = () => {
 
   const params = useParams();
 
-  const [shortsInfo, setShortsInfo] = useState<shorts>();
+  const [shortsInfo, setShortsInfo] = useState<Shorts>();
 
   useEffect(() => {
     axios

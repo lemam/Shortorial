@@ -66,14 +66,8 @@ export const getShortsList = async () => {
 // 특정 쇼츠 조회
 export const getShortsInfo = async (shortsNo: number) => {
   try {
-    // const response = await axios.get(`${REST_SHORTS_LIST_URL}/{shortsNo}`);
-    // return response.data;
-
-    return {
-      id: shortsNo,
-      url: "src/assets/sample.mp4",
-      length: 17,
-    };
+    const response = await axios.get(`${REST_SHORTS_LIST_URL}/${shortsNo}`);
+    return response.data;
   } catch (error) {
     console.error(error);
   }

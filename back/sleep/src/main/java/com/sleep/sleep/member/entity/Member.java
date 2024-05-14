@@ -40,7 +40,7 @@ public class Member implements UserDetails {
     private String memberPass;
     @Column(unique = true)
     private String memberNickname;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String memberProfile;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
