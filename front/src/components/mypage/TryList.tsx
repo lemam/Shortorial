@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-
-import { TryShorts, getTryShorts } from "../../apis/shorts";
-// import ChallengeResultPage from "./ChallengeComponent";
+import TryComponent from "./TryComponent";
+import { shorts, getTryShorts } from "../../apis/shorts";
 
 export default function TryList() {
-  // const [shortsList, setShortsList] = useState<TryShorts[]>([]);
-  const [, setShortsList] = useState<TryShorts[]>([]);
+  const [shortsList, setShortsList] = useState<shorts[]>([]);
 
   const getShorts = async () => {
     try {
@@ -22,17 +20,17 @@ export default function TryList() {
 
   return (
     <div>
-      {/* {Array.from({ length: Math.ceil(shortsList.length / 4) }, (_, index) => index * 4).map(
+      {Array.from({ length: Math.ceil(shortsList.length / 4) }, (_, index) => index * 4).map(
         (startIndex) => (
           <div key={startIndex}>
             <div style={{ display: "flex" }}>
               {shortsList.slice(startIndex, startIndex + 4).map((uploadShorts) => (
-                <ChallengeResultPage uploadShorts={uploadShorts} />
+                <TryComponent shorts={uploadShorts} />
               ))}
             </div>
           </div>
         )
-      )} */}
+      )}
     </div>
   );
 }
