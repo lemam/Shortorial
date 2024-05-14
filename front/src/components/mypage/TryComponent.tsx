@@ -84,7 +84,7 @@ const ChallengeResultPage = ({ shorts }: { shorts: shorts }) => {
 const ResultContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 360px;
+  width: calc(100% / 4);
 `;
 
 const VideoContainer = styled.div`
@@ -94,8 +94,6 @@ const VideoContainer = styled.div`
 `;
 
 const Video = styled.video`
-  width: 360px;
-  height: 640px;
   object-fit: cover;
 `;
 
