@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import TryComponent from "./TryComponent";
-import { shorts, getTryShorts } from "../../apis/shorts";
+import { shorts } from "../../apis/shorts";
+import { getTryShorts } from "../../apis/mypage";
 
 export default function TryList() {
   const [shortsList, setShortsList] = useState<shorts[]>([]);

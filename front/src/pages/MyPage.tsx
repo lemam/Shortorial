@@ -8,8 +8,8 @@ export default function MyPage() {
   const [currentTab, clickTab] = useState(0);
 
   const menuArr = [
-    { name: "저장한 영상", content: <UploadList /> },
-    { name: "시도한 영상", content: <TryList /> },
+    { name: "업로드", content: <UploadList /> },
+    { name: "참여", content: <TryList /> },
   ];
 
   const selectMenuHandler = (index: number) => {
@@ -46,37 +46,31 @@ const ProfileContainer = styled.div`
   flex-direction: column; /* 세로로 나열 */
 `;
 
-const TabMenu = styled.ul`
-  background-color: #dcdcdc;
-  color: rgb(232, 234, 237);
+const TabMenu = styled.div`
   font-weight: bold;
   display: flex;
   flex-direction: row;
   align-items: center;
   list-style: none;
-  margin-bottom: 7rem;
+  // margin-bottom: 7rem;
   margin-top: 10px;
+
+  text-align: center;
 
   .submenu {
     // 기본 Tabmenu 에 대한 CSS를 구현
     display: flex;
-    /* justify-content: space-between;
-    width: 380px;
-    heigth: 30px; */
-    width: calc(100% / 3);
-    padding: 10px;
+    justify-content: center;
+    heigth: 30px;
+    width: calc(100% / 2);
+    padding-bottom: 5px;
     font-size: 15px;
     transition: 0.5s;
-    border-radius: 10px 10px 0px 0px;
+    border-bottom: 2px solid #c7c7c7;
   }
 
   .focused {
     //선택된 Tabmenu 에만 적용되는 CSS를 구현
-    background-color: rgb(255, 255, 255);
-    color: rgb(21, 20, 20);
-  }
-
-  & div.desc {
-    text-align: center;
+    border-bottom: 2px solid #fb2576;
   }
 `;

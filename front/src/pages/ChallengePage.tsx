@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
-import danceVideo from "../assets/sample.mp4";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import LoadingModalComponent from "../components/modal/LoadingModalComponent";
 import { predictWebcam, setBtnInfo } from "../modules/Motion";
@@ -17,10 +17,16 @@ import {
   Save,
   Movie,
 } from "@mui/icons-material";
-import { postUploadShorts } from "../apis/shorts";
+import { postUploadShorts, getShortsInfo } from "../apis/shorts";
+import loading from "../assets/challenge/loading.gif";
+import complete from "../assets/challenge/complete.svg";
+import recordingImg from "../assets/challenge/recording.svg";
+import uncomplete from "../assets/challenge/uncomplete.svg";
+import axios from "axios";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
+  const params = useParams();
   const ffmpeg = createFFmpeg({ log: false });
 
   const userVideoRef = useRef<HTMLVideoElement>(null);
@@ -28,19 +34,27 @@ const ChallengePage = () => {
 
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [danceVideoPath, setDanceVideoPath] = useState<string>("");
+
   const [show, setShow] = useState(false);
   const [recording, setRecording] = useState(false); // 녹화 진행
   const initialTimer = parseInt(localStorage.getItem("timer") || "3");
   const [timer, setTimer] = useState<number>(initialTimer); // 타이머
-  const [loadPath, setLoadPath] = useState("src/assets/challenge/loading.gif"); // 로딩 이미지 경로
+  const [loadPath, setLoadPath] = useState(loading); // 로딩 이미지 경로
   const [ffmpegLog, setFfmpegLog] = useState("");
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
 
   type LearnState = "RECORD" | "READY";
   const [state, setState] = useState<LearnState>("READY");
-
+  // 모션 인식 카운트
   const { visibleCount, timerCount, recordCount, learnCount, resultCount } =
     useMotionDetectionStore();
+
+  // 댄스비디오 s3 url
+  const loadDanceVideo = async () => {
+    const path = await getShortsInfo(`${params.shortsNo}`);
+    setDanceVideoPath(path.shortsLink);
+  };
 
   const handleShowModal = () => {
     setShow(true); // 모달 열기
@@ -76,7 +90,8 @@ const ChallengePage = () => {
   };
 
   const stopRecording = () => {
-    setLoadPath("src/assets/challenge/loading.gif");
+    setLoadPath(loading);
+
     setFfmpegLog("대기중...");
     cancelRecording();
     mediaRecorder?.stop(); // recorder.onstop() 실행
@@ -102,13 +117,32 @@ const ChallengePage = () => {
 
         const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // Blob 생성
 
+        axios
+          .post(
+            `/api/s3/bring/${fileName}`,
+            {},
+            {
+              headers: {
+                Authorization:
+                  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTY1OTIxNywiZXhwIjoxNzE1ODc1MjE3fQ.40YHgvFUODERtYUyZet4YuLWktiRSNyhCA8hlU91ix8",
+              },
+            }
+          )
+          .then((response) => {
+            const filePath = response.data;
+            uploadVideo(auth, filePath, fileName, res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
         // 댄스 비디오 오디오 추출
         const danceVideoBlob = await fetchFile(danceVideo); // 링크된 댄스 비디오를 Blob으로 변환
         ffmpeg.FS("writeFile", "danceVideo.mp4", danceVideoBlob); // Blob을 가상 파일로 변환
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setLoadPath("src/assets/challenge/loading.gif");
+            setLoadPath(loading);
             setFfmpegLog(`노래 추출... ${Math.round(ratio * 100)}%\n`);
           }
         });
@@ -147,7 +181,7 @@ const ChallengePage = () => {
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setLoadPath("src/assets/challenge/loading.gif");
+            setLoadPath(loading);
             setFfmpegLog(`노래 삽입... ${Math.round(ratio * 100)}%\n`);
           }
         });
@@ -171,7 +205,7 @@ const ChallengePage = () => {
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setLoadPath("src/assets/challenge/loading.gif");
+            setLoadPath(loading);
             setFfmpegLog(`거울모드로 저장... ${Math.round(ratio * 100)}%\n`);
           }
         });
@@ -211,17 +245,13 @@ const ChallengePage = () => {
   const s3Upload = async (blob: Blob) => {
     try {
       const title = getCurrentDateTime();
-      // const formData = new FormData();
-      // formData.append("file", blob, `${title}.mp4`);
-      // formData.append("fileName", title);
-
       const uploadResponse = await postUploadShorts(blob, title);
 
-      setLoadPath("src/assets/challenge/complete.svg");
+      setLoadPath(complete);
       setFfmpegLog("저장 완료");
       console.log("s3 upload success", uploadResponse.data);
     } catch (error) {
-      setLoadPath("src/assets/challenge/uncomplete.svg");
+      setLoadPath(uncomplete);
       //if (error instanceof Error && error.stack) setFfmpegLog(error.stack);
       setFfmpegLog("저장 실패");
       console.error("s3 upload fail", error);
@@ -320,7 +350,9 @@ const ChallengePage = () => {
     }
   };
 
+  // 초기 설정
   useEffect(() => {
+    loadDanceVideo(); // 댄스 비디오 로드
     setInit(); // 카메라 초기화
     initVideoSize(danceVideoRef);
     initVideoSize(userVideoRef);
@@ -384,22 +416,19 @@ const ChallengePage = () => {
     <ChallengeContainer>
       <VideoContainer
         ref={danceVideoRef}
-        src={danceVideo}
+        src={danceVideoPath}
         playsInline
         onEnded={handleShowModal}
         className={isFlipped ? "flip" : ""}
+        crossOrigin="anonymous"
       ></VideoContainer>
       <UserContainer id="dom">
-        <UserVideoContainer
-          ref={userVideoRef}
-          autoPlay
-          playsInline
-        ></UserVideoContainer>
+        <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
         {state === "READY" ? (
           <Timer>{timer}</Timer>
         ) : (
           <RecordingComponent>
-            <Recording src="src/assets/challenge/recording.svg" />
+            <Recording src={recordingImg} />
             <RecordingTEXT>REC</RecordingTEXT>
           </RecordingComponent>
         )}
