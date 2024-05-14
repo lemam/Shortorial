@@ -49,7 +49,7 @@ const ChallengeResultPage = ({ shorts }: { shorts: shorts }) => {
       <VideoContainer>
         <Video
           crossOrigin="anonymous"
-          src={shorts.shortsUrl}
+          src={shorts.shortsLink}
           controls
         ></Video>
         {!download && (
