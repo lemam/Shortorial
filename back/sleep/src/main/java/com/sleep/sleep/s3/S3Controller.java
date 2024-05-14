@@ -125,10 +125,14 @@ public class S3Controller {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
 
             //s3와 db 업데이트하는 것
-            s3Service.reaname(uploadNo, oldTitle,username+"/"+newTitle);
+            s3Service.reaname(uploadNo, oldTitle, username + "/" + newTitle);
 
-            return new ResponseEntity<String>("Successfully update!",HttpStatus.OK);
-    @PostMapping("/s3/bring/{fileName}")
+            return new ResponseEntity<String>("Successfully update!", HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/bring/{fileName}")
     public ResponseEntity<?> BringFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
         try {
             // 토큰에서 사용자 이름 추출 (이 코드는 사용자가 직접 구현해야 함)

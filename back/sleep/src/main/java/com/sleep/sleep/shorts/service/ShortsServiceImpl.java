@@ -49,7 +49,7 @@ public class ShortsServiceImpl implements ShortsService{
         shortsInfo.setShortsChallengers(shorts.getShortsChallengers());
         shortsInfo.setShortsTime(shorts.getShortsTime());
         shortsInfo.setShortsLink(shorts.getShortsLink());
-        shortsInfo.setShortDate(shorts.getShortDate());
+        shortsInfo.setShortDate(shorts.getShortsDate());
 
         return shortsInfo;
     }
