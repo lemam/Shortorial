@@ -43,6 +43,7 @@ const SMALL_COUNT: number = 10;
 // const MED_COUNT: number = 15;
 // const MAX_COUNT: number = 30;
 
+// 챌린지 모드 버튼누르기
 export function btn_with_landmark_challenge(
   handLandmarker: NormalizedLandmark,
   setBtn: (newBtn: string) => void
@@ -207,25 +208,20 @@ export function btn_with_landmark_challenge(
   }
 }
 
+// 연습 모드 버튼 누르기
 function btn_with_landmark_learn(
   handLandmarker: NormalizedLandmark,
   setBtn: (newBtn: string) => void
 ) {
-  // console.log(handLandmarkerX);
+  // 절대 좌표로 변경
   const handLandmarkerX = makeAbsoluteLandmarkX(handLandmarker.x);
   const handLandmarkerY = makeAbsoluteLandmarkY(handLandmarker.y);
-  // if (handLandmarker.visibility > 0.5) {
-  //   console.log("X : ", handLandmarker.x);
-  //   console.log("Y : ", handLandmarkerY);
-  // }
-
   if (
     playSize &&
     handLandmarkerX <= playSize.right &&
     handLandmarkerX >= playSize.left &&
     handLandmarker.visibility > 0.5
   ) {
-    // console.log("A");
     if (handLandmarkerY >= playSize.top && handLandmarkerY <= playSize.bottom) {
       if (play_count >= SMALL_COUNT) {
         setBtn("play");
@@ -332,7 +328,6 @@ function btn_with_landmark_learn(
         useMotionDetectionStore
           .getState()
           .setSpeedCount((speed_count / SMALL_COUNT) * 100);
-        // console.log(speed_count);
       }
     }
   } else {
@@ -362,25 +357,36 @@ function action_with_landmark(
     before_handLandmarker.visibility > 0.5 &&
     curr_handmarker.visibility > 0.5
   ) {
-    // console.log("1 complete");
-    // console.log(before_handLandmarker);
-    // console.log(curr_handmarker);
-    // console.log("---------");
     if (
       before_handLandmarker.y > minY &&
       before_handLandmarker.y < maxY &&
       curr_handmarker.y > 0.3 &&
       curr_handmarker.y < 0.8
     ) {
-      // console.log("2 complete");
       if (before_handLandmarker.x - curr_handmarker.x < 0) {
         right_count = 0;
         left_count++;
-        if (left_count > 5) setAction("next");
+        if (left_count > 5) {
+          console.log("next");
+          setAction("next");
+          setTimeout(() => {
+            setAction("none");
+            left_count = 0;
+            right_count = 0;
+          }, 1500);
+        }
       } else if (before_handLandmarker.x - curr_handmarker.x > 0) {
         left_count = 0;
         right_count++;
-        if (right_count > 5) setAction("prev");
+        if (right_count > 5) {
+          console.log("prev");
+          setAction("prev");
+          setTimeout(() => {
+            setAction("none");
+            left_count = 0;
+            right_count = 0;
+          }, 1500);
+        }
       } else {
         left_count = right_count = 0;
       }
@@ -447,7 +453,7 @@ export async function predictWebcam(
           } else {
             curr_handmarker = landmark[18];
             const minY = landmark[11].y;
-            const maxY = landmark[23].y;
+            const maxY = (landmark[23].y + landmark[11].y) / 2;
             if (setAction)
               action_with_landmark(
                 before_handmarker,

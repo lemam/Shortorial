@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+// import { getTryCount, shorts } from "../apis/shorts";
+import { getTryCount } from "../apis/shorts";
 import { Shorts } from "../constants/types";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
@@ -12,8 +14,15 @@ const ShortsDetailPage = () => {
     navigate(`/learn/${params.shortsNo}`);
   };
 
-  const goToChallengeMode = () => {
-    navigate("/challenge");
+  const goToChallengeMode = async () => {
+    if (shortsInfo) {
+      const shortsNo = Number(params.shortsNo); // 숫자로 변환
+      if (!isNaN(shortsNo)) {
+        console.log("shortsNo", shortsNo);
+        await getTryCount(shortsNo);
+        navigate("/challenge");
+      }
+    }
   };
 
   const params = useParams();
@@ -36,7 +45,13 @@ const ShortsDetailPage = () => {
       <Header>Let's DANCE</Header>
       <ShortsDetailContainer>
         <VideoBox>
-          <video src={shortsInfo?.shortsLink} crossOrigin="anonymous" autoPlay loop controls />
+          <video
+            src={shortsInfo?.shortsLink}
+            crossOrigin="anonymous"
+            autoPlay
+            loop
+            controls
+          />
         </VideoBox>
         <DetailItem>
           <Label>제목</Label>
@@ -93,7 +108,6 @@ const Container = styled.div`
   //     margin-bottom: 50px;
   //   }
 `;
-
 const ShortsDetailContainer = styled.div`
   @media (orientation: landscape) {
   }

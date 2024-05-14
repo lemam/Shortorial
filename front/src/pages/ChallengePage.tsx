@@ -4,7 +4,6 @@ import styled, { keyframes } from "styled-components";
 import danceVideo from "../assets/sample.mp4";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import LoadingModalComponent from "../components/modal/LoadingModalComponent";
-import axios from "axios";
 import { predictWebcam, setBtnInfo } from "../modules/Motion";
 import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
@@ -18,6 +17,7 @@ import {
   Save,
   Movie,
 } from "@mui/icons-material";
+import { postUploadShorts } from "../apis/shorts";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -211,16 +211,11 @@ const ChallengePage = () => {
   const s3Upload = async (blob: Blob) => {
     try {
       const title = getCurrentDateTime();
-      const formData = new FormData();
-      formData.append("file", blob, `${title}.mp4`);
-      formData.append("fileName", title);
+      // const formData = new FormData();
+      // formData.append("file", blob, `${title}.mp4`);
+      // formData.append("fileName", title);
 
-      const uploadResponse = await axios.post("http://localhost:8080/s3/upload", formData, {
-        headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTU2NDc3NSwiZXhwIjoxNzE1NTY2NTc1fQ.EC05452JT7LFNmLPnUoNfGLPCJlVm8msTwIboQdzyr0",
-        },
-      });
+      const uploadResponse = await postUploadShorts(blob, title);
 
       setLoadPath("src/assets/challenge/complete.svg");
       setFfmpegLog("저장 완료");
@@ -395,7 +390,11 @@ const ChallengePage = () => {
         className={isFlipped ? "flip" : ""}
       ></VideoContainer>
       <UserContainer id="dom">
-        <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
+        <UserVideoContainer
+          ref={userVideoRef}
+          autoPlay
+          playsInline
+        ></UserVideoContainer>
         {state === "READY" ? (
           <Timer>{timer}</Timer>
         ) : (
