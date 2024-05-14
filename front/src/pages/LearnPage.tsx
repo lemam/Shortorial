@@ -7,7 +7,11 @@ import { VideoSection, Shorts } from "../constants/types";
 import { setBtnInfo } from "../modules/Motion";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
-import { useActionStore, useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
+import {
+  useActionStore,
+  useBtnStore,
+  useMotionDetectionStore,
+} from "../store/useMotionStore";
 import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
@@ -21,7 +25,10 @@ const LearnPage = () => {
   const centerSectionRef = useRef<HTMLDivElement>(null);
 
   const [videoSize, setVideoSize] = useState({ width: 0, height: 0 });
-  const [centerSectionSize, setCenterSectionSize] = useState({ width: 0, height: 0 });
+  const [centerSectionSize, setCenterSectionSize] = useState({
+    width: 0,
+    height: 0,
+  });
   const [leftSectionWidth, setLeftSectionWidth] = useState(0);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -56,14 +63,19 @@ const LearnPage = () => {
     state.countdownTimer,
   ]);
 
-  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore((state) => [
-    state.isLooping,
-    state.loopSection,
-    state.setIsLooping,
-    state.setLoopSection,
-  ]);
+  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore(
+    (state) => [
+      state.isLooping,
+      state.loopSection,
+      state.setIsLooping,
+      state.setLoopSection,
+    ]
+  );
 
-  const [isFlipped, setIsFlipped] = useLearnStore((state) => [state.isFlipped, state.setIsFlipped]);
+  const [isFlipped, setIsFlipped] = useLearnStore((state) => [
+    state.isFlipped,
+    state.setIsFlipped,
+  ]);
 
   const [playSpeed, changePlaySpeed] = useLearnStore((state) => [
     state.playSpeed,
@@ -76,15 +88,14 @@ const LearnPage = () => {
   const action = useActionStore((state) => state.action);
   const [canAction, setCanAction] = useState(true);
 
-  const [playCount, challengeCount, repeatCount, flipCount, speedCount] = useMotionDetectionStore(
-    (state) => [
+  const [playCount, challengeCount, repeatCount, flipCount, speedCount] =
+    useMotionDetectionStore((state) => [
       state.playCount,
       state.challengeCount,
       state.repeatCount,
       state.flipCount,
       state.speedCount,
-    ]
-  );
+    ]);
 
   // 영상 정보 가져오기
   const loadVideo = useCallback(async () => {
@@ -233,7 +244,8 @@ const LearnPage = () => {
   // 화면 크기 바뀔 때마다 실행 - videoSize, leftSectionWidth 초기화
   const handleResize = useCallback(() => {
     if (centerSectionRef.current) {
-      const { width, height } = centerSectionRef.current.getBoundingClientRect();
+      const { width, height } =
+        centerSectionRef.current.getBoundingClientRect();
       setCenterSectionSize({ width, height });
       initVideoSize();
     }
@@ -249,7 +261,8 @@ const LearnPage = () => {
     setTimeout(handleResize, 200);
     window.addEventListener("resize", () => setTimeout(handleResize, 200));
 
-    return () => window.removeEventListener("resize", () => setTimeout(handleResize, 200));
+    return () =>
+      window.removeEventListener("resize", () => setTimeout(handleResize, 200));
   }, [handleResize, initVideoSize]);
 
   // 화면의 준비가 모두 완료했을 때 실행
@@ -292,19 +305,22 @@ const LearnPage = () => {
         if (canAction) {
           moveToPrevSection();
           setCanAction(false);
-          setTimeout(() => {
-            setCanAction(true);
-          }, 1000);
+          // setTimeout(() => {
+          //   setCanAction(true);
+          // }, 1000);
         }
         break;
       case "next":
         if (canAction) {
           moveToNextSection();
           setCanAction(false);
-          setTimeout(() => {
-            setCanAction(true);
-          }, 1000);
+          // setTimeout(() => {
+          //   setCanAction(true);
+          // }, 1000);
         }
+        break;
+      case "none":
+        setCanAction(true);
         break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
