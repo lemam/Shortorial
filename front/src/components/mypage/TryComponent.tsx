@@ -147,14 +147,14 @@ const CheckIcon = styled(Check)`
   cursor: pointer;
 `;
 
-const GridContainer = styled.div`
-  position: relative;
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(2, 1fr);
+// const GridContainer = styled.div`
+//   position: relative;
+//   display: grid;
+//   gap: 16px;
+//   grid-template-columns: repeat(2, 1fr);
 
-  @media (orientation: landscape) {
-    grid-template-columns: repeat(4, minmax(162px, 1fr));
-  }
-`;
+//   @media (orientation: landscape) {
+//     grid-template-columns: repeat(4, minmax(162px, 1fr));
+//   }
+// `;
 export default ChallengeResultPage;
