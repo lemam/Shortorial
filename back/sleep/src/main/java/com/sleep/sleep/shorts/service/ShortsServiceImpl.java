@@ -131,7 +131,7 @@ public class ShortsServiceImpl implements ShortsService{
     }
 
     @Transactional
-    public boolean addTryCount(String username, int shortsNo) {
+    public void addTryCount(String username, int shortsNo) {
         // 멤버 찾기
         Member member = memberRepository.findByMemberId(username)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
@@ -153,14 +153,15 @@ public class ShortsServiceImpl implements ShortsService{
             TryShorts tryShorts = TryShorts.builder()
                     .memberIndex(member)
                     .shortsNo(shorts)
-                    .tryYn(1)
                     .build();
             tryShortsRepository.save(tryShorts);
             log.info("New tryShorts created for shortsNo: " + tryShorts.getShortsNo());
-            return true;
         } else {
-            log.info("TryShorts already exists for shortsNo: " + tryShortsOpt.get().getShortsNo());
-            return false;
+            TryShorts tryShorts = tryShortsOpt.get();
+            // 시도가 이미 있으면 uploadDate를 현재 시간으로 수정
+            tryShorts.setUploadDate(LocalDateTime.now());
+            tryShortsRepository.save(tryShorts);
+            log.info("UploadDate updated for tryShorts with shortsNo: " + tryShorts.getShortsNo());
         }
     }
 

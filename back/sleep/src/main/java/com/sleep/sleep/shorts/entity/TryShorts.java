@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -24,13 +25,17 @@ public class TryShorts {
     @ManyToOne
     @JoinColumn(name = "member_no")
     private Member memberIndex;
-    private int tryYn;
 
-    @Builder
-    public TryShorts(Shorts shortsNo, Member memberIndex, int tryYn) {
-        this.shortsNo = shortsNo;
-        this.memberIndex = memberIndex;
-        this.tryYn = tryYn;
+    @Column(nullable = false, updatable = true)
+    private LocalDateTime uploadDate;
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
     }
 
+    @Builder
+    public TryShorts(Shorts shortsNo, Member memberIndex) {
+        this.shortsNo = shortsNo;
+        this.memberIndex = memberIndex;
+        this.uploadDate = LocalDateTime.now();
+    }
 }

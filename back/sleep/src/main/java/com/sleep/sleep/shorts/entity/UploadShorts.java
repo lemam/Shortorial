@@ -27,6 +27,7 @@ public class UploadShorts {
     private String uploadTitle;
     @Column(nullable = false, updatable = false)
     private LocalDateTime uploadDate;
+    @Column(nullable = true)
     private String youtubeUrl;
 
 
