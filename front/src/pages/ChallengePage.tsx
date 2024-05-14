@@ -18,6 +18,10 @@ import {
   Movie,
 } from "@mui/icons-material";
 import { postUploadShorts } from "../apis/shorts";
+import loading from "../assets/challenge/loading.gif";
+import complete from "../assets/challenge/complete.svg";
+import recordingImg from "../assets/challenge/recording.svg";
+import uncomplete from "../assets/challenge/uncomplete.svg";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -32,7 +36,7 @@ const ChallengePage = () => {
   const [recording, setRecording] = useState(false); // 녹화 진행
   const initialTimer = parseInt(localStorage.getItem("timer") || "3");
   const [timer, setTimer] = useState<number>(initialTimer); // 타이머
-  const [loadPath, setLoadPath] = useState("src/assets/challenge/loading.gif"); // 로딩 이미지 경로
+  const [loadPath, setLoadPath] = useState(loading); // 로딩 이미지 경로
   const [ffmpegLog, setFfmpegLog] = useState("");
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
 
@@ -76,7 +80,8 @@ const ChallengePage = () => {
   };
 
   const stopRecording = () => {
-    setLoadPath("src/assets/challenge/loading.gif");
+    setLoadPath(loading);
+
     setFfmpegLog("대기중...");
     cancelRecording();
     mediaRecorder?.stop(); // recorder.onstop() 실행
@@ -108,7 +113,7 @@ const ChallengePage = () => {
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setLoadPath("src/assets/challenge/loading.gif");
+            setLoadPath(loading);
             setFfmpegLog(`노래 추출... ${Math.round(ratio * 100)}%\n`);
           }
         });
@@ -147,7 +152,7 @@ const ChallengePage = () => {
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setLoadPath("src/assets/challenge/loading.gif");
+            setLoadPath(loading);
             setFfmpegLog(`노래 삽입... ${Math.round(ratio * 100)}%\n`);
           }
         });
@@ -171,7 +176,7 @@ const ChallengePage = () => {
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
-            setLoadPath("src/assets/challenge/loading.gif");
+            setLoadPath(loading);
             setFfmpegLog(`거울모드로 저장... ${Math.round(ratio * 100)}%\n`);
           }
         });
@@ -211,17 +216,13 @@ const ChallengePage = () => {
   const s3Upload = async (blob: Blob) => {
     try {
       const title = getCurrentDateTime();
-      // const formData = new FormData();
-      // formData.append("file", blob, `${title}.mp4`);
-      // formData.append("fileName", title);
-
       const uploadResponse = await postUploadShorts(blob, title);
 
-      setLoadPath("src/assets/challenge/complete.svg");
+      setLoadPath(complete);
       setFfmpegLog("저장 완료");
       console.log("s3 upload success", uploadResponse.data);
     } catch (error) {
-      setLoadPath("src/assets/challenge/uncomplete.svg");
+      setLoadPath(uncomplete);
       //if (error instanceof Error && error.stack) setFfmpegLog(error.stack);
       setFfmpegLog("저장 실패");
       console.error("s3 upload fail", error);
@@ -390,16 +391,12 @@ const ChallengePage = () => {
         className={isFlipped ? "flip" : ""}
       ></VideoContainer>
       <UserContainer id="dom">
-        <UserVideoContainer
-          ref={userVideoRef}
-          autoPlay
-          playsInline
-        ></UserVideoContainer>
+        <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
         {state === "READY" ? (
           <Timer>{timer}</Timer>
         ) : (
           <RecordingComponent>
-            <Recording src="src/assets/challenge/recording.svg" />
+            <Recording src={recordingImg} />
             <RecordingTEXT>REC</RecordingTEXT>
           </RecordingComponent>
         )}
