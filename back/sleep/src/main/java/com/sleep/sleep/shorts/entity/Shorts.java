@@ -35,7 +35,7 @@ public class Shorts {
 
     private String shortsLink;
 
-    private LocalDate shortDate;
+    private LocalDate shortsDate;
 
 
     @OneToMany(mappedBy = "shortsNo", cascade = CascadeType.ALL)
