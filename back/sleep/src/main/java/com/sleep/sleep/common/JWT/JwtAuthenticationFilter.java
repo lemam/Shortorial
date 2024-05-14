@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if(username != null){
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
                 equalsUsernameFromTokenAndUserDetails(userDetails.getUsername(), username);
-                validateAccessToken(accessToken, userDetails);
+                validateAccessToken(accessToken);
                 processSecurity(request, userDetails);
             }
         }
@@ -63,9 +63,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void validateAccessToken(String accessToken, UserDetails userDetails) {
-        if (!jwtTokenUtil.validateToken(accessToken, userDetails)) {
-            throw new IllegalArgumentException("토큰 검증 실패");
+    private void validateAccessToken(String accessToken) {
+        if (!jwtTokenUtil.isTokenExpired(accessToken)) {
+            throw new IllegalArgumentException("만료된 토큰입니다.");
         }
     }
 

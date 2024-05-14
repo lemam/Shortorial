@@ -66,11 +66,6 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        String username = getUsername(token);
-        return username.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
-    }
 
     public long getRemainMilliSeconds(String token) {
         Date expiration = extractAllClaims(token).getExpiration();

@@ -3,6 +3,7 @@ package com.sleep.sleep.common.config;
 
 import com.sleep.sleep.common.redis.entity.CacheKey;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -18,9 +19,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 
 @Configuration
-@RequiredArgsConstructor
 @EnableCaching
 public class CacheConfig {
+
 
     @Bean
     public CacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory){
@@ -33,7 +34,8 @@ public class CacheConfig {
                                 .fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext
                         .SerializationPair
-                        .fromSerializer(new GenericJackson2JsonRedisSerializer()));
+                        .fromSerializer(new GenericJackson2JsonRedisSerializer()))
+                ;
 
 
         return RedisCacheManager.RedisCacheManagerBuilder

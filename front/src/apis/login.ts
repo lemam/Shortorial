@@ -16,9 +16,10 @@ export async function postLogin( id :string , password : string){
         const data = await axios.post(REST_MEMBER_API + "/login",{
             memberId: id,
             memberPass : password,
+            withCredentials: true,
         });
         
-        console.log(data);
+        // console.log(data);
         
         
         setAccessToken(data);
