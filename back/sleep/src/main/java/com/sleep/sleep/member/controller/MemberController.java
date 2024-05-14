@@ -8,6 +8,7 @@ import com.sleep.sleep.member.dto.MemberInfoDto;
 import com.sleep.sleep.member.dto.OriginLoginRequestDto;
 import com.sleep.sleep.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,6 +57,7 @@ public class MemberController {
         try {
             accessToken = memberService.login(originLoginRequestDto);
             resultMap.put("accessToken", accessToken);
+
         } catch (Exception e) {
             log.info(e.getMessage());
             resultMap.put("message", e.getMessage());

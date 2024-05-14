@@ -1,32 +1,36 @@
 package com.sleep.sleep.mypage.service;
 
+import com.sleep.sleep.member.entity.Member;
 import com.sleep.sleep.member.repository.MemberRepository;
-import com.sleep.sleep.mypage.dto.MyPageDto;
 import com.sleep.sleep.shorts.repository.TryShortsRepository;
+import com.sleep.sleep.shorts.repository.UploadShortsRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MyPageServiceImpl implements MyPageService{
     private final MemberRepository memberRepository;
     private final TryShortsRepository tryShortsRepository;
-    //내 정보 조회
-    @Override
-    public MyPageDto getMyInfo(int memberIndex) {
-        //memberNickname : string,
-        //memberProfile : string,
-        //tryMusic : int,
-        //completeMusic : int
-//        memberRepository.getMemberNickname
+    private final UploadShortsRepository uploadShortsRepository;
 
+    public Map<String,Integer> getCount(String username) {
+        Member member = memberRepository.findByMemberId(username)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        int memberIndex = member.getMemberIndex();
 
-        return null;
-    }
+        Map<String, Integer> counts = new HashMap<>();
 
-    //시도한 숏폼 카은트
-    @Override
-    public int tryShortsCount() {
-        return 0;
+        counts.put("tryShortsCount", tryShortsRepository.countTryNoByMemberNo(memberIndex));
+        counts.put("youtubeUrlCount", uploadShortsRepository.countYoutubeUrlByMemberIndex(memberIndex));
+        counts.put("uploadShortsCount", uploadShortsRepository.countUploadShortsByMemberIndex(memberIndex));
+
+        return counts;
     }
 
 }

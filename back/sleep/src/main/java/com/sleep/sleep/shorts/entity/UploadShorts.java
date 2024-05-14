@@ -27,6 +27,8 @@ public class UploadShorts {
     private String uploadTitle;
     @Column(nullable = false, updatable = false)
     private LocalDateTime uploadDate;
+    @Column(nullable = true)
+    private String youtubeUrl;
 
 
     @OneToOne
@@ -48,6 +50,9 @@ public class UploadShorts {
         this.uploadUrl = newUrl;
     }
 
+    public void putYoutubeUrl(String url){
+        this.youtubeUrl=url;
+    }
 
     @PrePersist
     protected void onCreate() {

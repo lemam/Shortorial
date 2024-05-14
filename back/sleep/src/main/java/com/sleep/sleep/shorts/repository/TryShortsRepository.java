@@ -15,9 +15,12 @@ import java.util.Optional;
 public interface TryShortsRepository extends JpaRepository<TryShorts,Integer> {
 
 //    Optional<TryShorts> findByMemberIndexAndShortsNo(Member member, Shorts shorts);
-@Query(nativeQuery = true, value = "select * from try_shorts where member_no = :memberNo and shorts_no=:shortsNo")
-Optional<TryShorts> findByMemberIndexAndShortsNo(@Param("memberNo") int memberNo,@Param("shortsNo") int shortsNo);
+    @Query(nativeQuery = true, value = "select * from try_shorts where member_no = :memberNo and shorts_no=:shortsNo")
+    Optional<TryShorts> findByMemberIndexAndShortsNo(@Param("memberNo") int memberNo,@Param("shortsNo") int shortsNo);
 
     @Query(nativeQuery = true, value = "select * from try_shorts where member_no = :memberNo")
     List<TryShorts> findTryShortList(@Param("memberNo") int memberNo);
+
+    @Query("SELECT COUNT(ts) FROM TryShorts ts WHERE ts.memberIndex.memberIndex = :memberIndex")
+    int countTryNoByMemberNo(@Param("memberIndex") int memberIndex);
 }

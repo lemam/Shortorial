@@ -18,7 +18,7 @@ export async function postLogin( id :string , password : string){
             memberPass : password,
         });
         
-        console.log(data);
+        // console.log(data);
         
         
         setAccessToken(data);

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Profile from "../components/mypage/Profile";
-import UploadSnsList from "../components/mypage/UploadSnsList";
 import UploadList from "../components/mypage/UploadList";
 import styled from "styled-components";
 import TryList from "../components/mypage/TryList";
@@ -10,7 +9,6 @@ export default function MyPage() {
 
   const menuArr = [
     { name: "저장한 영상", content: <UploadList /> },
-    { name: "업로드한 영상", content: <UploadSnsList /> },
     { name: "시도한 영상", content: <TryList /> },
   ];
 

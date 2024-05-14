@@ -8,6 +8,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
 @Getter
 @Setter
@@ -18,6 +20,6 @@ public class TryShortsDto {
     private int tryNo;
     private int shortsNo;
     private int memberIndex;
-    private int tryYn;
+    private LocalDateTime uploadDate;
 
 }

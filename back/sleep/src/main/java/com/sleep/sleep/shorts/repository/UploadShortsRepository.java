@@ -21,5 +21,10 @@ public interface UploadShortsRepository extends JpaRepository<UploadShorts,Integ
     @Query("SELECT COUNT(u) > 0 FROM UploadShorts u WHERE u.uploadTitle = :uploadTitle")
     boolean existsByUploadTitle(@Param("uploadTitle") String uploadTitle);
 
+    @Query("SELECT COUNT(us.youtubeUrl) FROM UploadShorts us WHERE us.memberIndex.memberIndex = :memberIndex AND us.youtubeUrl IS NOT NULL")
+    int countYoutubeUrlByMemberIndex(int memberIndex);
+
+    @Query("SELECT COUNT(us) FROM UploadShorts us WHERE us.memberIndex.memberIndex = :memberIndex")
+    int countUploadShortsByMemberIndex(int memberIndex);
 
 }

@@ -68,18 +68,33 @@ public class ShortsController {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
             System.out.println("username : "+ username);
 
-            Boolean result = shortsService.addTryCount(username,shortsNo);
-            if(result){
-                return new ResponseEntity<>("Add 1", HttpStatus.OK);
-            }
-            else{
-                return new ResponseEntity<>("It won't add more count as User have already been attempted.", HttpStatus.OK);
-            }
+            shortsService.addTryCount(username,shortsNo);
+            return new ResponseEntity<>("Successful Try Counting", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "DB에 유튜브 url 올리기", description = "헤더에 accessToken 넣기, RequestParam으로 uploadNo,youtubeUrl ")
+    @PutMapping("/youtubeUrl")
+    public ResponseEntity<?> putYoutubeUrl(@RequestHeader("Authorization") String accessToken, @RequestBody Map<String, String> data) {
+        try {
+            int uploadNo = Integer.parseInt(data.get("uploadNo"));
+            String url = data.get("youtubeUrl");
+
+            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+            System.out.println("username : "+ username);
+
+            shortsService.putYoutubeUrl(uploadNo,url);
+
+            return new ResponseEntity<>("Sucessful save DB!", HttpStatus.OK);
 
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     private String resolveToken(String accessToken) {
         log.info("resolveToken, AccessToken: "+ accessToken.toString());

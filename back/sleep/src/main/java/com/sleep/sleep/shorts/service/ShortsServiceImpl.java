@@ -131,7 +131,7 @@ public class ShortsServiceImpl implements ShortsService{
     }
 
     @Transactional
-    public boolean addTryCount(String username, int shortsNo) {
+    public void addTryCount(String username, int shortsNo) {
         // 멤버 찾기
         Member member = memberRepository.findByMemberId(username)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
@@ -153,41 +153,64 @@ public class ShortsServiceImpl implements ShortsService{
             TryShorts tryShorts = TryShorts.builder()
                     .memberIndex(member)
                     .shortsNo(shorts)
-                    .tryYn(1)
                     .build();
             tryShortsRepository.save(tryShorts);
             log.info("New tryShorts created for shortsNo: " + tryShorts.getShortsNo());
-            return true;
         } else {
-            log.info("TryShorts already exists for shortsNo: " + tryShortsOpt.get().getShortsNo());
-            return false;
+            TryShorts tryShorts = tryShortsOpt.get();
+            // 시도가 이미 있으면 uploadDate를 현재 시간으로 수정
+            tryShorts.setUploadDate(LocalDateTime.now());
+            tryShortsRepository.save(tryShorts);
+            log.info("UploadDate updated for tryShorts with shortsNo: " + tryShorts.getShortsNo());
         }
     }
 
+    public List<ShortsDto> getTryShortsList(String username){
+        // 시도한 영상 리스트 가져오기
 
-
-    public List<TryShortsDto> getTryShortsList(String username){
-        //시도한 영상 리스트
-
+        // 회원 번호 조회
         int memberNo = memberRepository.findByMemberId(username)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found")).getMemberIndex();
 
-        List<TryShorts> shorts = tryShortsRepository.findTryShortList(memberNo);
+        // 시도한 영상 리스트 조회
+        List<TryShorts> tryShortsList = tryShortsRepository.findTryShortList(memberNo);
 
-        List<TryShortsDto> tryShorts = new ArrayList<>();
+        // 시도한 영상 리스트를 담을 DTO 리스트
+        List<ShortsDto> shortsDtoList = new ArrayList<>();
 
-        for(TryShorts value : shorts){
-            TryShortsDto tryShortsDto = new TryShortsDto();
-            tryShortsDto.setTryNo(value.getTryNo());
-            tryShortsDto.setMemberIndex(memberNo);
-            tryShortsDto.setShortsNo(value.getShortsNo().getShortsNo());
-            tryShortsDto.setTryYn(value.getTryYn());
-            tryShorts.add(tryShortsDto);
+        // 시도한 영상 리스트를 순회하면서 DTO에 데이터 추가
+        for(TryShorts tryShorts : tryShortsList){
+            ShortsDto shortsDto = new ShortsDto();
+
+            // 시도한 영상의 ShortsNo를 사용하여 Shorts 엔티티 조회
+            Shorts shorts = tryShorts.getShortsNo();
+
+            // Shorts 엔티티의 데이터를 DTO에 추가
+            shortsDto.setShortsNo(shorts.getShortsNo());
+            shortsDto.setShortsUrl(shorts.getShortsUrl());
+            shortsDto.setShortsTime(shorts.getShortsTime());
+            shortsDto.setShortsTitle(shorts.getShortsTitle());
+            shortsDto.setShortsDirector(shorts.getShortsDirector());
+            shortsDto.setShortsChallengers(shorts.getShortsChallengers());
+            shortsDto.setShortsLink(shorts.getShortsLink());
+            shortsDto.setShortDate(shorts.getShortsDate());
+
+            // DTO 리스트에 DTO 추가
+            shortsDtoList.add(shortsDto);
         }
-        return tryShorts;
 
-
+        return shortsDtoList;
     }
 
+    public void putYoutubeUrl(int uploadNo,String url){
+        UploadShorts uploadShorts = uploadShortsRepository.findByUploadNo(uploadNo);
+
+        if (uploadShorts != null) {
+
+            uploadShorts.putYoutubeUrl(url);
+
+            uploadShortsRepository.save(uploadShorts);
+        }
+    }
 
 }

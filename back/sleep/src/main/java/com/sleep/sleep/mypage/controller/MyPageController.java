@@ -12,14 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/api/mypage")
 @RestController
@@ -27,24 +25,9 @@ import java.util.List;
 @Slf4j
 public class MyPageController {
 
-    private final MyPageService myPageService;
     private final ShortsService shortsService;
     private final JwtTokenUtil jwtTokenUtil;
-
-    @GetMapping("/info")
-    public ResponseEntity<?> getMyInfo(@RequestHeader("Authorization") String accessToken){
-        try{
-            //사용자 찾기
-            System.out.println(accessToken.toString());
-            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
-            System.out.println("username : "+ username);
-            MyPageDto myPageDto = new MyPageDto("ssafy",1,1);
-            return new ResponseEntity<MyPageDto>(myPageDto, HttpStatus.OK);
-
-        }catch (Exception e){
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    private final MyPageService myPageService;
 
     @Operation(summary = "사용자의 업로드한 영상 리스트", description ="사용자의 엑세스 토큰 필요함")
     @GetMapping("/upload-shorts")
@@ -60,14 +43,26 @@ public class MyPageController {
 
     @Operation(summary = "사용자가 시도한 영상 리스트", description ="사용자의 엑세스 토큰 필요함")
     @GetMapping("/try-shorts")
-    public ResponseEntity<List<TryShortsDto>> selectTryShortList(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<List<ShortsDto>> selectTryShortList(@RequestHeader("Authorization") String accessToken) {
         //사용자 찾기
         String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
         System.out.println("username : "+ username);
 
-        List<TryShortsDto> shortsList = shortsService.getTryShortsList(username);
+        List<ShortsDto> shortsList = shortsService.getTryShortsList(username);
 
         return ResponseEntity.ok(shortsList);
+    }
+
+    @Operation(summary = "프로플-카운터", description ="header에 accessToken")
+    @GetMapping("/counting")
+    public ResponseEntity<Map<String,Integer>> getCounting(@RequestHeader("Authorization") String accessToken) {
+        //사용자 찾기
+        String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+        System.out.println("username : "+ username);
+
+        Map<String,Integer> result = myPageService.getCount(username);
+
+        return ResponseEntity.ok(result);
     }
 
 
