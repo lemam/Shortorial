@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 
 import { TryShorts, getTryShorts } from "../../apis/shorts";
-import ChallengeResultPage from "./ChallengeComponent";
+// import ChallengeResultPage from "./ChallengeComponent";
 
 export default function TryList() {
-  const [shortsList, setShortsList] = useState<TryShorts[]>([]);
+  // const [shortsList, setShortsList] = useState<TryShorts[]>([]);
+  const [, setShortsList] = useState<TryShorts[]>([]);
 
   const getShorts = async () => {
     try {

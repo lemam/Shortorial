@@ -29,7 +29,6 @@ const LearnPage = () => {
     width: 0,
     height: 0,
   });
-  const [leftSectionWidth, setLeftSectionWidth] = useState(0);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const interval = intervalRef.current;
