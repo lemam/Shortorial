@@ -39,3 +39,7 @@ out/
 *.yml
 *.properties
 *.yaml
+*.node_modules
+
+back/upload/node_modules/
+
