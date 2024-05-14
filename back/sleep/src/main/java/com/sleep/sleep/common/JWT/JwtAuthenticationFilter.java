@@ -64,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void validateAccessToken(String accessToken) {
-        if (!jwtTokenUtil.isTokenExpired(accessToken)) {
+        if (jwtTokenUtil.isTokenExpired(accessToken)) {
             throw new IllegalArgumentException("만료된 토큰입니다.");
         }
     }
