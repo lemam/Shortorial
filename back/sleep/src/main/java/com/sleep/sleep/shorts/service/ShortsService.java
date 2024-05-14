@@ -30,5 +30,8 @@ public interface ShortsService {
     public boolean addTryCount(String username, int shortsNo);
 
     //사용자가 시도한 영상 리스트
-    public List<TryShortsDto> getTryShortsList(String username);
+    public List<ShortsDto> getTryShortsList(String username);
+
+    //유튜브 url 저장
+    public void putYoutubeUrl(int uploadNo,String url);
 }
