@@ -1,6 +1,7 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import GlobalStyle from "./GlobalStyle";
 import MainPage from "./pages/MainPage";
+import LandingPage from "./pages/LandingPage";
 import LoginForm from "./pages/LoginForm";
 import LearnPage from "./pages/LearnPage";
 import LearnPageTmp from "./pages/LearnPageTmp";
@@ -22,6 +23,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage />} />
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/learn/:shortsNo" element={<LearnPage />} />
           <Route path="/learn2" element={<LearnPageTmp />} />
