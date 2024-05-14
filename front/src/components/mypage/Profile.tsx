@@ -1,21 +1,36 @@
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { Countings, getCounting } from "../../apis/mypage";
 
 export default function Profile() {
+  const [counting, setCounting] = useState<Countings>();
+
+  const getCounts = async () => {
+    try {
+      const data = await getCounting();
+      setCounting(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getCounts();
+  }, []);
   return (
     <ProfileContainer>
       <ProfileInfoContainer>Profile 지역</ProfileInfoContainer>
       <ProfileNumContainer>
         <div>
-          <div>숫자</div>
+          <div>{counting?.tryShortsCount}</div>
           <div>참여</div>
         </div>
         <div>
-          <div>숫자</div>
+          <div>{counting?.uploadShortsCount}</div>
           <div>저장</div>
         </div>
         <div>
-          <div>숫자</div>
+          <div>{counting?.youtubeUrlCount}</div>
           <div>업로드</div>
         </div>
       </ProfileNumContainer>
