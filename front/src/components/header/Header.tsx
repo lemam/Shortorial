@@ -1,9 +1,14 @@
+import { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-const Header = () => {
+interface HeaderProps {
+  style?: CSSProperties;
+}
+
+const Header = ({ style }: HeaderProps) => {
   return (
-    <Container>
+    <Container style={style}>
       <Wrapper>
         <div>로고 들어갈 곳</div>
         {/* TODO: 로그인 상태이면 마이페이지, 로그아웃으로 변경 */}
@@ -44,6 +49,8 @@ const Container = styled.header`
   position: relative;
   width: 100%;
   height: 60px;
+  background-color: #fff;
+  z-index: 100;
 `;
 
 export default Header;
