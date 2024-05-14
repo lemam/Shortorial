@@ -60,12 +60,12 @@ public class MyPageController {
 
     @Operation(summary = "사용자가 시도한 영상 리스트", description ="사용자의 엑세스 토큰 필요함")
     @GetMapping("/try-shorts")
-    public ResponseEntity<List<TryShortsDto>> selectTryShortList(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<List<ShortsDto>> selectTryShortList(@RequestHeader("Authorization") String accessToken) {
         //사용자 찾기
         String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
         System.out.println("username : "+ username);
 
-        List<TryShortsDto> shortsList = shortsService.getTryShortsList(username);
+        List<ShortsDto> shortsList = shortsService.getTryShortsList(username);
 
         return ResponseEntity.ok(shortsList);
     }
