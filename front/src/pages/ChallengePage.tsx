@@ -17,7 +17,7 @@ import {
   Save,
   Movie,
 } from "@mui/icons-material";
-import { postUploadShorts, getShortsInfo, getS3blob } from "../apis/shorts";
+import { postUploadShorts, getShortsInfo, getS3blob, shorts } from "../apis/shorts";
 import loading from "../assets/challenge/loading.gif";
 import complete from "../assets/challenge/complete.svg";
 import recordingImg from "../assets/challenge/recording.svg";
@@ -31,6 +31,7 @@ const ChallengePage = () => {
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
 
+  const [short, setShort] = useState<shorts | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [danceVideoPath, setDanceVideoPath] = useState<string>("");
@@ -52,12 +53,16 @@ const ChallengePage = () => {
 
   const loadDanceVideo = async () => {
     // 댄스비디오 s3 url
-    const short = await getShortsInfo(`${params.shortsNo}`);
-    setDanceVideoPath(short.shortsLink);
+    const thisShort = await getShortsInfo(`${params.shortsNo}`);
 
-    // 댄스비디오 s3 blob
-    const s3blob = await getS3blob(short.shortsTitle);
-    setDanceVideoS3blob(s3blob);
+    setShort(thisShort);
+    if (thisShort) {
+      setDanceVideoPath(thisShort.shortsLink); // 쇼츠 s3 링크
+      const s3blob = await getS3blob(thisShort.shortsTitle); // 쇼츠 블롭화
+      setDanceVideoS3blob(s3blob);
+    } else {
+      alert("새로고침 해주세요.");
+    }
   };
 
   const handleShowModal = () => {
@@ -70,8 +75,9 @@ const ChallengePage = () => {
 
   const goToLearnMode = () => {
     stream?.getTracks().forEach((track) => track.stop());
-    navigate("/learn");
+    if (short) navigate(`/learn/${short.shortsNo}`);
   };
+
   const goToResult = () => {
     stream?.getTracks().forEach((track) => track.stop());
     navigate("/challenge/result");
