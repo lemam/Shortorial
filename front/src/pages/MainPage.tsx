@@ -3,6 +3,7 @@ import { Shorts } from "../constants/types";
 import { axios } from "../utils/axios";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/header/Header";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const MainPage = () => {
 
   return (
     <Container>
-      <Header>Let's DANCE</Header>
+      <Header />
       <GridContainer>
         {shortsList.map((shorts) => (
           <VideoItem key={shorts.shortsNo}>
@@ -42,17 +43,6 @@ const MainPage = () => {
 };
 
 export default MainPage;
-
-// Component 로 나중에 빼자
-const Header = styled.header`
-  width: 100%;
-  background-color: #f8f9fa;
-  padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
 
 const Container = styled.div`
   box-sizing: border-box;
