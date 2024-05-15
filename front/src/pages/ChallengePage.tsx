@@ -17,7 +17,7 @@ import {
   Save,
   Movie,
 } from "@mui/icons-material";
-import { postUploadShorts, getShortsInfo, getS3blob, shorts } from "../apis/shorts";
+import { postUploadShorts, getShortsInfo, getS3Blob, shorts } from "../apis/shorts";
 import loading from "../assets/challenge/loading.gif";
 import complete from "../assets/challenge/complete.svg";
 import recordingImg from "../assets/challenge/recording.svg";
@@ -58,7 +58,7 @@ const ChallengePage = () => {
     setShort(thisShort);
     if (thisShort) {
       setDanceVideoPath(thisShort.shortsLink); // 쇼츠 s3 링크
-      const s3blob = await getS3blob(thisShort.shortsTitle); // 쇼츠 블롭화
+      const s3blob = await getS3Blob(thisShort.shortsTitle); // 쇼츠 블롭화
       setDanceVideoS3blob(s3blob);
     } else {
       alert("새로고침 해주세요.");
@@ -240,11 +240,11 @@ const ChallengePage = () => {
   const s3Upload = async (blob: Blob) => {
     try {
       const title = getCurrentDateTime();
-      const uploadResponse = await postUploadShorts(blob, title);
+      await postUploadShorts(blob, title);
 
       setLoadPath(complete);
       setFfmpegLog("저장 완료");
-      console.log("s3 upload success", uploadResponse.data);
+      //console.log("s3 upload success", uploadResponse.data);
     } catch (error) {
       setLoadPath(uncomplete);
       //if (error instanceof Error && error.stack) setFfmpegLog(error.stack);

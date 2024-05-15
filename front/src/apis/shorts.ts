@@ -1,6 +1,6 @@
 import { axios } from "../utils/axios";
 
-const REST_SHORTS_URL = "api/s3";
+const REST_SHORTS_URL = "/api/s3";
 const REST_SHORTS_LIST_URL = "/api/shorts";
 const REST_MYPAGE_URL = "/api/mypage";
 
@@ -111,7 +111,7 @@ export async function getTryShorts() {
 }
 
 // S3에 있는 파일을 Blob으로 받기
-export async function getS3blob(fileName: string) {
+export async function getS3Blob(fileName: string) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
 
@@ -129,5 +129,45 @@ export async function getS3blob(fileName: string) {
     return data.data;
   } catch (error) {
     console.error("Error fetching data:", error);
+  }
+}
+
+export async function getMyS3Blob(uploadNo: number) {
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+
+    const data = await axios.post(
+      `${REST_SHORTS_URL}/bring/myblob/${uploadNo}`,
+      {},
+      {
+        headers: {
+          Authorization: token,
+        },
+        responseType: "blob",
+      }
+    );
+
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+// 이름 업데이트
+export async function updateTitle(updatingShorts: Map<string, string>, uploadNo: number) {
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+
+    const updatingShortsObj = Object.fromEntries(updatingShorts);
+
+    const data = await axios.put(`${REST_SHORTS_URL}/rename/${uploadNo}`, updatingShortsObj, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    return data.data;
+  } catch (error) {
+    console.error("Error Renaming data:", error);
   }
 }

@@ -1,68 +1,68 @@
 import { useState } from "react";
 import styled from "styled-components";
-import axios from "axios";
 import { Check, Create, Download } from "@mui/icons-material";
-import { UploadShorts } from "../../apis/shorts";
+import { UploadShorts, updateTitle } from "../../apis/shorts";
+import { getMyS3Blob } from "../../apis/shorts";
 
 const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) => {
   const [title, setTitle] = useState<string>(uploadShorts.uploadTitle);
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
 
-  const saveTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
-    //제목 수정 api
-  };
-
   const titleCanbeModified = () => setModify(true);
   const titleCanNotbeModified = () => setModify(false);
   const startDownload = () => setDownload(true);
   const completeDownload = () => setDownload(false);
 
-  const downloadVideo = () => {
+  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value);
+  };
+
+  const saveTitle = async () => {
+    setTitle(title);
+    titleCanNotbeModified();
+
+    const updatingShorts = new Map<string, string>();
+    updatingShorts.set("oldTitle", uploadShorts.uploadTitle);
+    updatingShorts.set("newTitle", title);
+
+    await updateTitle(updatingShorts, uploadShorts.uploadNo);
+    // 업데이트된 타이틀을 반영한 쇼츠를 조회해서 재렌더링 해야함
+  };
+
+  const downloadVideo = async () => {
     startDownload();
 
-    axios
-      .get(`http://localhost:8080/s3/download/file/${uploadShorts.uploadTitle}`, {
-        responseType: "blob",
-      })
-      .then((res) => {
-        const videoBlob = new Blob([res.data], { type: "video/mp4" }); // 비디오를 blob으로 변경
-        const downloadUrl = URL.createObjectURL(videoBlob); // blob url 생성
+    try {
+      const videoBlob = await getMyS3Blob(uploadShorts.uploadNo);
+      const downloadUrl = URL.createObjectURL(videoBlob); // blob url 생성
 
-        const downloadLink = document.createElement("a"); // 임시 a 태그 생성
-        downloadLink.href = downloadUrl; // href 링크 지정
-        downloadLink.setAttribute("download", `${title}.mp4`);
-        document.body.appendChild(downloadLink);
-        downloadLink.click(); // a 태그 클릭
+      const downloadLink = document.createElement("a"); // 임시 a 태그 생성
+      downloadLink.href = downloadUrl; // href 링크 지정
+      downloadLink.setAttribute("download", `${title}.mp4`);
+      document.body.appendChild(downloadLink);
+      downloadLink.click(); // a 태그 클릭
 
-        document.body.removeChild(downloadLink); // 임시 a 태그 제거
-        URL.revokeObjectURL(downloadUrl);
-
-        completeDownload();
-      })
-      .catch((err) => console.log(err));
+      document.body.removeChild(downloadLink); // 임시 a 태그 제거
+      URL.revokeObjectURL(downloadUrl);
+    } catch (err) {
+      alert("다운로드에 실패했습니다.");
+      console.log(err);
+    } finally {
+      completeDownload();
+    }
   };
 
   return (
     <ResultContainer>
       <VideoContainer>
-        <Video
-          crossOrigin="anonymous"
-          src={uploadShorts.uploadUrl}
-          controls
-        ></Video>
-        {!download && (
-          <DownloadIcon
-            onClick={downloadVideo}
-            fontSize="large"
-          ></DownloadIcon>
-        )}
+        <Video crossOrigin="anonymous" src={uploadShorts.uploadUrl} controls></Video>
+        {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
         {download && <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>}
       </VideoContainer>
       {!modify && (
         <TitleContainer>
-          <Title>{title}</Title>
+          <Title>{uploadShorts.uploadTitle}</Title>
           <ModifyIcon onClick={titleCanbeModified}></ModifyIcon>
         </TitleContainer>
       )}
@@ -71,10 +71,10 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
           <InputBox
             type="text"
             value={title}
-            onChange={saveTitle}
+            onChange={handleTitleChange}
             placeholder="제목을 입력하세요."
           />
-          <CheckIcon onClick={titleCanNotbeModified}></CheckIcon>
+          <CheckIcon onClick={saveTitle}></CheckIcon>
         </TitleContainer>
       )}
     </ResultContainer>
