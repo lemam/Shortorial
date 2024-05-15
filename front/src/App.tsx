@@ -16,17 +16,15 @@ import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 import MyPage from "./pages/MyPage";
 import ShortsDetailPage from "./pages/ShortsDetailPage";
 import FeedPage from "./pages/FeedPage";
-import useLoginStore from "./store/useLoginStore";
 
 function App() {
-  const isLogin = useLoginStore((state) => state.getIsLogin());
-
   return (
     <>
       <GlobalStyle />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={isLogin ? <MainPage /> : <LandingPage />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/main" element={<PrivateRoute component={<MainPage />} redirectTo="/" />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/learn/:shortsNo" element={<PrivateRoute component={<LearnPage />} />} />

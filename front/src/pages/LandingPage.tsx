@@ -1,8 +1,19 @@
 import styled from "styled-components";
 import heroImg from "/src/assets/landing/hero.jpg";
 import Header from "../components/header/Header";
+import { useEffect } from "react";
+import useLoginStore from "../store/useLoginStore";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
+  const isLogin = useLoginStore((state) => state.getIsLogin());
+  const navigate = useNavigate();
+
+  // 로그인한 유저의 접근 막기
+  useEffect(() => {
+    if (isLogin) navigate("/main");
+  }, [isLogin, navigate]);
+
   return (
     <div>
       <Header style={{ position: "fixed" }} />

@@ -3,11 +3,12 @@ import useLoginStore from "../../store/useLoginStore";
 
 interface PrivateRouteProps {
   component: JSX.Element;
+  redirectTo?: string;
 }
 
-const PrivateRoute = ({ component }: PrivateRouteProps) => {
+const PrivateRoute = ({ component, redirectTo = "/login" }: PrivateRouteProps) => {
   const isAuthenticated = useLoginStore((state) => state.getIsLogin());
-  return isAuthenticated ? component : <Navigate to="/login" />;
+  return isAuthenticated ? component : <Navigate to={redirectTo} />;
 };
 
 export default PrivateRoute;
