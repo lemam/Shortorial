@@ -1,6 +1,6 @@
 import { axios } from "../utils/axios";
 
-const REST_SHORTS_URL = "api/s3/upload";
+const REST_SHORTS_URL = "api/s3";
 const REST_SHORTS_LIST_URL = "/api/shorts";
 const REST_MYPAGE_URL = "/api/mypage";
 
@@ -40,7 +40,7 @@ export async function postUploadShorts(blob: Blob, fileName: string) {
     formData.append("file", blob, `${fileName}.mp4`);
     formData.append("fileName", fileName); // 파일 이름 추가
 
-    const data = await axios.post(REST_SHORTS_URL, formData, {
+    const data = await axios.post(`${REST_SHORTS_URL}/upload`, formData, {
       headers: {
         Authorization: token,
         "Content-Type": "multipart/form-data", // 파일 업로드 시 Content-Type 설정
@@ -64,7 +64,7 @@ export const getShortsList = async () => {
 };
 
 // 특정 쇼츠 조회
-export const getShortsInfo = async (shortsNo: number) => {
+export const getShortsInfo = async (shortsNo: string) => {
   try {
     const response = await axios.get(`${REST_SHORTS_LIST_URL}/${shortsNo}`);
     return response.data;
@@ -143,6 +143,28 @@ export async function getTryShorts() {
         Authorization: token,
       },
     });
+
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+// S3에 있는 파일을 Blob으로 받기
+export async function getS3blob(fileName: string) {
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+
+    const data = await axios.post(
+      `${REST_SHORTS_URL}/bring/blob/${fileName}`,
+      {},
+      {
+        headers: {
+          Authorization: token,
+        },
+        responseType: "blob",
+      }
+    );
 
     return data.data;
   } catch (error) {
