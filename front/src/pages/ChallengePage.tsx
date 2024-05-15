@@ -2,7 +2,7 @@ import { useCallback, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
-import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+import { createFFmpeg } from "@ffmpeg/ffmpeg";
 import LoadingModalComponent from "../components/modal/LoadingModalComponent";
 import { predictWebcam, setBtnInfo } from "../modules/Motion";
 import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
@@ -17,12 +17,11 @@ import {
   Save,
   Movie,
 } from "@mui/icons-material";
-import { postUploadShorts, getShortsInfo } from "../apis/shorts";
+import { postUploadShorts, getShortsInfo, getS3blob } from "../apis/shorts";
 import loading from "../assets/challenge/loading.gif";
 import complete from "../assets/challenge/complete.svg";
 import recordingImg from "../assets/challenge/recording.svg";
 import uncomplete from "../assets/challenge/uncomplete.svg";
-import axios from "axios";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -35,6 +34,7 @@ const ChallengePage = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [danceVideoPath, setDanceVideoPath] = useState<string>("");
+  const [danceVideoS3blob, setDanceVideoS3blob] = useState<Blob | null>(null);
 
   const [show, setShow] = useState(false);
   const [recording, setRecording] = useState(false); // 녹화 진행
@@ -50,10 +50,14 @@ const ChallengePage = () => {
   const { visibleCount, timerCount, recordCount, learnCount, resultCount } =
     useMotionDetectionStore();
 
-  // 댄스비디오 s3 url
   const loadDanceVideo = async () => {
-    const path = await getShortsInfo(`${params.shortsNo}`);
-    setDanceVideoPath(path.shortsLink);
+    // 댄스비디오 s3 url
+    const short = await getShortsInfo(`${params.shortsNo}`);
+    setDanceVideoPath(short.shortsLink);
+
+    // 댄스비디오 s3 blob
+    const s3blob = await getS3blob(short.shortsTitle);
+    setDanceVideoS3blob(s3blob);
   };
 
   const handleShowModal = () => {
@@ -115,30 +119,15 @@ const ChallengePage = () => {
           await ffmpeg.load(); // ffmpeg 로드
         }
 
-        const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // Blob 생성
+        const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // user video blob 생성
 
-        axios
-          .post(
-            `/api/s3/bring/${fileName}`,
-            {},
-            {
-              headers: {
-                Authorization:
-                  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsImlhdCI6MTcxNTY1OTIxNywiZXhwIjoxNzE1ODc1MjE3fQ.40YHgvFUODERtYUyZet4YuLWktiRSNyhCA8hlU91ix8",
-              },
-            }
-          )
-          .then((response) => {
-            const filePath = response.data;
-            uploadVideo(auth, filePath, fileName, res);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-
-        // 댄스 비디오 오디오 추출
-        const danceVideoBlob = await fetchFile(danceVideo); // 링크된 댄스 비디오를 Blob으로 변환
-        ffmpeg.FS("writeFile", "danceVideo.mp4", danceVideoBlob); // Blob을 가상 파일로 변환
+        const reader = new FileReader();
+        if (danceVideoS3blob) reader.readAsArrayBuffer(danceVideoS3blob); // dance video blob array buffer로 변환
+        reader.onloadend = async () => {
+          const arrayBuffer = reader.result as ArrayBuffer;
+          const uint8Array = new Uint8Array(arrayBuffer);
+          ffmpeg.FS("writeFile", "danceVideo.mp4", uint8Array); // Blob을 가상 파일로 변환
+        };
 
         ffmpeg.setProgress(({ ratio }) => {
           if (ratio > 0) {
@@ -453,18 +442,10 @@ const ChallengePage = () => {
               />
               <VideoMotionButton
                 icon={<Flip />}
-                toolTip="화면 반전"
+                toolTip="거울 모드"
                 onClick={() => setIsFlipped(!isFlipped)}
                 id="record"
                 progress={recordCount}
-                isVisible={state === "READY"}
-              />
-              <VideoMotionButton
-                icon={<DirectionsRun />}
-                toolTip="연습 모드로 이동"
-                onClick={goToLearnMode}
-                id="learn"
-                progress={learnCount}
                 isVisible={state === "READY"}
               />
               <VideoMotionButton
@@ -473,6 +454,14 @@ const ChallengePage = () => {
                 onClick={goToResult}
                 id="rslt"
                 progress={resultCount}
+                isVisible={state === "READY"}
+              />
+              <VideoMotionButton
+                icon={<DirectionsRun />}
+                toolTip="연습 모드로 이동"
+                onClick={goToLearnMode}
+                id="learn"
+                progress={learnCount}
                 isVisible={state === "READY"}
               />
             </div>

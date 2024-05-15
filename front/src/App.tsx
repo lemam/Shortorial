@@ -25,7 +25,7 @@ function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/learn/:shortsNo" element={<LearnPage />} />
           <Route path="/learn2" element={<LearnPageTmp />} />
-          <Route path="/challenge" element={<ChallengePage />} />
+          <Route path="/challenge/:shortsNo" element={<ChallengePage />} />
           <Route path="/challenge/result" element={<ChallengeResultPage />} />
           <Route path="/video-trim" element={<VideoTrimPage />} />
           <Route path="/video-marker" element={<VideoMarkerPage />} />

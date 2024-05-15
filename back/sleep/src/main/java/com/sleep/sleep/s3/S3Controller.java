@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +21,7 @@ import java.util.Map;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+
 
 @RestController
 @RequestMapping("/api/s3")
@@ -133,7 +136,7 @@ public class S3Controller {
         }
     }
     @PostMapping("/bring/{fileName}")
-    public ResponseEntity<?> BringFile(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
+    public ResponseEntity<?> getLocalFilePath(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
         try {
             // 토큰에서 사용자 이름 추출 (이 코드는 사용자가 직접 구현해야 함)
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
@@ -150,11 +153,32 @@ public class S3Controller {
             Files.copy(inputStream, Paths.get(tempFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
 
             // 작업 완료 로그
-            System.out.println("File downloaded and saved to temporary directory: " + tempFile.getAbsolutePath());
+            //System.out.println("File downloaded and saved to temporary directory: " + tempFile.getAbsolutePath());
 
-            // 클라이언트에 반환할 필요 없음
             return ResponseEntity.ok()
                     .body(tempFile.getAbsolutePath());
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/bring/blob/{fileName}")
+    public ResponseEntity<?> getLocalFileS3Path(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
+        try {
+            // 토큰에서 사용자 이름 추출 (이 코드는 사용자가 직접 구현해야 함)
+            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+            //String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+
+            // S3에서 파일 다운로드
+            InputStream inputStream = s3Service.downloadFile("Shorts/" + fileName);
+
+            // InputStream을 바이트 배열로 변환
+            byte[] fileContent = IOUtils.toByteArray(inputStream);
+
+            // 블롭(바이트 배열)을 클라이언트에 반환
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(fileContent);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

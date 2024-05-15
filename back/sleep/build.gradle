@@ -65,6 +65,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.jcodec/jcodec
 	implementation 'org.jcodec:jcodec:0.2.5'
 
+	// 파일 업로드
+	implementation 'commons-io:commons-io:2.11.0'
+
 }
 
 tasks.named('test') {
