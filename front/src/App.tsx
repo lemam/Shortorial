@@ -1,8 +1,11 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import PrivateRoute from "./modules/auth/PrivateRoute";
 import GlobalStyle from "./GlobalStyle";
 import MainPage from "./pages/MainPage";
 import LandingPage from "./pages/LandingPage";
 import LoginForm from "./pages/LoginForm";
+import SignUp from "./pages/SignUpPage";
 import LearnPage from "./pages/LearnPage";
 import LearnPageTmp from "./pages/LearnPageTmp";
 import ChallengePage from "./pages/ChallengePage";
@@ -13,29 +16,35 @@ import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 import MyPage from "./pages/MyPage";
 import ShortsDetailPage from "./pages/ShortsDetailPage";
 import FeedPage from "./pages/FeedPage";
-import "bootstrap/dist/css/bootstrap.min.css";
-import SignUp from "./pages/SignUpPage";
+import useLoginStore from "./store/useLoginStore";
 
 function App() {
+  const isLogin = useLoginStore((state) => state.getIsLogin());
+
   return (
     <>
       <GlobalStyle />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/landing" element={<LandingPage />} />
+          <Route path="/" element={isLogin ? <MainPage /> : <LandingPage />} />
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/learn/:shortsNo" element={<LearnPage />} />
+          <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/learn/:shortsNo" element={<PrivateRoute component={<LearnPage />} />} />
           <Route path="/learn2" element={<LearnPageTmp />} />
-          <Route path="/challenge" element={<ChallengePage />} />
-          <Route path="/challenge/result" element={<ChallengeResultPage />} />
+          <Route path="/challenge" element={<PrivateRoute component={<ChallengePage />} />} />
+          <Route
+            path="/challenge/result"
+            element={<PrivateRoute component={<ChallengeResultPage />} />}
+          />
           <Route path="/video-trim" element={<VideoTrimPage />} />
           <Route path="/video-marker" element={<VideoMarkerPage />} />
           {/* <Route path="/video-resize" element={<VideoResizePage />} /> */}
           <Route path="/mypage" element={<MyPage />} />
-          <Route path="/shorts/:shortsNo" element={<ShortsDetailPage />} />
+          <Route
+            path="/shorts/:shortsNo"
+            element={<PrivateRoute component={<ShortsDetailPage />} />}
+          />
           <Route path="/feed" element={<FeedPage />} />
-          <Route path="/sign-up" element={<SignUp />} />
         </Routes>
       </BrowserRouter>
     </>
