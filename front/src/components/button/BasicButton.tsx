@@ -31,11 +31,7 @@ const BasicButton = ({ text, color = "basic", onClick }: ButtonType) => {
   };
 
   return (
-    <Button
-      color={buttonColors[color]}
-      hoverColor={hoverButtonColors[color]}
-      onClick={onClick}
-    >
+    <Button color={buttonColors[color]} $hoverColor={hoverButtonColors[color]} onClick={onClick}>
       {text}
     </Button>
   );
@@ -43,7 +39,7 @@ const BasicButton = ({ text, color = "basic", onClick }: ButtonType) => {
 
 export default BasicButton;
 
-const Button = styled.button<{ color: string; hoverColor: string }>`
+const Button = styled.button<{ color: string; $hoverColor: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,7 +54,7 @@ const Button = styled.button<{ color: string; hoverColor: string }>`
   color: white;
   background-color: ${(props) => props.color};
   &:hover {
-    background-color: ${(props) => props.hoverColor};
+    background-color: ${(props) => props.$hoverColor};
   }
 
   @media screen and (max-width: 479px) {
