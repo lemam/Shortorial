@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv
+load_dotenv()
 
 class Config:
     JSON_AS_ASCII = False
@@ -15,4 +15,4 @@ class Config:
     }
 
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = True

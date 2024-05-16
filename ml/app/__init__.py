@@ -1,4 +1,5 @@
-from flask import Flask
-from .run import create_app
+from .app import create_app, init_db
+import numpy as np
 
-run = create_app()
+app = create_app()
+db_app, db = init_db()
