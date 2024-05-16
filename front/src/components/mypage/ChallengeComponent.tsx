@@ -1,13 +1,21 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Check, Create, Download } from "@mui/icons-material";
-import { UploadShorts, updateTitle } from "../../apis/shorts";
-import { getMyS3Blob } from "../../apis/shorts";
+import { Check, Create, Delete, Download, IosShare, YouTube } from "@mui/icons-material";
+import {
+  UploadShorts,
+  updateTitle,
+  getMyS3Blob,
+  shareShorts,
+  getFilePath,
+  deleteShorts,
+} from "../../apis/shorts";
 
 const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) => {
   const [title, setTitle] = useState<string>(uploadShorts.uploadTitle);
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
+  const [share, setShare] = useState<boolean>(false);
+  const [link, setLink] = useState<string | null>(null);
 
   const titleCanbeModified = () => setModify(true);
   const titleCanNotbeModified = () => setModify(false);
@@ -22,6 +30,15 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   const extractTitle = (fullTitle: string): string => {
     const titleParts = fullTitle.split("/");
     return titleParts.length > 1 ? titleParts[1] : fullTitle;
+  };
+
+  const deleteUploadedShorts = async () => {
+    const deletingShorts = new Map<string, string>();
+    deletingShorts.set("uploadNo", String(uploadShorts.uploadNo));
+    deletingShorts.set("title", uploadShorts.uploadTitle);
+
+    await deleteShorts(deletingShorts);
+    // 재렌더링 필요
   };
 
   const saveTitle = async () => {
@@ -59,28 +76,44 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
     }
   };
 
+  const shareShortsToYoutube = async () => {
+    (() => setShare(true))();
+
+    const filePath = await getFilePath(uploadShorts.uploadNo);
+    await shareShorts(filePath);
+
+    (() => setShare(false))();
+  };
+
   return (
     <ResultContainer>
       <VideoContainer>
-        <Video
-          crossOrigin="anonymous"
-          src={uploadShorts.uploadUrl}
-          controls
-        ></Video>
-        {!download && (
-          <DownloadIcon
-            onClick={downloadVideo}
-            fontSize="large"
-          ></DownloadIcon>
+        <Video crossOrigin="anonymous" src={uploadShorts.uploadUrl} controls></Video>
+        <MyVideoControlComponent>
+          {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
+          {download && (
+            <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>
+          )}
+          {!share && !link && (
+            <IosShareIcon onClick={shareShortsToYoutube} fontSize="large"></IosShareIcon>
+          )}
+          {!share && link && (
+            <YoutubeIcon
+              fontSize="large"
+              onClick={() => (window.location.href = link)}
+            ></YoutubeIcon>
+          )}
+          {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>}
+          <DeleteIcon fontSize="large" onClick={deleteUploadedShorts}></DeleteIcon>
+        </MyVideoControlComponent>
+        {!modify && (
+          <TitleContainer>
+            <Title>{uploadShorts.uploadTitle}</Title>
+            <ModifyIcon onClick={titleCanbeModified}></ModifyIcon>
+          </TitleContainer>
         )}
-        {download && <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>}
       </VideoContainer>
-      {!modify && (
-        <TitleContainer>
-          <Title>{uploadShorts.uploadTitle}</Title>
-          <ModifyIcon onClick={titleCanbeModified}></ModifyIcon>
-        </TitleContainer>
-      )}
+
       {modify && (
         <TitleContainer>
           <InputBox
@@ -114,20 +147,42 @@ const Video = styled.video`
   object-fit: cover;
 `;
 
-const DownloadIcon = styled(Download)`
+const MyVideoControlComponent = styled.div`
   position: absolute;
   right: 0;
-  top: 0;
+  display: flex;
+  flex-direction: column;
+`;
+
+const DownloadIcon = styled(Download)`
   cursor: pointer;
 `;
 
 const DownloadingIcon = styled.img`
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+`;
+
+const IosShareIcon = styled(IosShare)`
+  cursor: pointer;
+`;
+
+const SharingIcon = styled.img`
   position: absolute;
   right: 0;
-  top: 0;
+  top: 1%;
   cursor: pointer;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
+`;
+
+const YoutubeIcon = styled(YouTube)`
+  cursor: pointer;
+`;
+
+const DeleteIcon = styled(Delete)`
+  cursor: pointer;
 `;
 
 const TitleContainer = styled.div`
