@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-// import { getTryCount, shorts } from "../apis/shorts";
-import { getTryCount } from "../apis/shorts";
 import { Shorts } from "../constants/types";
 import { axios } from "../utils/axios";
 import styled from "styled-components";

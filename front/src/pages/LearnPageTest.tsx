@@ -7,7 +7,7 @@ import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
 import { setBtnInfo } from "../modules/Motion";
-import useVideoStore from "../store/useVideoStore";
+import useLearnStore from "../store/useLearnStore";
 import { useNavigate } from "react-router-dom";
 
 const LearnPageTest = () => {
@@ -38,7 +38,7 @@ const LearnPageTest = () => {
   const [sectionList, setSectionList] = useState<VideoSection[]>([]);
   const [currentTime, setCurrentTime] = useState<number>(0);
 
-  const { currentSection, loopSection, setLoopSection } = useVideoStore();
+  const { currentSection, loopSection, setLoopSection } = useLearnStore();
   const { btn } = useBtnStore();
   const { playCount, challengeCount, repeatCount, flipCount, speedCount } =
     useMotionDetectionStore();
