@@ -8,7 +8,7 @@ interface PrivateRouteProps {
 
 const PrivateRoute = ({ component, redirectTo = "/login" }: PrivateRouteProps) => {
   const isAuthenticated = useLoginStore((state) => state.getIsLogin());
-  return isAuthenticated ? component : <Navigate to={redirectTo} />;
+  return isAuthenticated ? component : <Navigate to={redirectTo} replace />;
 };
 
 export default PrivateRoute;
