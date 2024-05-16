@@ -3,6 +3,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import Member from "../constants/types";
 import { getMemberInfo } from "../apis/login";
 import { getAccessToken } from "../modules/auth/accessToken";
+import parseJwt from "../modules/auth/parseJwt";
 
 interface LoginState {
   loginMemberIdx: number;
@@ -21,7 +22,15 @@ const useLoginStore = create<LoginState>()(
       loginMember: null,
       setLoginMemberIdx: (by: number) => set(() => ({ loginMemberIdx: by })),
       setLoginMember: (by) => set(() => ({ loginMember: by })),
-      getIsLogin: () => Boolean(getAccessToken()),
+      getIsLogin: () => {
+        const token = getAccessToken();
+        if (token) {
+          const exp = parseJwt(token).exp;
+          const curr = (new Date().getTime() - new Date().getMilliseconds()) / 1000;
+          return exp >= curr;
+        }
+        return false;
+      },
 
       //로그인 회원 정보 업데이트
       updateLoginMember: async () => {
