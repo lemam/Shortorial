@@ -24,7 +24,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/main" element={<PrivateRoute component={<MainPage />} redirectTo="/" />} />
+          <Route path="/main" element={<PrivateRoute component={<MainPage />} />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/learn/:shortsNo" element={<PrivateRoute component={<LearnPage />} />} />
