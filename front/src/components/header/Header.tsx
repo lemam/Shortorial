@@ -1,6 +1,7 @@
 import { CSSProperties, MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import logo from "/src/assets/logo.png";
 import useLoginStore from "../../store/useLoginStore";
 
 interface HeaderProps {
@@ -9,18 +10,21 @@ interface HeaderProps {
 
 const Header = ({ style }: HeaderProps) => {
   const isLogin = useLoginStore((state) => state.getIsLogin());
+  const logout = useLoginStore((state) => state.logout);
   const navigate = useNavigate();
 
-  const logout = (e: MouseEvent) => {
+  const handleLogoutClick = (e: MouseEvent) => {
     e.preventDefault();
-    localStorage.removeItem("accessToken");
+    logout();
     navigate("/");
   };
 
   return (
     <Container style={style}>
       <Wrapper>
-        <div>로고 들어갈 곳</div>
+        <LogoContainer to="/main">
+          <LogoImg src={logo} alt="" />
+        </LogoContainer>
         <LinkWrapper>
           {!isLogin ? (
             <>
@@ -30,7 +34,7 @@ const Header = ({ style }: HeaderProps) => {
           ) : (
             <>
               <Link to="/mypage">마이페이지</Link>
-              <Link to="" onClick={logout}>
+              <Link to="" onClick={handleLogoutClick}>
                 로그아웃
               </Link>
             </>
@@ -40,6 +44,16 @@ const Header = ({ style }: HeaderProps) => {
     </Container>
   );
 };
+
+const LogoContainer = styled(Link)`
+  height: 40px;
+`;
+
+const LogoImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
 
 const LinkWrapper = styled.div`
   a {
