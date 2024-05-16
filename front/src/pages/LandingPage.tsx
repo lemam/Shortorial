@@ -9,10 +9,19 @@ import serviceLandscape from "/src/assets/landing/service_landscape.png";
 import Header from "../components/header/Header";
 import useLoginStore from "../store/useLoginStore";
 import BasicButton from "../components/button/BasicButton";
+import useScrollFadeIn from "../hooks/useScrollFadeIn";
 
 const LandingPage = () => {
   const isLogin = useLoginStore((state) => state.getIsLogin());
   const navigate = useNavigate();
+
+  const scroll1 = useScrollFadeIn({ direction: "none", duration: 1 });
+  const scroll7 = useScrollFadeIn({ direction: "none", duration: 1 });
+  const scroll2 = useScrollFadeIn();
+  const scroll3 = useScrollFadeIn();
+  const scroll4 = useScrollFadeIn();
+  const scroll5 = useScrollFadeIn();
+  const scroll6 = useScrollFadeIn();
 
   // 로그인한 유저의 접근 막기
   useEffect(() => {
@@ -24,17 +33,19 @@ const LandingPage = () => {
       <Header style={{ position: "fixed" }} />
       <HeroContainer>
         <HeroImg src={heroImg} alt="" />
-        <HeroTextContainer>
+        <HeroTextContainer {...scroll1}>
           <h1 className="title">{`SHORTORIAL에서\n쉽고 빠르게\n챌린지에 도전하세요`}</h1>
           <h2 className="subTitle">모션 인식 기반 댄스 챌린지 연습 서비스</h2>
         </HeroTextContainer>
-        <BasicButton
-          text="지금 시작하기"
-          style={CTAButtonStyled}
-          onClick={() => navigate("/main")}
-        />
+        <CTAButtonContainer {...scroll7}>
+          <BasicButton
+            text="지금 시작하기"
+            style={CTAButtonStyled}
+            onClick={() => navigate("/main")}
+          />
+        </CTAButtonContainer>
       </HeroContainer>
-      <Section>
+      <Section {...scroll2}>
         <h1 className="title">{`숏토리얼과 함께라면 여기가 나만의 연습실`}</h1>
         <p className="subTitle">
           {`웹캠 또는 스마트폰 카메라 하나로\n언제 어디서나 챌린지를 연습해보세요.`}
@@ -44,7 +55,7 @@ const LandingPage = () => {
           <DeviceImg src={deviceLandscape} alt="" />
         </ImageContainer>
       </Section>
-      <Section>
+      <Section {...scroll3}>
         <div>
           <h1 className="title">{`이제 멀리서 걸어오실 필요 없어요`}</h1>
           <p className="subTitle">{`춤추다가 걸어와서 버튼 누르고...\n이런 귀찮은 과정은 저희가 해결해드릴게요.`}</p>
@@ -57,12 +68,12 @@ const LandingPage = () => {
           {`별다른 기기 부착 없이 카메라로 모션을 인식하여 멀리서도 버튼 조작이 가능해요.`}
         </p>
       </Section>
-      <Section>
+      <Section {...scroll4}>
         <h1 className="title">인기 챌린지를 한눈에</h1>
         <p className="subTitle">지금 유행하는 다양한 댄스 챌린지에 도전해보세요.</p>
         <p className="text">당신이 좋아할만한 챌린지도 추천해드릴게요.</p>
       </Section>
-      <Section>
+      <Section {...scroll5}>
         <h1 className="title">촬영에서 업로드까지</h1>
         <p className="subTitle">{`연습한 그 자리에서 바로 촬영하고\nSNS에 공유해보세요.`}</p>
         <ImageContainer>
@@ -70,7 +81,7 @@ const LandingPage = () => {
           <DeviceImg src={deviceLandscape} alt="" />
         </ImageContainer>
       </Section>
-      <CenterSection>
+      <CenterSection {...scroll6}>
         <h1 className="title bg">{`춤 출 준비 되셨나요?`}</h1>
         <p className="subTitle">{`처음이라도 괜찮아요!`}</p>
         <p className="subTitle">{`숏토리얼은\n혼자서, 자신만의 속도로\n춤을 연습할 수 있어요.`}</p>
@@ -84,6 +95,10 @@ const LandingPage = () => {
     </Container>
   );
 };
+
+const CTAButtonContainer = styled.div`
+  z-index: 10;
+`;
 
 const CTAButtonStyled = {
   width: "auto",
@@ -131,7 +146,7 @@ const Section = styled.section`
   }
 
   @media screen and (min-width: 1024px) {
-    width: 900px;
+    width: 750px;
     padding-top: 150px;
     padding-bottom: 100px;
   }
