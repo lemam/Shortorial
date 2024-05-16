@@ -2,7 +2,6 @@ import { axios } from "../utils/axios";
 
 const REST_SHORTS_URL = "/api/s3";
 const REST_SHORTS_LIST_URL = "/api/shorts";
-const REST_MYPAGE_URL = "/api/mypage";
 
 export interface shorts {
   shortsNo: number;
@@ -93,23 +92,6 @@ export async function getTryCount(shortsNo: number) {
   }
 }
 
-//사용자가 시도한 쇼츠 조회
-export async function getTryShorts() {
-  try {
-    const token = "Bearer " + localStorage.getItem("accessToken");
-
-    const data = await axios.get(`${REST_MYPAGE_URL}/try-shorts`, {
-      headers: {
-        Authorization: token,
-      },
-    });
-
-    return data.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-}
-
 // S3에 있는 파일을 Blob으로 받기
 export async function getS3Blob(fileName: string) {
   try {
@@ -153,7 +135,7 @@ export async function getMyS3Blob(uploadNo: number) {
   }
 }
 
-// 이름 업데이트
+// 동영상 파일 이름 업데이트
 export async function updateTitle(updatingShorts: Map<string, string>, uploadNo: number) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
@@ -167,6 +149,35 @@ export async function updateTitle(updatingShorts: Map<string, string>, uploadNo:
     });
 
     return data.data;
+  } catch (error) {
+    console.error("Error Renaming data:", error);
+  }
+}
+
+// 동영상 파일 이름 중복검사
+export async function checkTitle(title: String) {
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+
+    const data = {
+      title: title,
+    };
+
+    const response = await axios.post(`${REST_SHORTS_URL}/try-shorts`, data, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    if (response.status === 200) {
+      // 요청이 성공적으로 처리됨, 이름으로 써도 됨.
+      console.log("Name is available.");
+      return true;
+    } else if (response.status === 400) {
+      // 클라이언트의 요청이 잘못됨, 이름으로 쓸 수 없음.
+      console.log("Name already exists. Please choose another one.");
+      return false;
+    }
   } catch (error) {
     console.error("Error Renaming data:", error);
   }
