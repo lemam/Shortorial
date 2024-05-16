@@ -5,7 +5,14 @@ import { UploadShorts, updateTitle } from "../../apis/shorts";
 import { getMyS3Blob } from "../../apis/shorts";
 
 const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) => {
-  const [title, setTitle] = useState<string>(uploadShorts.uploadTitle);
+  // 제목에서 '/' 이후의 부분을 추출하는 함수
+  const extractTitle = (fullTitle: string): string => {
+    const titleParts = fullTitle.split("/");
+    console.log(titleParts); // 확인용 로그
+    return titleParts.length > 0 ? titleParts[1] : fullTitle;
+  };
+
+  const [title, setTitle] = useState<string>(extractTitle(uploadShorts.uploadTitle));
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
 
@@ -16,12 +23,6 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
-  };
-
-  // 제목에서 '/' 이후의 부분을 추출하는 함수
-  const extractTitle = (fullTitle: string): string => {
-    const titleParts = fullTitle.split("/");
-    return titleParts.length > 1 ? titleParts[1] : fullTitle;
   };
 
   const saveTitle = async () => {
@@ -77,7 +78,7 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
       </VideoContainer>
       {!modify && (
         <TitleContainer>
-          <Title>{uploadShorts.uploadTitle}</Title>
+          <Title>{title}</Title>
           <ModifyIcon onClick={titleCanbeModified}></ModifyIcon>
         </TitleContainer>
       )}
