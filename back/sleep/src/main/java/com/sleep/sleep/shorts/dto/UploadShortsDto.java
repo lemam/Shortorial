@@ -14,6 +14,7 @@ public class UploadShortsDto {
     private String uploadUrl;
     private String uploadTitle;
     private String uploadDate;
+    private String youtubeUrl;
 
     public UploadShortsDto( String uploadUrl, String uploadTitle) {
         this.uploadUrl = uploadUrl;

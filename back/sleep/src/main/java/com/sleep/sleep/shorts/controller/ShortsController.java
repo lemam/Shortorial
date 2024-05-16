@@ -2,6 +2,9 @@ package com.sleep.sleep.shorts.controller;
 
 import com.sleep.sleep.common.JWT.JwtTokenUtil;
 import com.sleep.sleep.shorts.dto.ShortsDto;
+import com.sleep.sleep.shorts.dto.UploadShortsDto;
+import com.sleep.sleep.shorts.entity.UploadShorts;
+import com.sleep.sleep.shorts.repository.UploadShortsRepository;
 import com.sleep.sleep.shorts.service.ShortsService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ public class ShortsController {
 
     private final ShortsService shortsService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final UploadShortsRepository uploadShortsRepository;
 
     @Operation(summary = "쇼츠 목록 조회")
     @GetMapping
@@ -76,15 +80,11 @@ public class ShortsController {
     }
 
     @Operation(summary = "DB에 유튜브 url 올리기", description = "헤더에 accessToken 넣기, RequestParam으로 uploadNo,youtubeUrl ")
-    @PutMapping("/youtubeUrl")
-    public ResponseEntity<?> putYoutubeUrl(@RequestHeader("Authorization") String accessToken, @RequestBody Map<String, String> data) {
+    @PutMapping("/youtubeUrl/{uploadNo}/{videoId}")
+    public ResponseEntity<?> putYoutubeUrl(@PathVariable int uploadNo, @PathVariable String videoId) {
         try {
-            int uploadNo = Integer.parseInt(data.get("uploadNo"));
-            String url = data.get("youtubeUrl");
-
-            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
-            System.out.println("username : "+ username);
-
+            System.out.println(uploadNo + " " +videoId);
+            String url = "https://www.youtube.com/watch?v=" + videoId;
             shortsService.putYoutubeUrl(uploadNo,url);
 
             return new ResponseEntity<>("Sucessful save DB!", HttpStatus.OK);
