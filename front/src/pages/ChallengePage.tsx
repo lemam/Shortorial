@@ -339,8 +339,18 @@ const ChallengePage = () => {
   // 비디오 크기 초기화
   const initVideoSize = (videoRef: React.RefObject<HTMLVideoElement>) => {
     if (videoRef.current) {
-      videoRef.current.height = window.innerHeight;
-      videoRef.current.width = Math.floor((videoRef.current.height * 9) / 16);
+      switch (screen.orientation.type) {
+        case "landscape-primary":
+        case "landscape-secondary":
+          videoRef.current.height = window.innerHeight;
+          videoRef.current.width = Math.floor((videoRef.current.height * 9) / 16);
+          console.log(videoRef.current.height, videoRef.current.width);
+          break;
+        case "portrait-primary":
+        case "portrait-secondary":
+          videoRef.current.width = window.innerWidth;
+          videoRef.current.height = Math.floor((videoRef.current.width * 16) / 9);
+      }
     }
   };
 
@@ -530,8 +540,10 @@ const UserVideoContainer = styled.video`
 
 const ChallengeContainer = styled.div`
   display: flex;
-  background-color: black;
   justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: black;
 `;
 
 const blinkEffect = keyframes`
