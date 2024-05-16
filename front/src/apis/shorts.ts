@@ -20,6 +20,7 @@ export interface UploadShorts {
   uploadUrl: string;
   uploadTitle: string;
   uploadDate: string;
+  youtubeUrl: string;
 }
 
 export interface TryShorts {
@@ -156,13 +157,16 @@ export async function updateTitle(updatingShorts: Map<string, string>, uploadNo:
 
 // 유튜브 업로드
 const youtubeUrl = import.meta.env.VITE_YOUTUBE_URL;
-export async function shareShorts(filePath: string) {
-  axios
-    .get(`${youtubeUrl}/authenticate?fileName=${filePath}`) // node 서버로 요청 보냄
-    .then((response) => {
-      window.location.href = response.data.authUrl; // 응답 받은 authUrl로 이동
-    })
-    .catch((error) => console.error("Upload Error:", error));
+export async function shareShorts(filePath: string, uploadNo: number) {
+  try {
+    const response = await axios.get(
+      `${youtubeUrl}/authenticate?filePath=${encodeURIComponent(filePath)}&uploadNo=${uploadNo}`
+    );
+    // 서버에서 응답받은 authUrl로 이동
+    window.location.href = response.data.authUrl;
+  } catch (error) {
+    console.error("Upload Error:", error);
+  }
 }
 
 // 유튜브 업로드용 임시 파일 url

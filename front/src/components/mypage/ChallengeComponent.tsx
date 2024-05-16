@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Check, Create, Delete, Download, IosShare, YouTube } from "@mui/icons-material";
 import {
@@ -79,11 +79,32 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   const shareShortsToYoutube = async () => {
     (() => setShare(true))();
 
-    const filePath = await getFilePath(uploadShorts.uploadNo);
-    await shareShorts(filePath);
-
-    (() => setShare(false))();
+    const filePath = await getFilePath(uploadShorts.uploadNo); // 임시 저장한 파일 경로
+    await shareShorts(filePath, uploadShorts.uploadNo); // 유튜브 업로드 함수에 전달
   };
+
+  // youtube url 있는지 체크
+  useEffect(() => {
+    if (uploadShorts.youtubeUrl) {
+      setLink(uploadShorts.youtubeUrl);
+      setShare(false);
+    }
+  }, [uploadShorts.youtubeUrl]);
+
+  // 쿼리스트링에 auth=true가 있으면 유튜브 인증 완료
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const alertParam = urlParams.get("auth");
+
+    if (alertParam === "true") {
+      alert(
+        "유튜브 권한 설정이 완료되었습니다.\n공유 버튼을 누르면 채널에 비공개 동영상으로 업로드 됩니다."
+      );
+      urlParams.delete("auth"); // alert 파라미터 제거
+      const newUrl = window.location.pathname; // 원래 url + 남은 쿼리스트링
+      window.history.replaceState({}, document.title, newUrl); // 원래 url로 업데이트
+    }
+  }, []);
 
   return (
     <ResultContainer>
@@ -169,9 +190,6 @@ const IosShareIcon = styled(IosShare)`
 `;
 
 const SharingIcon = styled.img`
-  position: absolute;
-  right: 0;
-  top: 1%;
   cursor: pointer;
   width: 40px;
   height: 40px;
