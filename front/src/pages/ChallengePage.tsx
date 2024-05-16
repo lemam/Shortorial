@@ -541,6 +541,7 @@ const ChallengeContainer = styled.div`
 const blinkEffect = keyframes`
   50% {
     opacity: 0;
+  }
 `;
 
 const RecordingComponent = styled.div`
@@ -580,16 +581,20 @@ const Timer = styled.div`
 
 const VideoMotionButtonList = styled.div`
   position: absolute;
-  position: absolute;
-  top: 10%;
+  top: 0;
   right: 0;
   display: flex;
   flex-direction: column;
-  margin: 8px;
+  height: 100%;
+  padding: 18px 8px 0;
 
   .foldList {
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
+    height: auto;
+    min-height: 80%;
+    max-height: 100%;
   }
 
   button {
@@ -601,7 +606,6 @@ const VideoMotionButtonList = styled.div`
     button {
       width: 55px;
       height: 55px;
-      margin-bottom: 36px;
     }
   }
 `;

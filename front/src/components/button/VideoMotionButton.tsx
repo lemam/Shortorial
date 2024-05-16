@@ -86,7 +86,6 @@ const Container = styled.button<{ $progress: number; $isVisible: boolean }>`
   align-items: center;
   background-color: #35353580;
   border-radius: 50%;
-  margin-bottom: 24px;
   visibility: ${(props) => (props.$isVisible ? "visible" : "hidden !important")};
   opacity: ${(props) => (props.$isVisible ? "1" : "0")};
   transition-property: opacity, visibility;
@@ -129,7 +128,7 @@ const Container = styled.button<{ $progress: number; $isVisible: boolean }>`
   @media screen and (min-width: 768px) {
     width: 60px;
     height: 60px;
-    margin-bottom: 50px;
+    /* margin-bottom: 50px; */
 
     .text {
       font-size: 18px;
