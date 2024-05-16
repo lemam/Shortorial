@@ -1,20 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Check, Create, Download } from "@mui/icons-material";
-import { UploadShorts, updateTitle } from "../../apis/shorts";
+import { UploadShorts, checkTitle, updateTitle } from "../../apis/shorts";
 import { getMyS3Blob } from "../../apis/shorts";
+
+interface ContainerProps {
+  isPortrait: boolean;
+}
 
 const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) => {
   // 제목에서 '/' 이후의 부분을 추출하는 함수
   const extractTitle = (fullTitle: string): string => {
     const titleParts = fullTitle.split("/");
-    console.log(titleParts); // 확인용 로그
     return titleParts.length > 0 ? titleParts[1] : fullTitle;
   };
 
   const [title, setTitle] = useState<string>(extractTitle(uploadShorts.uploadTitle));
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
+  const [isPortrait, setIsPortrait] = useState<boolean>(window.innerHeight > window.innerWidth);
 
   const titleCanbeModified = () => setModify(true);
   const titleCanNotbeModified = () => setModify(false);
@@ -26,15 +30,20 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   };
 
   const saveTitle = async () => {
-    setTitle(title);
-    titleCanNotbeModified();
+    const result = await checkTitle(title);
+    if (result) {
+      setTitle(title);
+      titleCanNotbeModified();
 
-    const updatingShorts = new Map<string, string>();
-    updatingShorts.set("oldTitle", uploadShorts.uploadTitle);
-    updatingShorts.set("newTitle", title);
+      const updatingShorts = new Map<string, string>();
+      updatingShorts.set("oldTitle", uploadShorts.uploadTitle);
+      updatingShorts.set("newTitle", title);
 
-    await updateTitle(updatingShorts, uploadShorts.uploadNo);
-    // 업데이트된 타이틀을 반영한 쇼츠를 조회해서 재렌더링 해야함
+      await updateTitle(updatingShorts, uploadShorts.uploadNo);
+      // 업데이트된 타이틀을 반영한 쇼츠를 조회해서 재렌더링 해야함
+    } else {
+      alert("이미 존재하는 타이틀입니다.");
+    }
   };
 
   const downloadVideo = async () => {
@@ -60,9 +69,19 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
     }
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
-    <ResultContainer>
-      <VideoContainer>
+    <ResultContainer isPortrait={isPortrait}>
+      <VideoContainer isPortrait={isPortrait}>
         <Video
           crossOrigin="anonymous"
           src={uploadShorts.uploadUrl}
@@ -97,21 +116,22 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   );
 };
 
-const ResultContainer = styled.div`
+const ResultContainer = styled.div<ContainerProps>`
   display: flex;
   flex-direction: column;
-  width: 360px;
+  width: 100%;
+  // width: ${({ isPortrait }) => (isPortrait ? "100%" : "calc(100% / 2)")};
 `;
 
-const VideoContainer = styled.div`
+const VideoContainer = styled.div<ContainerProps>`
   display: flex;
-  flex-direction: column;
+  flex-direction: ${({ isPortrait }) => (isPortrait ? "column" : "row")};
   position: relative;
 `;
 
 const Video = styled.video`
-  width: 360px;
-  height: 640px;
+  // width: 100%;
+  // height: auto;
   object-fit: cover;
 `;
 
@@ -148,7 +168,7 @@ const ModifyIcon = styled(Create)`
 `;
 
 const InputBox = styled.input`
-  width: 360px;
+  width: 100%;
   border: 0;
   border-radius: 15px;
   outline: none;
