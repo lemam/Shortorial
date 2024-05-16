@@ -26,7 +26,7 @@ import uncomplete from "../assets/challenge/uncomplete.svg";
 const ChallengePage = () => {
   const navigate = useNavigate();
   const params = useParams();
-  const ffmpeg = createFFmpeg({ log: true });
+  const ffmpeg = createFFmpeg({ log: false });
 
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
@@ -48,6 +48,7 @@ const ChallengePage = () => {
   type LearnState = "RECORD" | "READY";
   const [state, setState] = useState<LearnState>("READY");
   // 모션 인식 카운트
+  const { btn, setBtn } = useBtnStore();
   const { visibleCount, timerCount, recordCount, learnCount, resultCount } =
     useMotionDetectionStore();
 
@@ -80,7 +81,7 @@ const ChallengePage = () => {
 
   const goToResult = () => {
     stream?.getTracks().forEach((track) => track.stop());
-    navigate("/challenge/result");
+    navigate("/mypage");
   };
 
   const changeTimer = () => {
@@ -333,8 +334,6 @@ const ChallengePage = () => {
       alert("카메라 접근을 허용해주세요.");
       console.log(error);
     }
-
-    // setInit();
   }, []);
 
   // 비디오 크기 초기화
@@ -347,29 +346,26 @@ const ChallengePage = () => {
 
   // 초기 설정
   useEffect(() => {
-    loadDanceVideo(); // 댄스 비디오 로드
     setInit(); // 카메라 초기화
+    loadDanceVideo(); // 댄스 비디오 로드
     initVideoSize(danceVideoRef);
     initVideoSize(userVideoRef);
 
-    (() => {
-      // 화면 크기가 바뀔 때 영상과 카메라 크기도 재설정
-      window.addEventListener("orientationchange", () => {
-        setTimeout(() => initVideoSize(danceVideoRef), 200);
-      });
-      window.addEventListener("orientationchange", () => {
-        setTimeout(() => initVideoSize(userVideoRef), 200);
-      });
-    })();
+    const handleOrientationChange = () => {
+      setTimeout(() => {
+        initVideoSize(danceVideoRef);
+        initVideoSize(userVideoRef);
+      }, 200);
+    };
+
+    window.addEventListener("orientationchange", handleOrientationChange);
 
     return () => {
-      window.removeEventListener("orientationchange", () => initVideoSize(userVideoRef));
-      window.removeEventListener("orientationchange", () => initVideoSize(danceVideoRef));
+      window.removeEventListener("orientationchange", handleOrientationChange);
     };
   }, []);
 
-  const { btn, setBtn } = useBtnStore();
-
+  // 모션인식 설정
   useEffect(() => {
     switch (btn) {
       case "visible":

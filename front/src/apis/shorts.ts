@@ -2,7 +2,6 @@ import { axios } from "../utils/axios";
 
 const REST_SHORTS_URL = "/api/s3";
 const REST_SHORTS_LIST_URL = "/api/shorts";
-const REST_MYPAGE_URL = "/api/mypage";
 
 export interface shorts {
   shortsNo: number;
@@ -21,6 +20,7 @@ export interface UploadShorts {
   uploadUrl: string;
   uploadTitle: string;
   uploadDate: string;
+  youtubeUrl: string;
 }
 
 export interface TryShorts {
@@ -93,23 +93,6 @@ export async function getTryCount(shortsNo: number) {
   }
 }
 
-//사용자가 시도한 쇼츠 조회
-export async function getTryShorts() {
-  try {
-    const token = "Bearer " + localStorage.getItem("accessToken");
-
-    const data = await axios.get(`${REST_MYPAGE_URL}/try-shorts`, {
-      headers: {
-        Authorization: token,
-      },
-    });
-
-    return data.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-}
-
 // S3에 있는 파일을 Blob으로 받기
 export async function getS3Blob(fileName: string) {
   try {
@@ -169,5 +152,59 @@ export async function updateTitle(updatingShorts: Map<string, string>, uploadNo:
     return data.data;
   } catch (error) {
     console.error("Error Renaming data:", error);
+  }
+}
+
+// 유튜브 업로드
+const youtubeUrl = import.meta.env.VITE_YOUTUBE_URL;
+export async function shareShorts(filePath: string, uploadNo: number) {
+  try {
+    const response = await axios.get(
+      `${youtubeUrl}/authenticate?filePath=${encodeURIComponent(filePath)}&uploadNo=${uploadNo}`
+    );
+    // 서버에서 응답받은 authUrl로 이동
+    window.location.href = response.data.authUrl;
+  } catch (error) {
+    console.error("Upload Error:", error);
+  }
+}
+
+// 유튜브 업로드용 임시 파일 url
+export async function getFilePath(uploadNo: number) {
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+    const data = await axios.post(
+      `${REST_SHORTS_URL}/save/${uploadNo}`,
+      {},
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
+
+    return data.data;
+  } catch (error) {
+    console.log("filePath error:" + error);
+  }
+}
+
+// 저장된 쇼츠 삭제
+export async function deleteShorts(deletingShorts: Map<string, string>) {
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+
+    const deletingShortsObj = Object.fromEntries(deletingShorts);
+
+    const data = await axios.delete(`${REST_SHORTS_URL}/delete`, {
+      headers: {
+        Authorization: token,
+      },
+      data: deletingShortsObj,
+    });
+
+    return data.data;
+  } catch (error) {
+    console.error("Error Deleting data:", error);
   }
 }
