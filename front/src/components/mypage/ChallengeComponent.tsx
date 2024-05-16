@@ -18,6 +18,12 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
     setTitle(event.target.value);
   };
 
+  // 제목에서 '/' 이후의 부분을 추출하는 함수
+  const extractTitle = (fullTitle: string): string => {
+    const titleParts = fullTitle.split("/");
+    return titleParts.length > 1 ? titleParts[1] : fullTitle;
+  };
+
   const saveTitle = async () => {
     setTitle(title);
     titleCanNotbeModified();
@@ -56,8 +62,17 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   return (
     <ResultContainer>
       <VideoContainer>
-        <Video crossOrigin="anonymous" src={uploadShorts.uploadUrl} controls></Video>
-        {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
+        <Video
+          crossOrigin="anonymous"
+          src={uploadShorts.uploadUrl}
+          controls
+        ></Video>
+        {!download && (
+          <DownloadIcon
+            onClick={downloadVideo}
+            fontSize="large"
+          ></DownloadIcon>
+        )}
         {download && <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>}
       </VideoContainer>
       {!modify && (
