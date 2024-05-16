@@ -47,18 +47,40 @@ const LandingPage = () => {
       <Section>
         <div>
           <h1 className="title">{`이제 멀리서 걸어오실 필요 없어요`}</h1>
-          <p className="subTitle">{`춤추다가 걸어와서 버튼 누르고...\n이런 귀찮은 과정은 저희가 도와드릴게요.`}</p>
+          <p className="subTitle">{`춤추다가 걸어와서 버튼 누르고...\n이런 귀찮은 과정은 저희가 해결해드릴게요.`}</p>
         </div>
         <ImageContainer>
           <ServiceImg src={serviceLandscape} alt="" />
           <DeviceImg src={deviceLandscape} alt="" />
         </ImageContainer>
-        <div style={{ margin: "50px 0" }}>
-          <p className="text">
-            {`별다른 기기 부착 없이 카메라로 모션을 인식하여 멀리서도 버튼 조작이 가능해요.`}
-          </p>
-        </div>
+        <p className="text">
+          {`별다른 기기 부착 없이 카메라로 모션을 인식하여 멀리서도 버튼 조작이 가능해요.`}
+        </p>
       </Section>
+      <Section>
+        <h1 className="title">인기 챌린지를 한눈에</h1>
+        <p className="subTitle">지금 유행하는 다양한 댄스 챌린지에 도전해보세요.</p>
+        <p className="text">당신이 좋아할만한 챌린지도 추천해드릴게요.</p>
+      </Section>
+      <Section>
+        <h1 className="title">촬영에서 업로드까지</h1>
+        <p className="subTitle">{`연습한 그 자리에서 바로 촬영하고\nSNS에 공유해보세요.`}</p>
+        <ImageContainer>
+          <ServiceImg src={serviceLandscape} alt="" />
+          <DeviceImg src={deviceLandscape} alt="" />
+        </ImageContainer>
+      </Section>
+      <CenterSection>
+        <h1 className="title bg">{`춤 출 준비 되셨나요?`}</h1>
+        <p className="subTitle">{`처음이라도 괜찮아요!`}</p>
+        <p className="subTitle">{`숏토리얼은\n혼자서, 자신만의 속도로\n춤을 연습할 수 있어요.`}</p>
+        <p className="subTitle">{`지금 바로 챌린지에 참여해보세요!`}</p>
+        <BasicButton
+          text="지금 시작하기"
+          style={CTAButtonStyled}
+          onClick={() => navigate("/main")}
+        />
+      </CenterSection>
     </Container>
   );
 };
@@ -101,6 +123,14 @@ const Section = styled.section`
   padding-top: 100px;
   padding-bottom: 50px;
   box-sizing: border-box;
+`;
+
+const CenterSection = styled(Section)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 `;
 
 const HeroTextContainer = styled.div`
@@ -151,14 +181,21 @@ const Container = styled.div`
     margin-bottom: 1rem;
   }
 
+  .bg {
+    color: #fff;
+    background-color: #000;
+    padding: 6px 8px;
+  }
+
   .subTitle {
     font-size: 20px;
     line-height: 1.4;
   }
 
   .text {
-    font-size: 18px;
+    margin: 50px 0 0;
     color: #333d4b;
+    font-size: 18px;
     line-height: 1.4;
   }
 `;
