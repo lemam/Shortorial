@@ -8,6 +8,7 @@ import deviceLandscape from "/src/assets/landing/device_landscape.png";
 import serviceLandscape from "/src/assets/landing/service_landscape.png";
 import Header from "../components/header/Header";
 import useLoginStore from "../store/useLoginStore";
+import BasicButton from "../components/button/BasicButton";
 
 const LandingPage = () => {
   const isLogin = useLoginStore((state) => state.getIsLogin());
@@ -27,6 +28,11 @@ const LandingPage = () => {
           <h1 className="title">{`SHORTORIAL에서\n쉽고 빠르게\n챌린지에 도전하세요`}</h1>
           <h2 className="subTitle">모션 인식 기반 댄스 챌린지 연습 서비스</h2>
         </HeroTextContainer>
+        <BasicButton
+          text="지금 시작하기"
+          style={CTAButtonStyled}
+          onClick={() => navigate("/main")}
+        />
       </HeroContainer>
       <Section>
         <h1 className="title">{`숏토리얼과 함께라면 여기가 나만의 연습실`}</h1>
@@ -48,13 +54,22 @@ const LandingPage = () => {
           <DeviceImg src={deviceLandscape} alt="" />
         </ImageContainer>
         <div style={{ margin: "50px 0" }}>
-          <p className="subTitle">
+          <p className="text">
             {`별다른 기기 부착 없이 카메라로 모션을 인식하여 멀리서도 버튼 조작이 가능해요.`}
           </p>
         </div>
       </Section>
     </Container>
   );
+};
+
+const CTAButtonStyled = {
+  width: "auto",
+  height: "auto",
+  marginTop: "20px",
+  padding: "11px 16px",
+  fontSize: "17px",
+  zIndex: "10",
 };
 
 const DeviceImg = styled.img`
@@ -90,6 +105,7 @@ const Section = styled.section`
 
 const HeroTextContainer = styled.div`
   position: relative;
+  z-index: 10;
 
   & > * {
     text-align: center;
@@ -108,12 +124,13 @@ const HeroImg = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: -1;
+  z-index: 10;
 `;
 
 const HeroContainer = styled.div`
   position: relative;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -126,7 +143,6 @@ const Container = styled.div`
   word-break: keep-all;
   white-space: pre-wrap;
   background-color: #f9f9f9;
-  z-index: -2;
 
   .title {
     font-size: 30px;
@@ -137,6 +153,12 @@ const Container = styled.div`
 
   .subTitle {
     font-size: 20px;
+    line-height: 1.4;
+  }
+
+  .text {
+    font-size: 18px;
+    color: #333d4b;
     line-height: 1.4;
   }
 `;

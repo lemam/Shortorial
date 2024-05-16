@@ -1,5 +1,5 @@
 import { MouseEvent } from "react";
-import styled from "styled-components";
+import styled, { CSSProperties } from "styled-components";
 
 interface ButtonType {
   text: string;
@@ -7,13 +7,14 @@ interface ButtonType {
   size?: string;
   disabled?: boolean;
   onClick?: (event: MouseEvent) => void;
+  style?: CSSProperties;
 }
 
 interface ButtonStyleType {
   [key: string]: string;
 }
 
-const BasicButton = ({ text, color = "basic", onClick }: ButtonType) => {
+const BasicButton = ({ text, color = "basic", onClick, style }: ButtonType) => {
   // 크기에 따른 버튼 css 설정 객체
   // const buttonSizes: ButtonStyleType = {
   //   md: "px-5 py-2",
@@ -31,7 +32,12 @@ const BasicButton = ({ text, color = "basic", onClick }: ButtonType) => {
   };
 
   return (
-    <Button color={buttonColors[color]} $hoverColor={hoverButtonColors[color]} onClick={onClick}>
+    <Button
+      color={buttonColors[color]}
+      $hoverColor={hoverButtonColors[color]}
+      onClick={onClick}
+      style={style}
+    >
       {text}
     </Button>
   );
