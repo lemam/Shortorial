@@ -123,6 +123,18 @@ const Section = styled.section`
   padding-top: 100px;
   padding-bottom: 50px;
   box-sizing: border-box;
+
+  @media screen and (min-width: 600px) {
+    width: 550px;
+    padding-top: 120px;
+    padding-bottom: 80px;
+  }
+
+  @media screen and (min-width: 1024px) {
+    width: 900px;
+    padding-top: 150px;
+    padding-bottom: 100px;
+  }
 `;
 
 const CenterSection = styled(Section)`
