@@ -4,16 +4,25 @@ import { axios } from "../utils/axios";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import { getTryCount } from "../apis/shorts";
 
 const ShortsDetailPage = () => {
   const navigate = useNavigate();
 
   const goToLearnMode = () => {
-    navigate(`/learn/${params.shortsNo}`);
+    const shortsNo = parseInt(params.shortsNo || "", 10);
+    if (!isNaN(shortsNo)) {
+      getTryCount(shortsNo);
+      navigate(`/learn/${shortsNo}`);
+    }
   };
 
   const goToChallengeMode = () => {
-    navigate(`/challenge/${params.shortsNo}`);
+    const shortsNo = parseInt(params.shortsNo || "", 10);
+    if (!isNaN(shortsNo)) {
+      getTryCount(shortsNo);
+      navigate(`/challenge/${shortsNo}`);
+    }
   };
 
   const params = useParams();
@@ -36,7 +45,13 @@ const ShortsDetailPage = () => {
       <Header>Let's DANCE</Header>
       <ShortsDetailContainer>
         <VideoBox>
-          <video src={shortsInfo?.shortsLink} crossOrigin="anonymous" autoPlay loop controls />
+          <video
+            src={shortsInfo?.shortsLink}
+            crossOrigin="anonymous"
+            autoPlay
+            loop
+            controls
+          />
         </VideoBox>
         <DetailItem>
           <Label>제목</Label>
@@ -55,10 +70,16 @@ const ShortsDetailPage = () => {
           <Value>{shortsInfo?.shortsChallengers}</Value>
         </DetailItem>
         <ButtonList>
-          <Button variant="secondary" onClick={goToLearnMode}>
+          <Button
+            variant="secondary"
+            onClick={goToLearnMode}
+          >
             연습 모드
           </Button>
-          <Button variant="primary" onClick={goToChallengeMode}>
+          <Button
+            variant="primary"
+            onClick={goToChallengeMode}
+          >
             챌린지 모드
           </Button>
         </ButtonList>
