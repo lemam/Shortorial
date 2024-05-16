@@ -26,7 +26,7 @@ import uncomplete from "../assets/challenge/uncomplete.svg";
 const ChallengePage = () => {
   const navigate = useNavigate();
   const params = useParams();
-  const ffmpeg = createFFmpeg({ log: false });
+  const ffmpeg = createFFmpeg({ log: true });
 
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
