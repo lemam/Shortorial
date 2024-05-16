@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import heroImg from "/src/assets/landing/hero.jpg";
-import device from "/src/assets/landing/device.png";
-import service from "/src/assets/landing/service.png";
+// import device from "/src/assets/landing/device3.png";
+import deviceLandscape from "/src/assets/landing/device_landscape.png";
+// import service from "/src/assets/landing/service.png";
+import serviceLandscape from "/src/assets/landing/service_landscape.png";
 import Header from "../components/header/Header";
 import useLoginStore from "../store/useLoginStore";
 
@@ -31,121 +33,58 @@ const LandingPage = () => {
         <p className="subTitle">
           {`웹캠 또는 스마트폰 카메라 하나로\n언제 어디서나 챌린지를 연습해보세요.`}
         </p>
-        <div style={{ position: "relative" }}>
-          <div
-            style={{
-              position: "absolute",
-              top: "-80px",
-              left: "50%",
-              transform: "translateX(-50%) rotate(270deg)",
-              width: "80%",
-            }}
-          >
-            <img
-              src={service}
-              alt=""
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%,-50%)",
-                width: "57%",
-                height: "auto",
-              }}
-            />
-            <img
-              src={device}
-              alt=""
-              style={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-              }}
-            />
-          </div>
-        </div>
+        <ImageContainer>
+          <ServiceImg src={serviceLandscape} alt="" />
+          <DeviceImg src={deviceLandscape} alt="" />
+        </ImageContainer>
       </Section>
       <Section>
         <div>
           <h1 className="title">{`이제 멀리서 걸어오실 필요 없어요`}</h1>
-          <p className="subTitle">{`춤추다가 걸어와서 버튼 누르고...\n이런 경험 없으신가요?`}</p>
-          <p className="subTitle">{`이런 귀찮은 과정은\n저희가 도와드릴게요.`}</p>
+          <p className="subTitle">{`춤추다가 걸어와서 버튼 누르고...\n이런 귀찮은 과정은 저희가 도와드릴게요.`}</p>
+        </div>
+        <ImageContainer>
+          <ServiceImg src={serviceLandscape} alt="" />
+          <DeviceImg src={deviceLandscape} alt="" />
+        </ImageContainer>
+        <div style={{ margin: "50px 0" }}>
           <p className="subTitle">
             {`별다른 기기 부착 없이 카메라로 모션을 인식하여 멀리서도 버튼 조작이 가능해요.`}
           </p>
-        </div>
-        <div
-          style={{
-            position: "relative",
-            // TODO: 가로 핸드폰 이미지를 만들어야 함. 돌리면 세로 여백이 너무 김. 근데 이거 아이폰인데 괜찮나
-            // 이러면 아래 absolute를 할 필요 없지 않나...
-            // display: flex;
-            // align-items: center;
-            // justify-content: center;
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "-80px",
-              left: "50%",
-              transform: "translateX(-50%) rotate(270deg)",
-              width: "80%",
-            }}
-          >
-            <img
-              src={service}
-              alt=""
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%,-50%)",
-                width: "57%",
-                height: "auto",
-              }}
-            />
-            <img
-              src={device}
-              alt=""
-              style={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-              }}
-            />
-          </div>
         </div>
       </Section>
     </Container>
   );
 };
 
-// const ImgContainer = styled.div`
-//   /* position: relative;
-//   width: 600px;
-//   height: 936px; */
+const DeviceImg = styled.img`
+  width: 100%;
+  height: 100%;
+`;
 
-//   /* position: absolute;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   height: auto; */
+const ServiceImg = styled.img`
+  position: absolute;
+  top: 53%;
+  left: 50%;
+  width: 90%;
+  border-radius: 1rem;
+  box-shadow: 12px 12px 15px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+`;
 
-//   position: absolute;
-//   top: 50%;
-//   left: 50%;
-//   width: 220px;
-//   height: auto;
-//   transform: translateX(-50%) rotate(270deg);
-// `;
+const ImageContainer = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const Section = styled.section`
   position: relative;
   width: 300px;
   margin: 0 auto;
-  padding-top: 70px;
-  padding-bottom: 230px;
+  padding-top: 100px;
+  padding-bottom: 50px;
   box-sizing: border-box;
 `;
 
@@ -173,6 +112,7 @@ const HeroImg = styled.img`
 `;
 
 const HeroContainer = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -183,9 +123,10 @@ const HeroContainer = styled.div`
 const Container = styled.div`
   position: relative;
   width: 100%;
-  height: 100%;
   word-break: keep-all;
   white-space: pre-wrap;
+  background-color: #f9f9f9;
+  z-index: -2;
 
   .title {
     font-size: 30px;
@@ -195,7 +136,7 @@ const Container = styled.div`
   }
 
   .subTitle {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1.4;
   }
 `;
