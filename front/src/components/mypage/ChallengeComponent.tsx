@@ -43,6 +43,8 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
       // 업데이트된 타이틀을 반영한 쇼츠를 조회해서 재렌더링 해야함
     } else {
       alert("이미 존재하는 타이틀입니다.");
+      setModify(false);
+      setTitle(extractTitle(uploadShorts.uploadTitle));
     }
   };
 
