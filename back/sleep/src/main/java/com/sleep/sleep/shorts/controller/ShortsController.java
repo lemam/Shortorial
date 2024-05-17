@@ -37,8 +37,8 @@ public class ShortsController {
         return ResponseEntity.ok(shortsService.getShortsInfo(shortsNo));
     }
 
-    @Operation(summary = "동영상 파일 이름 중복검사", description = "헤더에 accessToken 넣기, RequestParam으로 title 받기. true면 이미 있는 이름; false면 사용 가능한 이름 ")
-    @GetMapping("/checkName")
+    @Operation(summary = "동영상 파일 이름 중복검사", description = "헤더에 accessToken 넣기, RequestBody으로 title 받기. true면 이미 있는 이름; false면 사용 가능한 이름 ")
+    @PostMapping("/checkName")
     public ResponseEntity<?> checkName(@RequestHeader("Authorization") String accessToken, @RequestBody Map<String, String> data) {
         try {
             String title = data.get("title");
@@ -48,8 +48,7 @@ public class ShortsController {
 
             Boolean possible = shortsService.isNameExists(username+"/"+title);
 
-            if (possible) {
-                log.info("사용 가능 여부 : "+ possible);
+            if (!possible) {
                 return new ResponseEntity<>("Name is available.", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Name already exists. Please choose another one.", HttpStatus.BAD_REQUEST);
