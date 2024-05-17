@@ -46,13 +46,10 @@ public class ShortsController {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
             System.out.println("username : "+ username);
 
-            Boolean possible = shortsService.isNameExists(username+"/"+title);
+            Boolean possible = shortsService.isNameExists(username + "/" + title);
 
-            if (!possible) {
-                return new ResponseEntity<>("Name is available.", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Name already exists. Please choose another one.", HttpStatus.BAD_REQUEST);
-            }
+            // 이름이 존재하면 true, 존재하지 않으면 false를 반환
+            return new ResponseEntity<>(possible, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
