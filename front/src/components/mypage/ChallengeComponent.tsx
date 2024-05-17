@@ -48,8 +48,9 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   };
 
   const saveTitle = async () => {
+    // 이름이 존재하면 true, 존재하지 않으면 false를 반환
     const result = await checkTitle(title);
-    if (result) {
+    if (!result) {
       setTitle(title);
       titleCanNotbeModified();
 
