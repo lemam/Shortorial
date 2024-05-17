@@ -127,11 +127,6 @@ public class S3Controller {
             String oldTitle = data.get("oldTitle");
             String newTitle = data.get("newTitle");
 
-
-            // oldTitle과 newTitle 사용
-            //System.out.println("Old Title: " + oldTitle);
-            //System.out.println("New Title: " + newTitle);
-
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
 
             //s3와 db 업데이트하는 것
