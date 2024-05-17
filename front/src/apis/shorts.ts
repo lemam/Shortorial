@@ -164,21 +164,13 @@ export async function checkTitle(title: String) {
       title: title,
     };
 
-    const response = await axios.post(`${REST_SHORTS_URL}/try-shorts`, data, {
+    const response = await axios.post(`${REST_SHORTS_LIST_URL}/checkName`, data, {
       headers: {
         Authorization: token,
       },
     });
-
-    if (response.status === 200) {
-      // 요청이 성공적으로 처리됨, 이름으로 써도 됨.
-      console.log("Name is available.");
-      return true;
-    } else if (response.status === 400) {
-      // 클라이언트의 요청이 잘못됨, 이름으로 쓸 수 없음.
-      console.log("Name already exists. Please choose another one.");
-      return false;
-    }
+    // 이름이 존재하면 true, 존재하지 않으면 false를 반환
+    return response.data;
   } catch (error) {
     console.error("Error Renaming data:", error);
   }
