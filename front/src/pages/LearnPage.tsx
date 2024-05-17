@@ -435,7 +435,7 @@ const LearnPage = () => {
                     id="challenge"
                     icon={<Videocam />}
                     toolTip="챌린지 모드로 이동"
-                    link="/challenge"
+                    link={`/challenge/${params.shortsNo}`}
                     progress={challengeCount}
                     isVisible={state === "PAUSE"}
                   />
@@ -545,17 +545,22 @@ const Timer = styled.div`
 
 const VideoMotionButtonList = styled.div`
   position: absolute;
-  top: 50%;
+  top: 0;
   right: 0;
-  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  margin: 8px;
+  height: 100%;
+  padding: 18px 8px 0;
+  box-sizing: border-box;
 `;
 
 const FoldList = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
+  height: auto;
+  min-height: 80%;
+  max-height: 100%;
 `;
 
 const LoadingText = styled.div`

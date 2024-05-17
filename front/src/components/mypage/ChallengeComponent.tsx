@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Check, Create, Download } from "@mui/icons-material";
-import { UploadShorts, checkTitle, updateTitle } from "../../apis/shorts";
-import { getMyS3Blob } from "../../apis/shorts";
+import { Check, Create, Delete, Download, IosShare, YouTube } from "@mui/icons-material";
+import {
+  UploadShorts,
+  updateTitle,
+  getMyS3Blob,
+  shareShorts,
+  getFilePath,
+  deleteShorts,
+  checkTitle,
+} from "../../apis/shorts";
 
 interface ContainerProps {
   isPortrait: boolean;
@@ -19,6 +26,8 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
   const [isPortrait, setIsPortrait] = useState<boolean>(window.innerHeight > window.innerWidth);
+  const [share, setShare] = useState<boolean>(false);
+  const [link, setLink] = useState<string | null>(null);
 
   const titleCanbeModified = () => setModify(true);
   const titleCanNotbeModified = () => setModify(false);
@@ -27,6 +36,15 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
+  };
+
+  const deleteUploadedShorts = async () => {
+    const deletingShorts = new Map<string, string>();
+    deletingShorts.set("uploadNo", String(uploadShorts.uploadNo));
+    deletingShorts.set("title", uploadShorts.uploadTitle);
+
+    await deleteShorts(deletingShorts);
+    // 재렌더링 필요
   };
 
   const saveTitle = async () => {
@@ -81,6 +99,36 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
     };
   }, []);
 
+  const shareShortsToYoutube = async () => {
+    (() => setShare(true))();
+
+    const filePath = await getFilePath(uploadShorts.uploadNo); // 임시 저장한 파일 경로
+    await shareShorts(filePath, uploadShorts.uploadNo); // 유튜브 업로드 함수에 전달
+  };
+
+  // youtube url 있는지 체크
+  useEffect(() => {
+    if (uploadShorts.youtubeUrl) {
+      setLink(uploadShorts.youtubeUrl);
+      setShare(false);
+    }
+  }, [uploadShorts.youtubeUrl]);
+
+  // 쿼리스트링에 auth=true가 있으면 유튜브 인증 완료
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const alertParam = urlParams.get("auth");
+
+    if (alertParam === "true") {
+      alert(
+        "유튜브 권한 설정이 완료되었습니다.\n공유 버튼을 누르면 채널에 비공개 동영상으로 업로드 됩니다."
+      );
+      urlParams.delete("auth"); // alert 파라미터 제거
+      const newUrl = window.location.pathname; // 원래 url + 남은 쿼리스트링
+      window.history.replaceState({}, document.title, newUrl); // 원래 url로 업데이트
+    }
+  }, []);
+
   return (
     <ResultContainer isPortrait={isPortrait}>
       <VideoContainer isPortrait={isPortrait}>
@@ -89,13 +137,34 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
           src={uploadShorts.uploadUrl}
           controls
         ></Video>
-        {!download && (
-          <DownloadIcon
-            onClick={downloadVideo}
+        <MyVideoControlComponent>
+          {!download && (
+            <DownloadIcon
+              onClick={downloadVideo}
+              fontSize="large"
+            ></DownloadIcon>
+          )}
+          {download && (
+            <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>
+          )}
+          {!share && !link && (
+            <IosShareIcon
+              onClick={shareShortsToYoutube}
+              fontSize="large"
+            ></IosShareIcon>
+          )}
+          {!share && link && (
+            <YoutubeIcon
+              fontSize="large"
+              onClick={() => (window.location.href = link)}
+            ></YoutubeIcon>
+          )}
+          {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>}
+          <DeleteIcon
             fontSize="large"
-          ></DownloadIcon>
-        )}
-        {download && <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>}
+            onClick={deleteUploadedShorts}
+          ></DeleteIcon>
+        </MyVideoControlComponent>
       </VideoContainer>
       {!modify && (
         <TitleContainer>
@@ -137,20 +206,39 @@ const Video = styled.video`
   object-fit: cover;
 `;
 
-const DownloadIcon = styled(Download)`
+const MyVideoControlComponent = styled.div`
   position: absolute;
   right: 0;
-  top: 0;
+  display: flex;
+  flex-direction: column;
+`;
+
+const DownloadIcon = styled(Download)`
   cursor: pointer;
 `;
 
 const DownloadingIcon = styled.img`
-  position: absolute;
-  right: 0;
-  top: 0;
   cursor: pointer;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
+`;
+
+const IosShareIcon = styled(IosShare)`
+  cursor: pointer;
+`;
+
+const SharingIcon = styled.img`
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+`;
+
+const YoutubeIcon = styled(YouTube)`
+  cursor: pointer;
+`;
+
+const DeleteIcon = styled(Delete)`
+  cursor: pointer;
 `;
 
 const TitleContainer = styled.div`

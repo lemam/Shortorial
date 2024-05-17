@@ -91,6 +91,7 @@ public class ShortsServiceImpl implements ShortsService{
             UploadShortsDto.setUploadUrl(value.getUploadUrl());
             UploadShortsDto.setUploadTitle(value.getUploadTitle());
             UploadShortsDto.setUploadDate(value.getUploadDate().toString());
+            UploadShortsDto.setYoutubeUrl(value.getYoutubeUrl());
 
             uploadShorts.add(UploadShortsDto);
         }
