@@ -327,7 +327,7 @@ const LearnPage = () => {
         else pauseVideo();
         break;
       case "challenge":
-        if (state === "PAUSE") navigate("/challenge");
+        if (state === "PAUSE") navigate(`/challenge/${params.shortsNo}`);
         break;
       case "repeat":
         if (state === "PAUSE") toggleLooping();
