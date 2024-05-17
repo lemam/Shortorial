@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import TryComponent from "./TryComponent";
 import { shorts } from "../../apis/shorts";
 import { getTryShorts } from "../../apis/mypage";
 import styled from "styled-components";
