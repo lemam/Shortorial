@@ -47,6 +47,10 @@ const Header = ({ style }: HeaderProps) => {
 
 const LogoContainer = styled(Link)`
   height: 40px;
+
+  @media screen and (max-width: 479px) {
+    height: 26px;
+  }
 `;
 
 const LogoImg = styled.img`

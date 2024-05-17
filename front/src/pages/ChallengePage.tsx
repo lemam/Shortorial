@@ -26,7 +26,7 @@ import uncomplete from "../assets/challenge/uncomplete.svg";
 const ChallengePage = () => {
   const navigate = useNavigate();
   const params = useParams();
-  const ffmpeg = createFFmpeg({ log: true });
+  const ffmpeg = createFFmpeg({ log: false });
 
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const danceVideoRef = useRef<HTMLVideoElement>(null);
@@ -48,6 +48,7 @@ const ChallengePage = () => {
   type LearnState = "RECORD" | "READY";
   const [state, setState] = useState<LearnState>("READY");
   // 모션 인식 카운트
+  const { btn, setBtn } = useBtnStore();
   const { visibleCount, timerCount, recordCount, learnCount, resultCount } =
     useMotionDetectionStore();
 
@@ -80,7 +81,7 @@ const ChallengePage = () => {
 
   const goToResult = () => {
     stream?.getTracks().forEach((track) => track.stop());
-    navigate("/challenge/result");
+    navigate("/mypage");
   };
 
   const changeTimer = () => {
@@ -333,43 +334,48 @@ const ChallengePage = () => {
       alert("카메라 접근을 허용해주세요.");
       console.log(error);
     }
-
-    // setInit();
   }, []);
 
   // 비디오 크기 초기화
   const initVideoSize = (videoRef: React.RefObject<HTMLVideoElement>) => {
     if (videoRef.current) {
-      videoRef.current.height = window.innerHeight;
-      videoRef.current.width = Math.floor((videoRef.current.height * 9) / 16);
+      switch (screen.orientation.type) {
+        case "landscape-primary":
+        case "landscape-secondary":
+          videoRef.current.height = window.innerHeight;
+          videoRef.current.width = Math.floor((videoRef.current.height * 9) / 16);
+          console.log(videoRef.current.height, videoRef.current.width);
+          break;
+        case "portrait-primary":
+        case "portrait-secondary":
+          videoRef.current.width = window.innerWidth;
+          videoRef.current.height = Math.floor((videoRef.current.width * 16) / 9);
+      }
     }
   };
 
   // 초기 설정
   useEffect(() => {
-    loadDanceVideo(); // 댄스 비디오 로드
     setInit(); // 카메라 초기화
+    loadDanceVideo(); // 댄스 비디오 로드
     initVideoSize(danceVideoRef);
     initVideoSize(userVideoRef);
 
-    (() => {
-      // 화면 크기가 바뀔 때 영상과 카메라 크기도 재설정
-      window.addEventListener("orientationchange", () => {
-        setTimeout(() => initVideoSize(danceVideoRef), 200);
-      });
-      window.addEventListener("orientationchange", () => {
-        setTimeout(() => initVideoSize(userVideoRef), 200);
-      });
-    })();
+    const handleOrientationChange = () => {
+      setTimeout(() => {
+        initVideoSize(danceVideoRef);
+        initVideoSize(userVideoRef);
+      }, 200);
+    };
+
+    window.addEventListener("orientationchange", handleOrientationChange);
 
     return () => {
-      window.removeEventListener("orientationchange", () => initVideoSize(userVideoRef));
-      window.removeEventListener("orientationchange", () => initVideoSize(danceVideoRef));
+      window.removeEventListener("orientationchange", handleOrientationChange);
     };
   }, []);
 
-  const { btn, setBtn } = useBtnStore();
-
+  // 모션인식 설정
   useEffect(() => {
     switch (btn) {
       case "visible":
@@ -534,13 +540,16 @@ const UserVideoContainer = styled.video`
 
 const ChallengeContainer = styled.div`
   display: flex;
-  background-color: black;
   justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: black;
 `;
 
 const blinkEffect = keyframes`
   50% {
     opacity: 0;
+  }
 `;
 
 const RecordingComponent = styled.div`
@@ -580,16 +589,20 @@ const Timer = styled.div`
 
 const VideoMotionButtonList = styled.div`
   position: absolute;
-  position: absolute;
-  top: 10%;
+  top: 0;
   right: 0;
   display: flex;
   flex-direction: column;
-  margin: 8px;
+  height: 100%;
+  padding: 18px 8px 0;
 
   .foldList {
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
+    height: auto;
+    min-height: 80%;
+    max-height: 100%;
   }
 
   button {
@@ -601,7 +614,6 @@ const VideoMotionButtonList = styled.div`
     button {
       width: 55px;
       height: 55px;
-      margin-bottom: 36px;
     }
   }
 `;
