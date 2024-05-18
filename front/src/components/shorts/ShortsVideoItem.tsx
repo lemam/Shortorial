@@ -21,6 +21,7 @@ const ShortsVideoItem = ({ shortsInfo, isLoading }: ShortsVideoPrpos) => {
           <VideoContainer to={`/shorts/${shortsInfo.shortsNo}`}>
             <VideoBox>
               <Video src={shortsInfo.shortsLink} crossOrigin="anonymous" />
+              <Gradient className="gradient" />
               <PlayButton>
                 <PlayArrow sx={{ color: "white" }} />
               </PlayButton>
@@ -35,6 +36,17 @@ const ShortsVideoItem = ({ shortsInfo, isLoading }: ShortsVideoPrpos) => {
     </>
   );
 };
+
+const Gradient = styled.div`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+  background: rgb(0, 0, 0);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.25));
+  opacity: 0;
+  transition: opacity 0.2s;
+`;
 
 const PlayButton = styled.button`
   position: absolute;
@@ -55,6 +67,10 @@ const VideoBox = styled.div`
 
   &:hover button {
     background-color: #fb2576;
+  }
+
+  &:hover .gradient {
+    opacity: 1;
   }
 `;
 
