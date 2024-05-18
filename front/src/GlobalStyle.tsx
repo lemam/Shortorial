@@ -12,6 +12,13 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  :root {
+    --grid-item-max-width: 500px;
+    --grid-item-min-width: 310px;
+    --grid-items-per-row: 2;
+    --grid-item-margin: 12px;
+  }
+
   body {
   font-family: "Noto Sans KR", sans-serif;
 }

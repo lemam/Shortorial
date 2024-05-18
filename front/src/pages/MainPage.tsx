@@ -1,95 +1,66 @@
 import { useEffect, useState } from "react";
-import { Shorts } from "../constants/types";
-import { axios } from "../utils/axios";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { Shorts } from "../constants/types";
+import { getShortsInfo } from "../apis/shorts";
 import Header from "../components/header/Header";
+import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
 
 const MainPage = () => {
-  const navigate = useNavigate();
+  const [shortsInfo, setShortsInfo] = useState<Shorts>();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const goToDetail = (shortNo: number) => {
-    navigate(`/shorts/${shortNo}`);
+  const loadShortsInfo = async () => {
+    const data = await getShortsInfo(1 + "");
+    if (data) {
+      setShortsInfo(data);
+      setIsLoading(false);
+    }
   };
 
-  const [shortsList, setShortsList] = useState<Shorts[]>([]);
-
   useEffect(() => {
-    axios
-      .get<Shorts[]>("/api/shorts")
-      .then((response) => {
-        setShortsList(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+    loadShortsInfo();
   }, []);
 
   return (
     <Container>
       <Header />
-      <GridContainer>
-        {shortsList.map((shorts) => (
-          <VideoItem key={shorts.shortsNo}>
-            <VideoBox onClick={() => goToDetail(shorts.shortsNo)}>
-              <video src={shorts.shortsLink} crossOrigin="anonymous"></video>
-            </VideoBox>
-            <VideoTitle>{shorts.shortsTitle}</VideoTitle>
-          </VideoItem>
-        ))}
-      </GridContainer>
+      <Section>
+        <SectionTitle>둘러보기</SectionTitle>
+        <SectionConents>
+          <ShortsVideoItem shortsInfo={shortsInfo} isLoading={isLoading} />
+          <ShortsVideoItem shortsInfo={shortsInfo} isLoading={isLoading} />
+          <ShortsVideoItem shortsInfo={shortsInfo} isLoading={isLoading} />
+          <ShortsVideoItem shortsInfo={shortsInfo} isLoading={isLoading} />
+          <ShortsVideoItem shortsInfo={shortsInfo} isLoading={isLoading} />
+        </SectionConents>
+      </Section>
     </Container>
   );
 };
 
-export default MainPage;
-
 const Container = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
+
+const Section = styled.section`
+  position: relative;
+  margin: 16px;
+  margin-top: 76px;
   box-sizing: border-box;
 `;
 
-const GridContainer = styled.div`
-  position: relative;
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(2, 1fr);
-
-  @media (orientation: landscape) {
-    grid-template-columns: repeat(4, minmax(162px, 1fr));
-  }
-`;
-
-const VideoItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  // align-items: center;
-  width: 100%; // 비디오 박스의 최대 너비를 고려
-  padding: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const VideoBox = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 286px;
-  border-radius: 8px;
-  overflow: hidden;
-
-  video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-// 쇼츠 제목
-const VideoTitle = styled.div`
+const SectionTitle = styled.h3`
+  font-size: 22px;
   font-weight: bold;
-  white-space: nowrap; /* 줄 바꿈 방지 */
-  overflow: hidden; /* 넘침 숨김 */
-  text-overflow: ellipsis; /* 넘침시 생략 부호(...) 표시 */
+  margin: 1rem 0;
 `;
+
+const SectionConents = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+`;
+
+export default MainPage;
