@@ -7,17 +7,24 @@ import {
   NormalizedLandmark,
 } from "@mediapipe/tasks-vision";
 
-import sampleVideo from "../../assets/sample.mp4";
-
 interface VideoType {
   width: number;
   height: number;
-  getLandmark: (landmarkData: NormalizedLandmark[]) => void;
+  src: string;
+  ref: React.RefObject<HTMLVideoElement>;
+  className: string;
+  getLandmark?: (landmarkData: NormalizedLandmark[]) => void;
 }
 
 const MAX_COUNT: number = 2;
 
-export default function MotionVideo({ width, height, getLandmark }: VideoType) {
+export default function MotionVideo({
+  width,
+  height,
+  src,
+  ref,
+  className,
+}: VideoType) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -132,7 +139,7 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
               );
               canvasCtxTest.restore();
             }
-            getLandmark(landmark);
+            // getLandmark(landmark);
 
             drawingUtils.drawLandmarks(landmark, {
               radius: (data: any) =>
@@ -176,30 +183,14 @@ export default function MotionVideo({ width, height, getLandmark }: VideoType) {
   }, []);
 
   return (
-    <Container>
-      <video
-        id="video"
-        width={width}
-        height={height}
-        style={{ objectFit: "cover" }}
-        ref={videoRef}
-        src={sampleVideo}
-        // autoPlay
-        playsInline
-      ></video>
-      <canvas
-        id="video_canvas"
-        width={width}
-        height={height}
-        style={{ objectFit: "cover" }}
-      ></canvas>
-      <canvas
-        id="test_canvas"
-        width={width}
-        height={height}
-        style={{ objectFit: "cover", background: "grey", display: "none" }}
-      ></canvas>
-    </Container>
+    <video
+      width={width}
+      height={height}
+      src={src}
+      ref={ref}
+      className={className}
+      crossOrigin="anonymous"
+    ></video>
   );
 }
 

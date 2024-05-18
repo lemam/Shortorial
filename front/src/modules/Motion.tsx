@@ -435,11 +435,14 @@ export async function predictWebcam(
       lastWebcamTime = webcam.currentTime;
 
       poseLandmarker.detectForVideo(webcam, startTimeMs, (result) => {
-        // if (!canvasCtx || !drawingUtils || !canvasElement) return null;
-        // canvasCtx.save();
-        // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        if (!canvasCtx || !drawingUtils || !canvasElement) return null;
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
         for (const landmark of result.landmarks) {
+          for (let oneLandmark of landmark) {
+            oneLandmark.x = 1 - oneLandmark.x;
+          }
           // 오른손이 우측 상단에 가면 알려주는 함수
           if (cate == "challenge")
             btn_with_landmark_challenge(landmark[18], setBtn);
@@ -465,16 +468,17 @@ export async function predictWebcam(
             // console.log(cnt);
             before_handmarker = curr_handmarker;
           }
-          // drawingUtils.drawLandmarks(landmark, {
-          //   radius: (data: any) =>
-          //     DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
-          // });
-          // drawingUtils.drawConnectors(
-          //   landmark,
-          //   PoseLandmarker.POSE_CONNECTIONS
-          // );
+
+          drawingUtils.drawLandmarks(landmark, {
+            radius: (data: any) =>
+              DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
+          });
+          drawingUtils.drawConnectors(
+            landmark,
+            PoseLandmarker.POSE_CONNECTIONS
+          );
         }
-        // canvasCtx.restore();
+        canvasCtx.restore();
       });
     }
   }
@@ -493,11 +497,6 @@ export async function predictWebcam(
       setAction
     )
   );
-  // 뒤로 가기 하면 webcam 멈추기
-  // window.addEventListener("popstate", () => {
-  //   webcam.pause();
-
-  // });
   // Call this function again to keep predicting when the browser is ready.
   // if (webcamRunning === true) {
   //   webcam.style.display = "block";
@@ -518,7 +517,7 @@ function makeAbsoluteLandmarkX(relativeX: number): number {
   if (domSize) {
     // console.log(domSize.left + (1 - relativeX) * domSize?.width);
     // console.log("A " + visibleBtnSize?.right);
-    return domSize.left + (1 - relativeX) * domSize?.width;
+    return domSize.left + relativeX * domSize?.width;
   }
   return -1;
 }
