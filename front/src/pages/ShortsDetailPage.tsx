@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Shorts } from "../constants/types";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import { getTryCount, getShortsInfo } from "../apis/shorts";
 import Header from "../components/header/Header";
@@ -18,12 +18,12 @@ const ShortsDetailPage = () => {
     setShortsInfo(shorts);
   };
 
-  const goToLearnMode = () => {
+  const goToLearnMode = (shortsNo: number) => {
     getTryCount(shortsNo);
     navigate(`/learn/${shortsNo}`);
   };
 
-  const goToChallengeMode = () => {
+  const goToChallengeMode = (shortsNo: number) => {
     getTryCount(shortsNo);
     navigate(`/challenge/${shortsNo}`);
   };

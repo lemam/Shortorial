@@ -1,14 +1,42 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Shorts } from "../constants/types";
-import { getShortsList } from "../apis/shorts";
+import { getShortsList, getTryCount } from "../apis/shorts";
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
+import { CancelPresentation, EmojiPeople, MusicNote, TimerOutlined } from "@mui/icons-material";
 
 const MainPage = () => {
+  const navigate = useNavigate();
+  const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [selectedShorts, setSelectedShorts] = useState<Shorts | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [allShortsList, setAllShortsList] = useState<Shorts[]>();
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>();
+
+  const openModal = (shorts: Shorts) => {
+    return () => {
+      setSelectedShorts(shorts);
+      setShowDetails(true);
+    };
+  };
+
+  const closeModal = () => {
+    setShowDetails(false);
+    setSelectedShorts(null);
+  };
+
+  const goToLearnMode = (shortsNo: number) => {
+    getTryCount(shortsNo);
+    navigate(`/learn/${shortsNo}`);
+  };
+
+  const goToChallengeMode = (shortsNo: number) => {
+    getTryCount(shortsNo);
+    navigate(`/challenge/${shortsNo}`);
+  };
 
   // 둘러보기 쇼츠 리스트 가져오기
   const loadAllShortsList = async () => {
@@ -45,7 +73,8 @@ const MainPage = () => {
                 shortsInfo={shorts}
                 isLoading={isLoading}
                 isSerise
-              />
+                onClick={openModal(shorts)}
+              ></ShortsVideoItem>
             ))}
           </SectionConents>
         </Section>
@@ -71,6 +100,35 @@ const MainPage = () => {
           </SectionConents>
         </Section>
       </SectionWrapper>
+      {showDetails && selectedShorts && (
+        <DetailContainer>
+          <CancelIcon>
+            <CancelPresentation onClick={closeModal} />
+          </CancelIcon>
+          <Details>
+            <Detail
+              icon={<MusicNote />}
+              text={selectedShorts.shortsTitle}
+              fontWeight="bold"
+              fontSize="22px"
+            ></Detail>
+            <Detail text={selectedShorts.shortsDirector} fontSize="18px"></Detail>
+            <Detail icon={<TimerOutlined />} text={`${selectedShorts.shortsTime}초`}></Detail>
+            <Detail
+              icon={<EmojiPeople />}
+              text={`${selectedShorts.shortsChallengers}명의 챌린저`}
+            ></Detail>
+          </Details>
+          <ButtonContainer>
+            <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>
+              연습모드
+            </RouteButton>
+            <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>
+              챌린지모드
+            </RouteButton>
+          </ButtonContainer>
+        </DetailContainer>
+      )}
     </Container>
   );
 };
@@ -108,6 +166,65 @@ const SectionConents = styled.div`
 
   &.nowrap {
     flex-wrap: nowrap;
+  }
+`;
+
+const DetailContainer = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1;
+  padding: 10px;
+  width: 50%;
+  height: 50%;
+`;
+
+const CancelIcon = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const Details = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+`;
+
+interface DetailType {
+  text?: string;
+  fontSize?: string;
+  fontWeight?: string;
+  icon?: JSX.Element;
+}
+
+const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
+  return (
+    <div style={{ fontSize: fontSize, fontWeight: fontWeight }}>
+      {icon} {text}
+    </div>
+  );
+};
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const RouteButton = styled.button`
+  border: 3px solid black;
+  border-radius: 20px;
+  background-color: #f3f3f3;
+  color: black;
+  padding: 8px;
+  cursor: pointer;
+  margin: 5px; 0px;
+  font-size: 14px;
+
+  &:hover {
+    background-color: #FF7EA0;; 
   }
 `;
 

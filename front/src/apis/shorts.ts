@@ -74,7 +74,7 @@ export const getShortsInfo = async (shortsNo: string) => {
 };
 
 //영상 시도하면 카운트
-export async function getTryCount(shortsNo: string) {
+export async function getTryCount(shortsNo: number) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
     const data = {

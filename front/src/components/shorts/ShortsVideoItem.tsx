@@ -8,9 +8,10 @@ interface ShortsVideoPrpos {
   shortsInfo: Shorts | undefined;
   isLoading?: boolean;
   isSerise?: boolean;
+  onClick?: () => void;
 }
 
-const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise }: ShortsVideoPrpos) => {
+const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise, onClick }: ShortsVideoPrpos) => {
   return (
     <>
       {isLoading ? (
@@ -20,8 +21,9 @@ const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise }: ShortsVideoPrpos) 
       ) : (
         shortsInfo && (
           <VideoContainer
-            to={`/shorts/${shortsInfo.shortsNo}`}
+            // to={`/shorts/${shortsInfo.shortsNo}`}
             className={`${isSerise ? "serise" : ""} `}
+            onClick={onClick}
           >
             <VideoBox>
               <Video src={shortsInfo.shortsLink} crossOrigin="anonymous" />
@@ -78,7 +80,22 @@ const VideoBox = styled.div`
   }
 `;
 
-const VideoContainer = styled(Link)`
+// const VideoContainer = styled(Link)`
+//   position: relative;
+//   width: calc(100% / var(--grid-items-per-row) - var(--grid-item-margin));
+//   margin: calc(var(--grid-item-margin) / 2);
+//   color: #000;
+
+//   &.serise {
+//     --grid-items-per-row: 3;
+//   }
+
+//   @media screen and (min-width: 600px) {
+//     max-width: var(--grid-item-max-width);
+//   }
+// `;
+
+const VideoContainer = styled.div`
   position: relative;
   width: calc(100% / var(--grid-items-per-row) - var(--grid-item-margin));
   margin: calc(var(--grid-item-margin) / 2);
