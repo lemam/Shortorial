@@ -236,7 +236,7 @@ const ButtonContainer = styled.div`
 
   @media (max-aspect-ratio: 1/1) {
     flex-direction: column;
-    padding: 0px 30px;
+    padding: 0px 25px;
   }
 `;
 
