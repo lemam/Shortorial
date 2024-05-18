@@ -17,6 +17,19 @@ const GlobalStyle = createGlobalStyle`
     --grid-item-min-width: 310px;
     --grid-items-per-row: 2;
     --grid-item-margin: 12px;
+
+    @media screen and (min-width: 600px) {
+      --grid-items-per-row: 3;
+      --grid-item-margin: 16px;
+    }
+
+    @media screen and (min-width: 769px) {
+      --grid-items-per-row: 4;
+    }
+
+    @media screen and (min-width: 1024px) {
+      --grid-items-per-row: 5;
+    }
   }
 
   body {

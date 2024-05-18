@@ -54,7 +54,8 @@ const Section = styled.section`
 const SectionTitle = styled.h3`
   font-size: 22px;
   font-weight: bold;
-  margin: 1rem 0;
+  margin: 1rem;
+  margin-left: calc(var(--grid-item-margin) / 2);
 `;
 
 const SectionConents = styled.div`

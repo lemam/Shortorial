@@ -63,6 +63,10 @@ const VideoContainer = styled(Link)`
   width: calc(100% / var(--grid-items-per-row) - var(--grid-item-margin));
   margin: calc(var(--grid-item-margin) / 2);
   color: #000;
+
+  @media screen and (min-width: 600px) {
+    max-width: var(--grid-item-max-width);
+  }
 `;
 
 const Video = styled.video`
