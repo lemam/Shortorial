@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { PlayArrow } from "@mui/icons-material";
 import { Skeleton } from "@mui/material";
@@ -101,8 +100,9 @@ const VideoContainer = styled.div`
   margin: calc(var(--grid-item-margin) / 2);
   color: #000;
 
+  // TODO: 반응형으로 수정할 것 또는 스크롤
   &.serise {
-    --grid-items-per-row: 3;
+    --grid-items-per-row: 4;
   }
 
   @media screen and (min-width: 600px) {
