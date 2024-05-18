@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { Shorts } from "../constants/types";
 import { getShortsList, getTryCount } from "../apis/shorts";
 import Header from "../components/header/Header";
@@ -190,6 +190,18 @@ const SectionConents = styled.div`
   }
 `;
 
+const pulse = keyframes`
+  0% { 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.1); 
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+`;
+
 const Modal = styled.div`
   position: fixed;
   top: 50%;
@@ -200,6 +212,7 @@ const Modal = styled.div`
   padding: 10px;
   width: 50%;
   height: 50%;
+  animation: ${pulse} 0.5s ease-in-out;
 `;
 
 const CancelIcon = styled.div`
