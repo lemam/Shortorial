@@ -6,10 +6,11 @@ import { Shorts } from "../../constants/types";
 
 interface ShortsVideoPrpos {
   shortsInfo: Shorts | undefined;
-  isLoading: boolean;
+  isLoading?: boolean;
+  isSerise?: boolean;
 }
 
-const ShortsVideoItem = ({ shortsInfo, isLoading }: ShortsVideoPrpos) => {
+const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise }: ShortsVideoPrpos) => {
   return (
     <>
       {isLoading ? (
@@ -18,7 +19,10 @@ const ShortsVideoItem = ({ shortsInfo, isLoading }: ShortsVideoPrpos) => {
         </SkeletonContainer>
       ) : (
         shortsInfo && (
-          <VideoContainer to={`/shorts/${shortsInfo.shortsNo}`}>
+          <VideoContainer
+            to={`/shorts/${shortsInfo.shortsNo}`}
+            className={`${isSerise ? "serise" : ""} `}
+          >
             <VideoBox>
               <Video src={shortsInfo.shortsLink} crossOrigin="anonymous" />
               <Gradient className="gradient" />
@@ -79,6 +83,10 @@ const VideoContainer = styled(Link)`
   width: calc(100% / var(--grid-items-per-row) - var(--grid-item-margin));
   margin: calc(var(--grid-item-margin) / 2);
   color: #000;
+
+  &.serise {
+    --grid-items-per-row: 3;
+  }
 
   @media screen and (min-width: 600px) {
     max-width: var(--grid-item-max-width);

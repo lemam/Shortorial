@@ -23,12 +23,14 @@ const GlobalStyle = createGlobalStyle`
       --grid-item-margin: 16px;
     }
 
-    @media screen and (min-width: 769px) {
+    @media screen and (min-width: 830px) {
       --grid-items-per-row: 4;
+      --grid-item-margin: 18px;
     }
 
     @media screen and (min-width: 1024px) {
-      --grid-items-per-row: 5;
+      --grid-items-per-row: 4;
+      --grid-item-margin: 20px;
     }
   }
 
