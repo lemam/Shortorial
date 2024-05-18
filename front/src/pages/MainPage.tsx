@@ -5,7 +5,13 @@ import { Shorts } from "../constants/types";
 import { getShortsList, getTryCount } from "../apis/shorts";
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
-import { CancelPresentation, EmojiPeople, MusicNote, TimerOutlined } from "@mui/icons-material";
+import {
+  CancelPresentation,
+  Copyright,
+  EmojiPeople,
+  MusicNote,
+  TimerOutlined,
+} from "@mui/icons-material";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -87,6 +93,7 @@ const MainPage = () => {
                 shortsInfo={shorts}
                 isLoading={isLoading}
                 isSerise
+                onClick={openModal(shorts)}
               />
             ))}
           </SectionConents>
@@ -95,27 +102,41 @@ const MainPage = () => {
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
             {allShortsList?.map((shorts) => (
-              <ShortsVideoItem key={shorts.shortsNo} shortsInfo={shorts} isLoading={isLoading} />
+              <ShortsVideoItem
+                key={shorts.shortsNo}
+                shortsInfo={shorts}
+                isLoading={isLoading}
+                onClick={openModal(shorts)}
+              />
             ))}
           </SectionConents>
         </Section>
       </SectionWrapper>
       {showDetails && selectedShorts && (
-        <DetailContainer>
+        <Modal>
           <CancelIcon>
-            <CancelPresentation onClick={closeModal} />
+            <CancelPresentation onClick={closeModal} fontSize="large" />
           </CancelIcon>
           <Details>
             <Detail
               icon={<MusicNote />}
               text={selectedShorts.shortsTitle}
               fontWeight="bold"
-              fontSize="22px"
+              fontSize="30px"
             ></Detail>
-            <Detail text={selectedShorts.shortsDirector} fontSize="18px"></Detail>
-            <Detail icon={<TimerOutlined />} text={`${selectedShorts.shortsTime}초`}></Detail>
+            <Detail
+              icon={<Copyright />}
+              text={selectedShorts.shortsDirector}
+              fontSize="20px"
+            ></Detail>
+            <Detail
+              icon={<TimerOutlined />}
+              fontSize="18px"
+              text={`${selectedShorts.shortsTime}초`}
+            ></Detail>
             <Detail
               icon={<EmojiPeople />}
+              fontSize="18px"
               text={`${selectedShorts.shortsChallengers}명의 챌린저`}
             ></Detail>
           </Details>
@@ -127,7 +148,7 @@ const MainPage = () => {
               챌린지모드
             </RouteButton>
           </ButtonContainer>
-        </DetailContainer>
+        </Modal>
       )}
     </Container>
   );
@@ -169,8 +190,8 @@ const SectionConents = styled.div`
   }
 `;
 
-const DetailContainer = styled.div`
-  position: absolute;
+const Modal = styled.div`
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -188,9 +209,10 @@ const CancelIcon = styled.div`
 
 const Details = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   flex-direction: column;
   align-items: center;
+  height: 60%;
 `;
 
 interface DetailType {
@@ -211,6 +233,11 @@ const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
+
+  @media (max-aspect-ratio: 1/1) {
+    flex-direction: column;
+    padding: 0px 30px;
+  }
 `;
 
 const RouteButton = styled.button`
@@ -221,7 +248,7 @@ const RouteButton = styled.button`
   padding: 8px;
   cursor: pointer;
   margin: 5px; 0px;
-  font-size: 14px;
+  font-size: 16px;
 
   &:hover {
     background-color: #FF7EA0;; 
