@@ -83,7 +83,7 @@ const Container = styled.div`
 
 const Section = styled.section`
   position: relative;
-  margin: 60px 16px;
+  margin: 16px;
   box-sizing: border-box;
 `;
 
@@ -91,7 +91,7 @@ const SectionWrapper = styled.div`
   position: relative;
   max-width: 1100px;
   margin: 0 auto;
-  margin-top: 76px;
+  padding-top: 70px;
 `;
 
 const SectionTitle = styled.h3`
