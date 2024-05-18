@@ -71,7 +71,76 @@ const MainPage = () => {
       <Header />
       <SectionWrapper>
         <Section>
-          <SectionTitle>이 쇼츠에 도전해보세요!</SectionTitle>
+          <SectionTitle>오늘의 챌린지</SectionTitle>
+          <div
+            style={{
+              display: "flex",
+              backgroundColor: "#ededed",
+              position: "relative",
+              width: "100%",
+              alignItems: "center",
+              padding: "16px",
+              borderRadius: "16px",
+            }}
+          >
+            {allShortsList && (
+              <>
+                <div style={{ width: "260px" }}>
+                  <video
+                    style={{
+                      width: "100%",
+                      objectFit: "cover",
+                      borderRadius: "12px",
+                    }}
+                    src={allShortsList[0].shortsLink}
+                    crossOrigin="anonymous"
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    marginLeft: "16px",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Details style={{ alignItems: "flex-start" }}>
+                    <Detail
+                      icon={<MusicNote />}
+                      text={allShortsList[0].shortsTitle}
+                      fontWeight="bold"
+                      fontSize="30px"
+                    ></Detail>
+                    <Detail
+                      icon={<Copyright />}
+                      text={allShortsList[0].shortsDirector}
+                      fontSize="20px"
+                    ></Detail>
+                    <Detail
+                      icon={<TimerOutlined />}
+                      fontSize="18px"
+                      text={`${allShortsList[0].shortsTime}초`}
+                    ></Detail>
+                    <Detail
+                      icon={<EmojiPeople />}
+                      fontSize="18px"
+                      text={`${allShortsList[0].shortsChallengers}명의 챌린저`}
+                    ></Detail>
+                  </Details>
+                  <ButtonContainer>
+                    <RouteButton onClick={() => goToLearnMode(allShortsList[0].shortsNo)}>
+                      연습모드
+                    </RouteButton>
+                    <RouteButton onClick={() => goToChallengeMode(allShortsList[0].shortsNo)}>
+                      챌린지모드
+                    </RouteButton>
+                  </ButtonContainer>
+                </div>
+              </>
+            )}
+          </div>
+        </Section>
+        <Section>
+          <SectionTitle>당신을 위한 추천 챌린지</SectionTitle>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
               <ShortsVideoItem
@@ -85,7 +154,7 @@ const MainPage = () => {
           </SectionConents>
         </Section>
         <Section>
-          <SectionTitle>실시간 인기 쇼츠</SectionTitle>
+          <SectionTitle>실시간 인기 챌린지</SectionTitle>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
               <ShortsVideoItem
