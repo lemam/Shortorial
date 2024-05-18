@@ -156,7 +156,7 @@ export async function updateTitle(updatingShorts: Map<string, string>, uploadNo:
 }
 
 // 동영상 파일 이름 중복검사
-export async function checkTitle(title: String) {
+export async function checkTitle(title: string) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
 
