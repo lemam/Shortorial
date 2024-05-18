@@ -8,12 +8,24 @@ import {
   shareShorts,
   getFilePath,
   deleteShorts,
+  checkTitle,
 } from "../../apis/shorts";
 
+interface ContainerProps {
+  isPortrait: boolean;
+}
+
 const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) => {
-  const [title, setTitle] = useState<string>(uploadShorts.uploadTitle);
+  // 제목에서 '/' 이후의 부분을 추출하는 함수
+  const extractTitle = (fullTitle: string): string => {
+    const titleParts = fullTitle.split("/");
+    return titleParts.length > 0 ? titleParts[1] : fullTitle;
+  };
+
+  const [title, setTitle] = useState<string>(extractTitle(uploadShorts.uploadTitle));
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
+  const [isPortrait, setIsPortrait] = useState<boolean>(window.innerHeight > window.innerWidth);
   const [share, setShare] = useState<boolean>(false);
   const [link, setLink] = useState<string | null>(null);
 
@@ -26,12 +38,6 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
     setTitle(event.target.value);
   };
 
-  // 제목에서 '/' 이후의 부분을 추출하는 함수
-  const extractTitle = (fullTitle: string): string => {
-    const titleParts = fullTitle.split("/");
-    return titleParts.length > 1 ? titleParts[1] : fullTitle;
-  };
-
   const deleteUploadedShorts = async () => {
     const deletingShorts = new Map<string, string>();
     deletingShorts.set("uploadNo", String(uploadShorts.uploadNo));
@@ -42,15 +48,23 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   };
 
   const saveTitle = async () => {
-    setTitle(title);
-    titleCanNotbeModified();
+    // 이름이 존재하면 true, 존재하지 않으면 false를 반환
+    const result = await checkTitle(title);
+    if (!result) {
+      setTitle(title);
+      titleCanNotbeModified();
 
-    const updatingShorts = new Map<string, string>();
-    updatingShorts.set("oldTitle", uploadShorts.uploadTitle);
-    updatingShorts.set("newTitle", title);
+      const updatingShorts = new Map<string, string>();
+      updatingShorts.set("oldTitle", uploadShorts.uploadTitle);
+      updatingShorts.set("newTitle", title);
 
-    await updateTitle(updatingShorts, uploadShorts.uploadNo);
-    // 업데이트된 타이틀을 반영한 쇼츠를 조회해서 재렌더링 해야함
+      await updateTitle(updatingShorts, uploadShorts.uploadNo);
+      // 업데이트된 타이틀을 반영한 쇼츠를 조회해서 재렌더링 해야함
+    } else {
+      alert("이미 존재하는 타이틀입니다.");
+      setModify(false);
+      setTitle(extractTitle(uploadShorts.uploadTitle));
+    }
   };
 
   const downloadVideo = async () => {
@@ -75,6 +89,16 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
       completeDownload();
     }
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const shareShortsToYoutube = async () => {
     (() => setShare(true))();
@@ -107,16 +131,28 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   }, []);
 
   return (
-    <ResultContainer>
-      <VideoContainer>
-        <Video crossOrigin="anonymous" src={uploadShorts.uploadUrl} controls></Video>
+    <ResultContainer isPortrait={isPortrait}>
+      <VideoContainer isPortrait={isPortrait}>
+        <Video
+          crossOrigin="anonymous"
+          src={uploadShorts.uploadUrl}
+          controls
+        ></Video>
         <MyVideoControlComponent>
-          {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
+          {!download && (
+            <DownloadIcon
+              onClick={downloadVideo}
+              fontSize="large"
+            ></DownloadIcon>
+          )}
           {download && (
             <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>
           )}
           {!share && !link && (
-            <IosShareIcon onClick={shareShortsToYoutube} fontSize="large"></IosShareIcon>
+            <IosShareIcon
+              onClick={shareShortsToYoutube}
+              fontSize="large"
+            ></IosShareIcon>
           )}
           {!share && link && (
             <YoutubeIcon
@@ -125,16 +161,18 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
             ></YoutubeIcon>
           )}
           {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>}
-          <DeleteIcon fontSize="large" onClick={deleteUploadedShorts}></DeleteIcon>
+          <DeleteIcon
+            fontSize="large"
+            onClick={deleteUploadedShorts}
+          ></DeleteIcon>
         </MyVideoControlComponent>
-        {!modify && (
-          <TitleContainer>
-            <Title>{uploadShorts.uploadTitle}</Title>
-            <ModifyIcon onClick={titleCanbeModified}></ModifyIcon>
-          </TitleContainer>
-        )}
       </VideoContainer>
-
+      {!modify && (
+        <TitleContainer>
+          <Title>{title}</Title>
+          <ModifyIcon onClick={titleCanbeModified}></ModifyIcon>
+        </TitleContainer>
+      )}
       {modify && (
         <TitleContainer>
           <InputBox
@@ -150,21 +188,22 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
   );
 };
 
-const ResultContainer = styled.div`
+const ResultContainer = styled.div<ContainerProps>`
   display: flex;
   flex-direction: column;
-  width: 360px;
+  width: 100%;
+  // width: ${({ isPortrait }) => (isPortrait ? "100%" : "calc(100% / 2)")};
 `;
 
-const VideoContainer = styled.div`
+const VideoContainer = styled.div<ContainerProps>`
   display: flex;
-  flex-direction: column;
+  flex-direction: ${({ isPortrait }) => (isPortrait ? "column" : "row")};
   position: relative;
 `;
 
 const Video = styled.video`
-  width: 360px;
-  height: 640px;
+  // width: 100%;
+  // height: auto;
   object-fit: cover;
 `;
 
@@ -220,7 +259,7 @@ const ModifyIcon = styled(Create)`
 `;
 
 const InputBox = styled.input`
-  width: 360px;
+  width: 100%;
   border: 0;
   border-radius: 15px;
   outline: none;

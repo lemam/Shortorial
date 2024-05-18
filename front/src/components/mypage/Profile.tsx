@@ -76,6 +76,8 @@ const ProfileContainer = styled.div`
   display: flex;
   height: 100%;
   flex-direction: column; /* 세로로 나열 */
+  justify-content: center; /* 수평 가운데 정렬 */
+  align-items: center; /* 수직 가운데 정렬 */
   border: 1px solid black;
   padding: 10px;
 `;
@@ -84,6 +86,8 @@ const ProfileInfoContainer = styled.div`
   justify-content: center; /* 수평 가운데 정렬 */
   align-items: center; /* 수직 가운데 정렬 */
   padding: 10px;
+  height: 100%;
+  width: 100%;
 `;
 const ProfileImage = styled.img`
   height: 50px;
@@ -94,6 +98,8 @@ const ProfileNumContainer = styled.div`
   justify-content: center;
   border-top: 1px solid black;
   padding: 10px;
+  height: 100%;
+  width: 100%;
 
   .innerDiv {
     display: flex;

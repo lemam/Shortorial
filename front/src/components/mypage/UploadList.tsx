@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { UploadShorts } from "../../apis/shorts";
 import { getUploadedShorts } from "../../apis/mypage";
 import ChallengeResultPage from "./ChallengeComponent";
+import styled from "styled-components";
 
 export default function UploadList() {
   const [shortsList, setShortsList] = useState<UploadShorts[]>([]);
+  const [isPortrait, setIsPortrait] = useState<boolean>(window.innerHeight > window.innerWidth);
 
   const getShorts = async () => {
     try {
@@ -17,30 +19,43 @@ export default function UploadList() {
 
   useEffect(() => {
     getShorts();
+    const handleResize = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
     <div>
-      {Array.from({ length: Math.ceil(shortsList.length / 4) }, (_, index) => index * 4).map(
-        (startIndex) => (
-          <div key={startIndex}>
-            {/* 4개씩 묶어서 렌더링 */}
-            <div style={{ display: "flex" }}>
-              {shortsList.slice(startIndex, startIndex + 4).map((uploadShorts) => (
-                <ChallengeResultPage uploadShorts={uploadShorts} />
+      {Array.from(
+        { length: Math.ceil(shortsList.length / (isPortrait ? 2 : 4)) },
+        (_, index) => index * (isPortrait ? 2 : 4)
+      ).map((startIndex) => (
+        <div key={startIndex}>
+          {/* 4개씩 묶어서 렌더링 */}
+          <Container style={{ display: "flex" }}>
+            {shortsList
+              .slice(startIndex, startIndex + (isPortrait ? 2 : 4))
+              .map((uploadShorts, i) => (
+                <ChallengeResultPage
+                  key={i}
+                  uploadShorts={uploadShorts}
+                />
               ))}
-            </div>
-          </div>
-        )
-      )}
+          </Container>
+        </div>
+      ))}
     </div>
   );
 }
-// const VideoContainer = styled.div`
-//   display: flex;
-//   // margin-right: 5px; /* 오른쪽 마진을 20px로 설정 */
-//   padding: 5px; /* 오른쪽 마진을 20px로 설정 */
-//   height: 100%;
-//   border: 1px solid red;
-//   flex-direction: column; /* 세로로 나열 */
-// `;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 50%;
+
+  @media screen and (orientation: landscape) {
+    width: calc(100% / 4);
+  }
+`;

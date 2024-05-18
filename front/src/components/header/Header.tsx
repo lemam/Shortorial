@@ -47,6 +47,10 @@ const Header = ({ style }: HeaderProps) => {
 
 const LogoContainer = styled(Link)`
   height: 40px;
+
+  @media screen and (max-width: 479px) {
+    height: 26px;
+  }
 `;
 
 const LogoImg = styled.img`
@@ -80,7 +84,9 @@ const Wrapper = styled.div`
 `;
 
 const Container = styled.header`
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 60px;
   background-color: #fff;

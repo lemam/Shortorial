@@ -136,7 +136,7 @@ export async function getMyS3Blob(uploadNo: number) {
   }
 }
 
-// 이름 업데이트
+// 동영상 파일 이름 업데이트
 export async function updateTitle(updatingShorts: Map<string, string>, uploadNo: number) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
@@ -150,6 +150,27 @@ export async function updateTitle(updatingShorts: Map<string, string>, uploadNo:
     });
 
     return data.data;
+  } catch (error) {
+    console.error("Error Renaming data:", error);
+  }
+}
+
+// 동영상 파일 이름 중복검사
+export async function checkTitle(title: String) {
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+
+    const data = {
+      title: title,
+    };
+
+    const response = await axios.post(`${REST_SHORTS_LIST_URL}/checkName`, data, {
+      headers: {
+        Authorization: token,
+      },
+    });
+    // 이름이 존재하면 true, 존재하지 않으면 false를 반환
+    return response.data;
   } catch (error) {
     console.error("Error Renaming data:", error);
   }
