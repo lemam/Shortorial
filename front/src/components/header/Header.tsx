@@ -84,7 +84,9 @@ const Wrapper = styled.div`
 `;
 
 const Container = styled.header`
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 60px;
   background-color: #fff;
