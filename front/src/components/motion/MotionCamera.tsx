@@ -22,7 +22,7 @@ export default function MotionCamera({
   const { setBtn } = useBtnStore();
   const { setAction } = useActionStore();
 
-  console.log(isCanvas);
+  // console.log(isCanvas);
   useEffect(() => {
     // 모델 초기화
     createPoseLandmarker();
@@ -62,7 +62,6 @@ export default function MotionCamera({
       navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
         if (webcam) {
           webcam.srcObject = stream;
-          // while (!poseLandmarker) console.log("loading poselandmarker");
           webcam.addEventListener("loadeddata", () =>
             predictWebcam(
               "learn",
@@ -86,7 +85,6 @@ export default function MotionCamera({
         const tracks = stream?.getTracks();
         tracks?.forEach((track) => track.stop());
         webcam.srcObject = null;
-        console.log("Cleaned up webcam and tracks.");
       };
 
       window.addEventListener("popstate", cleanup);

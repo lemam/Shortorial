@@ -4,7 +4,7 @@ import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import noRepeat from "/src/assets/icon/repeat-off.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import { VideoSection, Shorts } from "../constants/types";
-import { setBtnInfo } from "../modules/Motion";
+import { predictVideo, setBtnInfo } from "../modules/Motion";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
 import {
@@ -15,8 +15,13 @@ import {
 import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
-import MotionVideo from "../components/motion/MotionVideo";
-
+import { Acc } from "../modules/Acc";
+import {
+  useMotionLandmarkStore,
+  useVideoLandmarkStore,
+  useValueStore,
+  useCountStore,
+} from "../store/useAccStore";
 const LearnPage = () => {
   type LearnState = "LOADING" | "PAUSE" | "READY" | "PLAY";
 
@@ -172,16 +177,22 @@ const LearnPage = () => {
       initInterval();
       moveVideoTime(currentSection.start); // 현재 구간 시작 시간으로 이동
       setState("PAUSE");
+      setAccFlag(false);
     }
   }, [currentSection.start, initInterval, moveVideoTime, video]);
 
   // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
   const handleTimeUpdate = useCallback(() => {
     if (video) {
+      setAccFlag(true);
       // 반복하지 않는 경우
       if (!isLooping) {
+        console.log("not Loop");
         setCurrentTime(video.currentTime);
-        if (video.ended) setState("PAUSE");
+        if (video.ended) {
+          setState("PAUSE");
+          setAccFlag(false);
+        }
         return;
       }
 
@@ -283,6 +294,7 @@ const LearnPage = () => {
     if (interval && timer <= 0) {
       initInterval();
       playVideo();
+      if (video) predictVideo(video);
     }
   }, [initInterval, interval, playVideo, timer]);
 
@@ -361,6 +373,48 @@ const LearnPage = () => {
     setIsCanvas(!isCanvas);
   };
 
+  // landmark 정보
+  const videoLandmark = useVideoLandmarkStore.getState().videoLandmark;
+  const motionLandmark = useMotionLandmarkStore.getState().motionLandmark;
+  const [acc, setAcc] = useState(0);
+  const [accFlag, setAccFlag] = useState(false);
+  const [accValue, setAccValue] = useValueStore((state) => [
+    state.accValue,
+    state.setAccValue,
+  ]);
+  const [count, setCount] = useCountStore((state) => [
+    state.count,
+    state.setCount,
+  ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (videoLandmark && motionLandmark) {
+        setAcc(await Acc(videoLandmark, motionLandmark));
+        if (state === "PLAY") {
+          setAccValue(acc + accValue);
+          setCount(count + 1);
+        }
+        if (state === "READY") {
+          setAccValue(0);
+          setCount(0);
+        }
+      }
+    };
+
+    fetchData();
+  }, [videoLandmark, motionLandmark]);
+
+  useEffect(() => {
+    if (count == 0) setAccValue(accValue / 1);
+    else {
+      if (state === "PAUSE") {
+        setAccValue(accValue / count);
+        console.log(accValue);
+        console.log(count);
+        console.log("++++++++++++++++");
+      }
+    }
+  }, [accFlag]);
   return (
     <Container>
       {state === "LOADING" ? (
@@ -378,13 +432,14 @@ const LearnPage = () => {
           </LeftSection>
           <CenterSection ref={centerSectionRef}>
             <VideoContainer>
-              <MotionVideo
+              <video
                 width={videoSize.width}
                 height={videoSize.height}
                 src={videoInfo.shortsLink}
                 ref={videoRef}
                 className={isFlipped ? "flip" : ""}
-              ></MotionVideo>
+                crossOrigin="anonymous"
+              ></video>
             </VideoContainer>
             <VideoContainer id="dom">
               <MotionCamera
@@ -394,6 +449,7 @@ const LearnPage = () => {
                 autoPlay
                 isCanvas={isCanvas}
               ></MotionCamera>
+              <Score accFlag={accFlag}>{accValue}</Score>
               <VideoMotionButtonList>
                 {state === "PAUSE" ? (
                   <VideoMotionButton
@@ -588,4 +644,10 @@ const LoadingText = styled.div`
   color: #fff;
 `;
 
+const Score = styled.div<{ accFlag: boolean }>`
+  position: absolute;
+  font-size: xx-large;
+  color: red;
+  display: flex;
+`;
 export default LearnPage;
