@@ -327,7 +327,7 @@ const Details = styled.div`
   justify-content: space-evenly;
   flex-direction: column;
   align-items: center;
-  height: 60%;
+  height: 65%;
 `;
 
 interface DetailType {
@@ -339,7 +339,7 @@ interface DetailType {
 
 const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
   return (
-    <div style={{ fontSize: fontSize, fontWeight: fontWeight }}>
+    <div style={{ fontSize: fontSize, fontWeight: fontWeight, margin: "5px 0px" }}>
       {icon} {text}
     </div>
   );
@@ -348,7 +348,7 @@ const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
-  padding: 30px;
+  padding: 10px;
 
   @media (max-aspect-ratio: 1/1) {
     flex-direction: column;
