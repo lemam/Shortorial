@@ -81,15 +81,11 @@ export async function getTryCount(shortsNo: number) {
       shortsNo: shortsNo,
     };
 
-    const response = await axios.put(
-      `${REST_SHORTS_LIST_URL}/addTryCount`,
-      data,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
+    const response = await axios.put(`${REST_SHORTS_LIST_URL}/addTryCount`, data, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
     return response.data;
   } catch (error) {
@@ -141,24 +137,17 @@ export async function getMyS3Blob(uploadNo: number) {
 }
 
 // 동영상 파일 이름 업데이트
-export async function updateTitle(
-  updatingShorts: Map<string, string>,
-  uploadNo: number
-) {
+export async function updateTitle(updatingShorts: Map<string, string>, uploadNo: number) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
 
     const updatingShortsObj = Object.fromEntries(updatingShorts);
 
-    const data = await axios.put(
-      `${REST_SHORTS_URL}/rename/${uploadNo}`,
-      updatingShortsObj,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
+    const data = await axios.put(`${REST_SHORTS_URL}/rename/${uploadNo}`, updatingShortsObj, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
     return data.data;
   } catch (error) {
@@ -175,15 +164,11 @@ export async function checkTitle(title: string) {
       title: title,
     };
 
-    const response = await axios.post(
-      `${REST_SHORTS_LIST_URL}/checkName`,
-      data,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
+    const response = await axios.post(`${REST_SHORTS_LIST_URL}/checkName`, data, {
+      headers: {
+        Authorization: token,
+      },
+    });
     // 이름이 존재하면 true, 존재하지 않으면 false를 반환
     return response.data;
   } catch (error) {
@@ -196,9 +181,7 @@ const youtubeUrl = import.meta.env.VITE_YOUTUBE_URL;
 export async function shareShorts(filePath: string, uploadNo: number) {
   try {
     const response = await axios.get(
-      `${youtubeUrl}/authenticate?filePath=${encodeURIComponent(
-        filePath
-      )}&uploadNo=${uploadNo}`
+      `${youtubeUrl}/authenticate?filePath=${encodeURIComponent(filePath)}&uploadNo=${uploadNo}`
     );
     // 서버에서 응답받은 authUrl로 이동
     window.location.href = response.data.authUrl;
@@ -249,14 +232,8 @@ export async function deleteShorts(deletingShorts: Map<string, string>) {
 
 // 인기순 쇼츠 조회
 export async function getTopRankingShorts() {
-  const token = "Bearer " + localStorage.getItem("accessToken");
-  const data = await axios.get(`${REST_SHORTS_LIST_URL}/topRanking`, {
-    headers: {
-      Authorization: token,
-    },
-  });
-
-  console.log(data.data);
+  // const token = "Bearer " + localStorage.getItem("accessToken");
+  const data = await axios.get(`${REST_SHORTS_LIST_URL}/topRanking`);
   return data.data;
 }
 

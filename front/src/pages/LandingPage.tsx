@@ -42,11 +42,11 @@ const LandingPage = () => {
 
   return (
     <Container>
-      <Header style={{ position: "fixed" }} />
+      <Header />
       <HeroContainer>
         <HeroImg src={heroImg} alt="" />
         <HeroTextContainer {...HeroTextScroll}>
-          <h1 className="title">{`SHORTORIAL에서\n쉽고 빠르게\n챌린지에 도전하세요`}</h1>
+          <h1 className="sectionTitle">{`SHORTORIAL에서\n쉽고 빠르게\n챌린지에 도전하세요`}</h1>
           <h2 className="subTitle">모션 인식 기반 댄스 챌린지 연습 서비스</h2>
         </HeroTextContainer>
         <CTAButtonContainer {...HeroCTAScroll}>
@@ -58,7 +58,7 @@ const LandingPage = () => {
         </CTAButtonContainer>
       </HeroContainer>
       <Section {...FirstSectionScroll}>
-        <h1 className="title">{`숏토리얼과 함께라면 여기가 나만의 연습실`}</h1>
+        <h1 className="sectionTitle">{`숏토리얼과 함께라면 여기가 나만의 연습실`}</h1>
         <p className="subTitle">
           {`웹캠 또는 스마트폰 카메라 하나로\n언제 어디서나 챌린지를 연습해보세요.`}
         </p>
@@ -69,7 +69,7 @@ const LandingPage = () => {
       </Section>
       <Section {...SecondSectionScroll}>
         <div>
-          <h1 className="title">{`이제 멀리서 걸어오실 필요 없어요`}</h1>
+          <h1 className="sectionTitle">{`이제 멀리서 걸어오실 필요 없어요`}</h1>
           <p className="subTitle">{`춤추다가 걸어와서 버튼 누르고...\n이런 귀찮은 과정은 저희가 해결해드릴게요.`}</p>
         </div>
         <ImageContainer>
@@ -81,9 +81,9 @@ const LandingPage = () => {
         </p>
       </Section>
       <Section {...ThirdSectionScroll}>
-        <h1 className="title">인기 챌린지를 한눈에</h1>
+        <h1 className="sectionTitle">인기 챌린지를 한눈에</h1>
         <p className="subTitle">지금 유행하는 다양한 댄스 챌린지에 도전해보세요.</p>
-        <SeriesSection style={{ background: "#ffe5ec" }}>
+        <SeriesSection style={{ background: "#ffe5ec", flexDirection: "column" }}>
           <SectionHeaderContainer>
             <SectionTitle>🔥 요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
             <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
@@ -95,9 +95,16 @@ const LandingPage = () => {
           </SectionConents>
         </SeriesSection>
         <p className="text">당신이 좋아할만한 챌린지도 추천해드릴게요.</p>
+        <CTAButtonContainer>
+          <BasicButton
+            text="지금 확인하러 가기"
+            style={CTAButtonStyled}
+            onClick={() => navigate("/main")}
+          />
+        </CTAButtonContainer>
       </Section>
       <Section {...ForthSectionScroll}>
-        <h1 className="title">촬영에서 업로드까지</h1>
+        <h1 className="sectionTitle">촬영에서 업로드까지</h1>
         <p className="subTitle">{`연습한 그 자리에서 바로 촬영하고\nSNS에 공유해보세요.`}</p>
         <ImageContainer>
           <ServiceImg src={serviceMotionGif} alt="" />
@@ -105,7 +112,7 @@ const LandingPage = () => {
         </ImageContainer>
       </Section>
       <CenterSection {...LastSectionScroll}>
-        <h1 className="title bg">{`춤 출 준비 되셨나요?`}</h1>
+        <h1 className="sectionTitle bg">{`춤 출 준비 되셨나요?`}</h1>
         <p className="subTitle">{`처음이라도 괜찮아요!`}</p>
         <p className="subTitle">{`숏토리얼은\n혼자서, 자신만의 속도로\n춤을 연습할 수 있어요.`}</p>
         <p className="subTitle">{`지금 바로 챌린지에 참여해보세요!`}</p>
@@ -233,7 +240,7 @@ const Container = styled.div`
   white-space: pre-wrap;
   background-color: #f9f9f9;
 
-  .title {
+  .sectionTitle {
     font-size: 30px;
     font-weight: bold;
     line-height: 1.4;
