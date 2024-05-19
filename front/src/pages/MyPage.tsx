@@ -55,7 +55,7 @@ const MypageContainer = styled.div`
 `;
 
 const ProfileContainer = styled.div`
-  height: 17vh;
+  height: 96px;
   margin-top: 1rem;
   margin-bottom: 2rem;
 
