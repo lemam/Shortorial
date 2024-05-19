@@ -13,6 +13,7 @@ interface DomState {
   saveBtnSize: DOMRect | null | undefined;
   learnBtnSize: DOMRect | null | undefined;
   rsltBtnSize: DOMRect | null | undefined;
+  canvasBtnSize: DOMRect | null | undefined;
   setDomSize: (newDomSize: DOMRect | null | undefined) => void;
   setVisibleBtnSize: (newBtnSize: DOMRect | null | undefined) => void;
   setTimeBtnSize: (newBtnSize: DOMRect | null | undefined) => void;
@@ -20,6 +21,7 @@ interface DomState {
   setSaveBtnSize: (newBtnSize: DOMRect | null | undefined) => void;
   setLearnBtnSize: (newBtnSize: DOMRect | null | undefined) => void;
   setRsltBtnSize: (newBtnSize: DOMRect | null | undefined) => void;
+  setCanvasBtnSize: (newBtnSize: DOMRect | null | undefined) => void;
 
   playSize: DOMRect | null | undefined;
   challengeSize: DOMRect | null | undefined;
@@ -57,6 +59,7 @@ export const useDomStore = create<DomState>((set) => ({
   saveBtnSize: null,
   learnBtnSize: null,
   rsltBtnSize: null,
+  canvasBtnSize: null,
 
   playSize: null,
   challengeSize: null,
@@ -78,6 +81,8 @@ export const useDomStore = create<DomState>((set) => ({
     set({ learnBtnSize: newBtnSize }),
   setRsltBtnSize: (newBtnSize: DOMRect | null | undefined) =>
     set({ rsltBtnSize: newBtnSize }),
+  setCanvasBtnSize: (newBtnSize: DOMRect | null | undefined) =>
+    set({ canvasBtnSize: newBtnSize }),
 
   setPlaySize: (newDomSize: DOMRect | null | undefined) =>
     set({ playSize: newDomSize }),
@@ -103,6 +108,7 @@ interface MotionDetection {
   flipCount: number;
   speedCount: number;
   saveCount: number;
+  canvasCount: number;
 
   setVisibleCount: (newVisibleCount: number) => void;
   setTimerCount: (newTimerCount: number) => void;
@@ -115,6 +121,7 @@ interface MotionDetection {
   setFlipCount: (newFlipCount: number) => void;
   setSpeedCount: (newSpeedCount: number) => void;
   setSaveCount: (newSaveCount: number) => void;
+  setCanvasCount: (newCanvasCount: number) => void;
 }
 
 export const useMotionDetectionStore = create<MotionDetection>((set) => ({
@@ -129,6 +136,7 @@ export const useMotionDetectionStore = create<MotionDetection>((set) => ({
   flipCount: 0,
   speedCount: 0,
   saveCount: 0,
+  canvasCount: 0,
 
   setVisibleCount: (newVisibleCount: number) =>
     set({ visibleCount: newVisibleCount }),
@@ -146,4 +154,6 @@ export const useMotionDetectionStore = create<MotionDetection>((set) => ({
   setFlipCount: (newFlipCount: number) => set({ flipCount: newFlipCount }),
   setSpeedCount: (newSpeedCount: number) => set({ speedCount: newSpeedCount }),
   setSaveCount: (newSaveCount: number) => set({ saveCount: newSaveCount }),
+  setCanvasCount: (newCanvasCount: number) =>
+    set({ canvasCount: newCanvasCount }),
 }));

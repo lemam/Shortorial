@@ -40,7 +40,7 @@ const SignUpPage = () => {
 
     const rslt = await signUp(id, pass, nickname);
     console.log(rslt);
-    navigate("/learn");
+    navigate("/login");
   };
 
   // 아이디
@@ -98,7 +98,10 @@ const SignUpPage = () => {
     <TotalPage>
       <Title>
         <LogoContainer to="/">
-          <LogoImg src={logo} alt="" />
+          <LogoImg
+            src={logo}
+            alt=""
+          />
         </LogoContainer>
       </Title>
       <SignUp>
@@ -132,7 +135,10 @@ const SignUpPage = () => {
           />
         </Input>
         <Btn>
-          <BasicButton text="완료" onClick={signUpForm} />
+          <BasicButton
+            text="완료"
+            onClick={signUpForm}
+          />
         </Btn>
       </SignUp>
     </TotalPage>

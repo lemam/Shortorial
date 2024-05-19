@@ -27,6 +27,8 @@ def setting_app(app):
             music_dict["shortsTime"] = music_dict.pop("shorts_time")
             music_dict["shortsTitle"] = music_dict.pop("shorts_title")
             music_dict["shortsUrl"] = music_dict.pop("shorts_url")        
+            music_dict["singerName"] = music_dict.pop("singer_name")
+            music_dict["musicName"] = music_dict.pop("music_name")
                        
         return jsonify(music_list_dict)
 

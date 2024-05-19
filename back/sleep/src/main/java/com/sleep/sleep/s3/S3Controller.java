@@ -5,6 +5,7 @@ import com.sleep.sleep.shorts.entity.UploadShorts;
 import com.sleep.sleep.shorts.repository.UploadShortsRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpStatus;
@@ -168,6 +169,7 @@ public class S3Controller {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     // S3 파일 Blob 변환(원본 쇼츠 폴더)
     @PostMapping("/bring/blob/{fileName}")

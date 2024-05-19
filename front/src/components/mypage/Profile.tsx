@@ -68,6 +68,7 @@ const ProfileContainer = styled.div`
   border: 2px solid #fb2576;
   border-radius: 20px;
   box-shadow: 2px 2px #fb2576;
+  background: white;
 `;
 const ProfilRightContainer = styled.div`
   display: flex;
