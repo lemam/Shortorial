@@ -1,6 +1,7 @@
 import useLoginStore from "../store/useLoginStore";
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import logo from "/src/assets/logo.png";
 import { getMemberInfo, postLogin } from "../apis/login";
 // import WarningIcon from "@mui/icons-material/Warning";
 import { styled } from "styled-components";
@@ -85,11 +86,21 @@ export default function LoginForm() {
   // );
   return (
     <TotalPage>
-      <Title>Let's Dance</Title>
+      <Title>
+        <LogoContainer to="/">
+          <LogoImg
+            src={logo}
+            alt=""
+          />
+        </LogoContainer>
+      </Title>
       <Login>
         <Input>
           <NameContainer> 로그인 </NameContainer>
-          <InputComponent cate="아이디" getValue={setId} />
+          <InputComponent
+            cate="아이디"
+            getValue={setId}
+          />
           <InputComponent
             cate="비밀번호"
             type="password"
@@ -97,7 +108,10 @@ export default function LoginForm() {
           />
         </Input>
         <Btn>
-          <BasicButton text="완료" onClick={handleSubmit} />
+          <BasicButton
+            text="완료"
+            onClick={handleSubmit}
+          />
         </Btn>
         <FindContent>
           <Find to="/help/idInquiry">아이디 찾기&nbsp;|&nbsp;</Find>
@@ -108,6 +122,20 @@ export default function LoginForm() {
     </TotalPage>
   );
 }
+
+const LogoContainer = styled(Link)`
+  height: 40px;
+
+  @media screen and (max-width: 479px) {
+    height: 26px;
+  }
+`;
+
+const LogoImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
 
 const TotalPage = styled.div`
   width: 100%;

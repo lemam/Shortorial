@@ -45,7 +45,6 @@ const MypageContainer = styled.div`
   margin-right: 20px; /* 오른쪽 마진을 20px로 설정 */
   margin-left: 20px; /* 왼쪽 마진을 20px로 설정 */
   height: 100%;
-  border: 1px solid blue;
   flex-direction: column; /* 세로로 나열 */
 
   @media screen and (orientation: landscape) {
