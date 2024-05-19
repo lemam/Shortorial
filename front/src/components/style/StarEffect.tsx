@@ -13,23 +13,24 @@ const twinkling = keyframes`
   }
 `;
 
-// Star SVG component
-const StarSVG = styled.svg`
+// Star styled component
+const Star = styled.div`
+  border-radius: 50%;
+  background-color: white;
   position: absolute;
-  fill: white;
   overflow: hidden;
 
   &.style1 {
-    width: 10px;
-    height: 10px;
+    width: 1px;
+    height: 1px;
   }
   &.style2 {
-    width: 15px;
-    height: 15px;
+    width: 2px;
+    height: 2px;
   }
   &.style3 {
-    width: 20px;
-    height: 20px;
+    width: 3px;
+    height: 3px;
   }
 
   &.twinkle {
@@ -52,16 +53,7 @@ const generateStars = (numStars: number, windowWidth: number, windowHeight: numb
     const x = getRandomValue(windowWidth);
     const y = getRandomValue(windowHeight);
 
-    stars.push(
-      <StarSVG
-        className={`${style} twinkle`}
-        style={{ top: y, left: x }}
-        viewBox="0 0 24 24"
-        key={i}
-      >
-        <polygon points="12,2 15,8.6 22,9.3 17,14 18.6,21 12,17.7 5.4,21 7,14 2,9.3 9,8.6" />
-      </StarSVG>
-    );
+    stars.push(<Star className={`${style} twinkle`} style={{ top: y, left: x }} key={i} />);
   }
 
   return stars;

@@ -193,27 +193,19 @@ const MainPage = () => {
             <CancelPresentation onClick={closeModal} fontSize="large" />
           </CancelIcon>
           <Details>
-            <Detail
-              icon={<MusicNote />}
-              text={selectedShorts.shortsTitle}
-              fontWeight="bold"
-              fontSize="30px"
-            ></Detail>
-            <Detail
-              icon={<Copyright />}
-              text={selectedShorts.shortsDirector}
-              fontSize="20px"
-            ></Detail>
-            <Detail
-              icon={<TimerOutlined />}
-              fontSize="18px"
-              text={`${selectedShorts.shortsTime}초`}
-            ></Detail>
-            <Detail
-              icon={<EmojiPeople />}
-              fontSize="18px"
-              text={`${selectedShorts.shortsChallengers}명의 챌린저`}
-            ></Detail>
+            <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="28px"></Detail>
+            <div>
+              <Detail
+                icon={<Copyright />}
+                text={selectedShorts.shortsDirector}
+                fontSize="18px"
+              ></Detail>
+              <Detail icon={<TimerOutlined />} text={`${selectedShorts.shortsTime}초`}></Detail>
+              <Detail
+                icon={<EmojiPeople />}
+                text={`${selectedShorts.shortsChallengers}명의 챌린저`}
+              ></Detail>
+            </div>
           </Details>
           <ButtonContainer>
             <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>
@@ -314,15 +306,20 @@ const Modal = styled.div`
   transform: translate(-50%, -50%);
   background-color: rgba(255, 255, 255, 0.8);
   z-index: 1;
-  padding: 10px;
+  padding: 20px;
   width: 50%;
   height: 50%;
   animation: ${pulse} 0.5s ease-in-out;
+
+  @media (max-width: 700px) {
+    width: 60%;
+  }
 `;
 
 const CancelIcon = styled.div`
   display: flex;
   justify-content: flex-end;
+  cursor: pointer;
 `;
 
 const Details = styled.div`
@@ -351,6 +348,7 @@ const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
+  padding: 30px;
 
   @media (max-aspect-ratio: 1/1) {
     flex-direction: column;
@@ -359,17 +357,17 @@ const ButtonContainer = styled.div`
 `;
 
 const RouteButton = styled.button`
-  border: 3px solid black;
-  border-radius: 20px;
-  background-color: #f3f3f3;
+  border: 1px solid #fb2576;
+  border-radius: 10px;
+  background-color: white;
   color: black;
   padding: 8px;
   cursor: pointer;
   margin: 5px;
-  font-size: 16px;
+  width: 100%;
 
   &:hover {
-    background-color: #ff7ea0;
+    background-color: #d3d3d3;
   }
 `;
 

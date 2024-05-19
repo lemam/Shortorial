@@ -427,7 +427,7 @@ const ChallengePage = () => {
 
   return (
     <ChallengeContainer>
-      <StarEffect numStars={100} />
+      <StarEffect numStars={80} />
 
       <VideoContainer
         ref={danceVideoRef}
@@ -532,6 +532,13 @@ const ChallengeContainer = styled.div`
   justify-content: center;
   align-items: center;
   background-color: black;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(48, 13, 45, 1) 80%,
+    rgba(112, 0, 102, 1) 100%
+  );
 `;
 
 const VideoContainer = styled.video`
