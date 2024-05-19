@@ -597,12 +597,19 @@ const RecordingTEXT = styled.div`
 
 const Timer = styled.div`
   position: absolute;
-  left: 50%;
   top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
-  font-size: 130px;
-  color: #fb2576;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 84px;
+  height: 84px;
+  font-size: 48px;
+  color: #fff;
+  background: #35353580;
+  border: 5px solid #fff;
+  border-radius: 50%;
 `;
 
 const VideoMotionButtonList = styled.div`
