@@ -1,7 +1,8 @@
 import styled from "styled-components";
-import { PlayArrow } from "@mui/icons-material";
+import { Pause, PlayArrow } from "@mui/icons-material";
 import { Skeleton } from "@mui/material";
 import { Shorts } from "../../constants/types";
+import { MouseEvent, useRef, useState } from "react";
 
 interface ShortsVideoPrpos {
   shortsInfo: Shorts | undefined;
@@ -11,6 +12,25 @@ interface ShortsVideoPrpos {
 }
 
 const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise, onClick }: ShortsVideoPrpos) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handlePlayButtonClick = (e: MouseEvent) => {
+    e.stopPropagation();
+
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+        videoRef.current.autoplay = true;
+        setIsPlaying(true);
+      } else {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+        setIsPlaying(false);
+      }
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -21,14 +41,18 @@ const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise, onClick }: ShortsVid
         shortsInfo && (
           <VideoContainer
             // to={`/shorts/${shortsInfo.shortsNo}`}
-            className={`${isSerise ? "serise" : ""} `}
+            className={isSerise ? "serise" : ""}
             onClick={onClick}
           >
             <VideoBox>
-              <Video src={shortsInfo.shortsLink} crossOrigin="anonymous" />
+              <Video ref={videoRef} src={shortsInfo.shortsLink} crossOrigin="anonymous" />
               <Gradient className="gradient" />
-              <PlayButton>
-                <PlayArrow sx={{ color: "white" }} />
+              <PlayButton onClick={handlePlayButtonClick}>
+                {!isPlaying ? (
+                  <PlayArrow sx={{ color: "white" }} />
+                ) : (
+                  <Pause sx={{ color: "white" }} />
+                )}
               </PlayButton>
             </VideoBox>
             <DetailsContainer>
@@ -44,11 +68,12 @@ const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise, onClick }: ShortsVid
 
 const Gradient = styled.div`
   position: absolute;
-  bottom: 0;
+  bottom: 5px;
   width: 100%;
   height: 100px;
   background: rgb(0, 0, 0);
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.25));
+  border-radius: 0 0 12px 12px;
   opacity: 0;
   transition: opacity 0.2s;
 `;

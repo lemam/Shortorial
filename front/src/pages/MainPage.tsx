@@ -258,11 +258,9 @@ const SectionTitle = styled.h3`
 const SectionConents = styled.div`
   display: flex;
   flex-wrap: wrap;
-  /* width: 100%; */
-  justify-content: center;
 
   &.nowrap {
-    flex-wrap: nowrap;
+    justify-content: center;
   }
 `;
 
