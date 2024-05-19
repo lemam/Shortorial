@@ -241,3 +241,15 @@ export async function getTopRankingShorts() {
 
   return data.data;
 }
+
+// 추천 쇼츠 조회
+export async function getRecommendedShorts() {
+  const token = "Bearer " + localStorage.getItem("accessToken");
+  const data = await axios.get("/pyapi/music", {
+    headers: {
+      Authorization: token,
+    },
+  });
+
+  return data.data;
+}

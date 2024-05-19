@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { Shorts } from "../constants/types";
-import { getShortsList, getTopRankingShorts, getTryCount } from "../apis/shorts";
+import {
+  getRecommendedShorts,
+  getShortsList,
+  getTopRankingShorts,
+  getTryCount,
+} from "../apis/shorts";
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
 import { CancelPresentation, Copyright, EmojiPeople, TimerOutlined } from "@mui/icons-material";
@@ -15,6 +20,7 @@ const MainPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [allShortsList, setAllShortsList] = useState<Shorts[]>();
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>();
+  const [recommendedShorts, setRecommendedShorts] = useState<Shorts[]>();
 
   const openModal = (shorts: Shorts) => {
     return () => {
@@ -44,14 +50,22 @@ const MainPage = () => {
     if (data) setAllShortsList(data);
   };
 
+  // 인기 쇼츠 리스트 가져오기
   const loadPopularShortsList = async () => {
     const data = await getTopRankingShorts();
     if (data) setPopularShortsList(data);
   };
 
+  // 추천 쇼츠 리스트 가져오기
+  const loadRecommendedShortsList = async () => {
+    const data = await getRecommendedShorts();
+    if (data) setRecommendedShorts(data);
+  };
+
   useEffect(() => {
     loadAllShortsList();
     loadPopularShortsList();
+    loadRecommendedShortsList();
   }, []);
 
   useEffect(() => {
@@ -64,23 +78,25 @@ const MainPage = () => {
     <Container>
       <Header />
       <SectionWrapper>
-        <SeriesSection style={{ background: "#fefae0" }}>
-          <SectionHeaderContainer>
-            <SectionTitle>⭐ 이런 챌린지는 어떠세요?</SectionTitle>
-            <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
-          </SectionHeaderContainer>
-          <SectionConents className="nowrap">
-            {popularShortsList?.map((shorts) => (
-              <ShortsVideoItem
-                key={shorts.shortsNo}
-                shortsInfo={shorts}
-                isLoading={isLoading}
-                isSerise
-                onClick={openModal(shorts)}
-              ></ShortsVideoItem>
-            ))}
-          </SectionConents>
-        </SeriesSection>
+        {recommendedShorts && (
+          <SeriesSection style={{ background: "#fefae0" }}>
+            <SectionHeaderContainer>
+              <SectionTitle>⭐ 이런 챌린지는 어떠세요?</SectionTitle>
+              <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
+            </SectionHeaderContainer>
+            <SectionConents className="nowrap">
+              {popularShortsList?.map((shorts) => (
+                <ShortsVideoItem
+                  key={shorts.shortsNo}
+                  shortsInfo={shorts}
+                  isLoading={isLoading}
+                  isSerise
+                  onClick={openModal(shorts)}
+                ></ShortsVideoItem>
+              ))}
+            </SectionConents>
+          </SeriesSection>
+        )}
         <SeriesSection style={{ background: "#ffe5ec" }}>
           <SectionHeaderContainer>
             <SectionTitle>🔥 요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
