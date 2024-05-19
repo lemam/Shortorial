@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
-import { Shorts } from "../constants/types";
+import { RecomShorts, Shorts } from "../constants/types";
 import {
   getRecommendedShorts,
   getShortsList,
@@ -26,7 +26,7 @@ const MainPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [allShortsList, setAllShortsList] = useState<Shorts[]>();
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>();
-  const [recommendedShorts, setRecommendedShorts] = useState<Shorts[]>();
+  const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>();
 
   const openModal = (shorts: Shorts) => {
     return () => {
