@@ -37,4 +37,5 @@ export interface RecomShorts {
   shortsTitle: string;
   shortsUrl: string;
   singerName: string;
+  musicName: string;
 }
