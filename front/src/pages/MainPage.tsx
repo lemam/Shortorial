@@ -5,13 +5,7 @@ import { Shorts } from "../constants/types";
 import { getShortsList, getTryCount } from "../apis/shorts";
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
-import {
-  CancelPresentation,
-  Copyright,
-  EmojiPeople,
-  MusicNote,
-  TimerOutlined,
-} from "@mui/icons-material";
+import { CancelPresentation, Copyright, EmojiPeople, TimerOutlined } from "@mui/icons-material";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -348,7 +342,6 @@ const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
-  padding: 10px;
 
   @media (max-aspect-ratio: 1/1) {
     flex-direction: column;
@@ -361,10 +354,9 @@ const RouteButton = styled.button`
   border-radius: 10px;
   background-color: white;
   color: black;
-  padding: 8px;
+  padding: 10px 20px;
   cursor: pointer;
   margin: 5px;
-  width: 100%;
 
   &:hover {
     background-color: #d3d3d3;

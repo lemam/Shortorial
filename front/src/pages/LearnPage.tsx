@@ -11,6 +11,7 @@ import { useActionStore, useBtnStore, useMotionDetectionStore } from "../store/u
 import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
+import StarEffect from "../components/style/StarEffect";
 
 const LearnPage = () => {
   type LearnState = "LOADING" | "PAUSE" | "READY" | "PLAY";
@@ -346,6 +347,7 @@ const LearnPage = () => {
 
   return (
     <Container>
+      <StarEffect numStars={80} />
       {state === "LOADING" ? (
         <LoadingText>Loading...</LoadingText>
       ) : (
@@ -462,6 +464,13 @@ const Container = styled.div`
     display: flex;
     flex-direction: column-reverse;
   }
+
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(48, 13, 45, 1) 80%,
+    rgba(112, 0, 102, 1) 100%
+  );
 `;
 
 const Section = styled.section`
