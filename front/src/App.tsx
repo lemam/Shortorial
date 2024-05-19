@@ -7,12 +7,10 @@ import LandingPage from "./pages/LandingPage";
 import LoginForm from "./pages/LoginForm";
 import SignUp from "./pages/SignUpPage";
 import LearnPage from "./pages/LearnPage";
-import LearnPageTmp from "./pages/LearnPageTmp";
 import ChallengePage from "./pages/ChallengePage";
 import ChallengeResultPage from "./pages/ChallengeResultPage";
 import VideoTrimPage from "./pages/VideoTrimPage";
 import VideoMarkerPage from "./pages/VIdeoMarkerPage";
-// import VideoResizePage from "./pages/VideoResizePage";
 import MyPage from "./pages/MyPage";
 import FeedPage from "./pages/FeedPage";
 
@@ -23,11 +21,16 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/main" element={<PrivateRoute component={<MainPage />} />} />
+          <Route
+            path="/main"
+            element={<PrivateRoute component={<MainPage />} />}
+          />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/sign-up" element={<SignUp />} />
-          <Route path="/learn/:shortsNo" element={<PrivateRoute component={<LearnPage />} />} />
-          <Route path="/learn2" element={<LearnPageTmp />} />
+          <Route
+            path="/learn/:shortsNo"
+            element={<PrivateRoute component={<LearnPage />} />}
+          />
           <Route
             path="/challenge/:shortsNo"
             element={<PrivateRoute component={<ChallengePage />} />}

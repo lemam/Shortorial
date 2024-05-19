@@ -1,9 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  PoseLandmarker,
-  FilesetResolver,
-  NormalizedLandmark,
-} from "@mediapipe/tasks-vision";
+import { useEffect, useRef } from "react";
+import { PoseLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { useVideoLandmarkStore } from "../../store/useAccStore";
 interface VideoType {
   width: number;
