@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { createFFmpeg } from "@ffmpeg/ffmpeg";
 import LoadingModalComponent from "../components/modal/LoadingModalComponent";
-import { predictWebcam, setBtnInfo } from "../modules/Motion";
+import { predictWebcamChallenge, setBtnInfo } from "../modules/Motion";
 import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
 import VideoMotionButton from "../components/button/VideoMotionButton";
@@ -304,16 +304,6 @@ const ChallengePage = () => {
     }
   }, [recording]);
 
-  const canvasElement = document.getElementById(
-    "output_canvas"
-  ) as HTMLCanvasElement | null;
-  let canvasCtx: CanvasRenderingContext2D | null = null;
-  // 그리기 도구
-  let drawingUtils: DrawingUtils | null = null;
-
-  if (canvasElement) canvasCtx = canvasElement.getContext("2d");
-  if (canvasCtx) drawingUtils = new DrawingUtils(canvasCtx);
-
   const lastWebcamTime = -1;
   const before_handmarker: NormalizedLandmark | null = null;
   const curr_handmarker: NormalizedLandmark | null = null;
@@ -338,16 +328,12 @@ const ChallengePage = () => {
         setStream(mediaStream);
         userVideoRef.current.addEventListener("loadeddata", () => {
           console.log("이벤트 삽입 완");
-          predictWebcam(
+          predictWebcamChallenge(
             "challenge",
             userVideoRef.current,
-            canvasCtx,
-            canvasElement,
-            drawingUtils,
             lastWebcamTime,
             before_handmarker,
             curr_handmarker,
-            // false,
             setBtn
           );
         });
@@ -444,7 +430,7 @@ const ChallengePage = () => {
 
   useEffect(() => {
     setBtnInfo();
-  }, [state]);
+  }, []);
 
   return (
     <ChallengeContainer>

@@ -201,7 +201,6 @@ const SeriesSection = styled.section`
   justify-content: space-between;
   background: #ededed;
   border-radius: 16px;
-  // border: 2px solid #333;
   padding: 36px;
   margin: 48px 16px;
 
