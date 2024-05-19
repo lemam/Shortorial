@@ -43,7 +43,8 @@ export default function MyPage() {
   );
 }
 const OutSide = styled.div`
-  // height: 100%;
+  position: relative;
+  height: 100%;
   background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 1) 0%,
