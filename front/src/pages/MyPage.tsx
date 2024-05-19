@@ -55,12 +55,13 @@ const MypageContainer = styled.div`
 `;
 
 const ProfileContainer = styled.div`
-  height: 15vh;
+  height: 17vh;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
 
   @media screen and (orientation: landscape) {
     padding-right: 15%; /* 오른쪽 마진을 20px로 설정 */
     padding-left: 15%; /* 왼쪽 마진을 20px로 설정 */
-    margin-bottom: 1rem;
   }
 `;
 
@@ -76,6 +77,7 @@ const TabMenu = styled.div`
 
   .submenu {
     // 기본 Tabmenu 에 대한 CSS를 구현
+
     display: flex;
     justify-content: center;
     height: 3rem;
@@ -84,7 +86,7 @@ const TabMenu = styled.div`
     padding-bottom: 5px;
     font-size: 15px;
     transition: 0.5s;
-    border-bottom: 2px solid #c7c7c7;
+    border-bottom: 2px solid #fb2576;
   }
 
   .focused {

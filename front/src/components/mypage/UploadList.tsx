@@ -6,7 +6,6 @@ import UploadComponent from "./UploadComponent";
 
 export default function UploadList() {
   const [shortsList, setShortsList] = useState<UploadShorts[]>([]);
-  const [isPortrait, setIsPortrait] = useState<boolean>(window.innerHeight > window.innerWidth);
 
   const getShorts = async () => {
     try {
@@ -23,41 +22,49 @@ export default function UploadList() {
 
   useEffect(() => {
     getShorts();
-    const handleResize = () => {
-      setIsPortrait(window.innerHeight > window.innerWidth);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
-    <div>
-      {Array.from(
-        { length: Math.ceil(shortsList.length / (isPortrait ? 2 : 4)) },
-        (_, index) => index * (isPortrait ? 2 : 4)
-      ).map((startIndex) => (
-        <div key={startIndex}>
-          <Container style={{ display: "flex" }}>
-            {shortsList.slice(startIndex, startIndex + (isPortrait ? 2 : 4)).map((uploadShorts) => (
+    <Container>
+      <SectionWrapper>
+        <Section>
+          <SectionConents>
+            {shortsList.map((uploadShorts) => (
               <UploadComponent
                 key={uploadShorts.uploadNo}
                 uploadShorts={uploadShorts}
                 onDelete={handleDeleteShort}
               />
             ))}
-          </Container>
-        </div>
-      ))}
-    </div>
+          </SectionConents>
+        </Section>
+      </SectionWrapper>
+    </Container>
   );
 }
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: row;
-  width: 50%;
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
 
-  @media screen and (orientation: landscape) {
-    width: calc(100% / 4);
+const Section = styled.section`
+  position: relative;
+  margin: 16px;
+  box-sizing: border-box;
+`;
+
+const SectionConents = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+
+  &.nowrap {
+    justify-content: center;
   }
+`;
+const SectionWrapper = styled.div`
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
 `;

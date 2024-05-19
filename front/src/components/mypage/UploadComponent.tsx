@@ -11,10 +11,6 @@ import {
   checkTitle,
 } from "../../apis/shorts";
 
-interface ContainerProps {
-  isPortrait: boolean;
-}
-
 interface UploadComponentProps {
   uploadShorts: UploadShorts;
   onDelete: (uploadNo: number) => void;
@@ -24,15 +20,14 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
   // 제목에서 '/' 이후의 부분을 추출하는 함수
   const extractTitle = (fullTitle: string): string => {
     const titleParts = fullTitle.split("/");
-    return titleParts.length > 0 ? titleParts[1] : fullTitle;
+    return titleParts.length > 1 ? titleParts[1] : fullTitle;
   };
 
   const [title, setTitle] = useState<string>(extractTitle(uploadShorts.uploadTitle));
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
-  const [isPortrait, setIsPortrait] = useState<boolean>(window.innerHeight > window.innerWidth);
   const [share, setShare] = useState<boolean>(false);
-  const [link, setLink] = useState<string | null>(null);
+  const [link, setLink] = useState<string | null>(uploadShorts.youtubeUrl || null);
 
   const titleCanbeModified = () => setModify(true);
   const titleCanNotbeModified = () => setModify(false);
@@ -49,12 +44,10 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
     deletingShorts.set("title", uploadShorts.uploadTitle);
 
     await deleteShorts(deletingShorts);
-    // 재렌더링 필요
     onDelete(uploadShorts.uploadNo); // 삭제 후 상위 컴포넌트에 uploadNo 전달
   };
 
   const saveTitle = async () => {
-    // 이름이 존재하면 true, 존재하지 않으면 false를 반환
     const result = await checkTitle(title);
     if (!result) {
       setTitle(title);
@@ -65,7 +58,6 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
       updatingShorts.set("newTitle", title);
 
       await updateTitle(updatingShorts, uploadShorts.uploadNo);
-      // 업데이트된 타이틀을 반영한 쇼츠를 조회해서 재렌더링 해야함
     } else {
       alert("이미 존재하는 타이틀입니다.");
       setModify(false);
@@ -78,15 +70,15 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
 
     try {
       const videoBlob = await getMyS3Blob(uploadShorts.uploadNo);
-      const downloadUrl = URL.createObjectURL(videoBlob); // blob url 생성
+      const downloadUrl = URL.createObjectURL(videoBlob);
 
-      const downloadLink = document.createElement("a"); // 임시 a 태그 생성
-      downloadLink.href = downloadUrl; // href 링크 지정
+      const downloadLink = document.createElement("a");
+      downloadLink.href = downloadUrl;
       downloadLink.setAttribute("download", `${title}.mp4`);
       document.body.appendChild(downloadLink);
-      downloadLink.click(); // a 태그 클릭
+      downloadLink.click();
 
-      document.body.removeChild(downloadLink); // 임시 a 태그 제거
+      document.body.removeChild(downloadLink);
       URL.revokeObjectURL(downloadUrl);
     } catch (err) {
       alert("다운로드에 실패했습니다.");
@@ -96,32 +88,20 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
     }
   };
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsPortrait(window.innerHeight > window.innerWidth);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
   const shareShortsToYoutube = async () => {
-    (() => setShare(true))();
+    setShare(true);
 
-    const filePath = await getFilePath(uploadShorts.uploadNo); // 임시 저장한 파일 경로
-    await shareShorts(filePath, uploadShorts.uploadNo); // 유튜브 업로드 함수에 전달
+    const filePath = await getFilePath(uploadShorts.uploadNo);
+    await shareShorts(filePath, uploadShorts.uploadNo);
   };
 
-  // youtube url 있는지 체크
   useEffect(() => {
     if (uploadShorts.youtubeUrl) {
       setLink(uploadShorts.youtubeUrl);
       setShare(false);
     }
-  }, [uploadShorts.youtubeUrl]);
+  }, [uploadShorts]);
 
-  // 쿼리스트링에 auth=true가 있으면 유튜브 인증 완료
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const alertParam = urlParams.get("auth");
@@ -130,15 +110,16 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
       alert(
         "유튜브 권한 설정이 완료되었습니다.\n공유 버튼을 누르면 채널에 비공개 동영상으로 업로드 됩니다."
       );
-      urlParams.delete("auth"); // alert 파라미터 제거
-      const newUrl = window.location.pathname; // 원래 url + 남은 쿼리스트링
-      window.history.replaceState({}, document.title, newUrl); // 원래 url로 업데이트
+      urlParams.delete("auth");
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
     }
   }, []);
 
   return (
-    <ResultContainer isPortrait={isPortrait}>
-      <VideoContainer isPortrait={isPortrait}>
+    <ResultContainer>
+      <VideoContainer>
+        <Gradient className="gradient" />
         <Video
           crossOrigin="anonymous"
           src={uploadShorts.uploadUrl}
@@ -194,22 +175,42 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
   );
 };
 
-const ResultContainer = styled.div<ContainerProps>`
-  display: flex;
+const ResultContainer = styled.div`
   flex-direction: column;
-  width: 100%;
-  // width: ${({ isPortrait }) => (isPortrait ? "100%" : "calc(100% / 2)")};
+
+  position: relative;
+  width: calc(100% / var(--grid-items-per-row) - var(--grid-item-margin));
+  margin: calc(var(--grid-item-margin) / 2);
+  color: #000;
+
+  &.serise {
+    --grid-items-per-row: 3;
+    max-width: 220px;
+  }
+
+  @media screen and (min-width: 600px) {
+    max-width: var(--grid-item-max-width);
+  }
 `;
 
-const VideoContainer = styled.div<ContainerProps>`
+const VideoContainer = styled.div`
   display: flex;
-  flex-direction: ${({ isPortrait }) => (isPortrait ? "column" : "row")};
   position: relative;
 `;
-
+const Gradient = styled.div`
+  position: absolute;
+  bottom: 5px;
+  width: 100%;
+  height: 100px;
+  background: rgb(0, 0, 0);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.25));
+  border-radius: 0 0 12px 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+`;
 const Video = styled.video`
-  // width: 100%;
-  // height: auto;
+  width: 100%;
+  border-radius: 12px;
   object-fit: cover;
 `;
 

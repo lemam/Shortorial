@@ -35,29 +35,42 @@ export default function Profile() {
 
   return (
     <ProfileContainer>
-      <ProfileNumContainer key="memberNickname">{memberInfo?.memberNickname}</ProfileNumContainer>
-      <ProfileNumContainer key="tryShorts">
-        <div>{counting?.tryShortsCount}</div>
-        <div>참여</div>
+      <ProfileNumContainer
+        key="memberNickname"
+        className="left"
+      >
+        {memberInfo?.memberNickname}
       </ProfileNumContainer>
-      <ProfileNumContainer key="uploadShorts">
-        <div>{counting?.uploadShortsCount}</div>
-        <div>완료</div>
-      </ProfileNumContainer>
-      <ProfileNumContainer key="youtubeUrl">
-        <div>{counting?.youtubeUrlCount}</div>
-        <div>게시</div>
-      </ProfileNumContainer>
+
+      <ProfilRightContainer>
+        <ProfileNumContainer key="tryShorts">
+          <div className="number">{counting?.tryShortsCount}</div>
+          <div>참여</div>
+        </ProfileNumContainer>
+        <ProfileNumContainer key="uploadShorts">
+          <div className="number">{counting?.uploadShortsCount}</div>
+          <div>완료</div>
+        </ProfileNumContainer>
+        <ProfileNumContainer key="youtubeUrl">
+          <div className="number">{counting?.youtubeUrlCount}</div>
+          <div>게시</div>
+        </ProfileNumContainer>
+      </ProfilRightContainer>
     </ProfileContainer>
   );
 }
 const ProfileContainer = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   padding: 10px;
   height: 100%;
   width: 100%;
-  border: 1px solid black;
+  border: 2px solid #fb2576;
+  border-radius: 20px;
+  box-shadow: 2px 2px #fb2576;
+`;
+const ProfilRightContainer = styled.div`
+  display: flex;
 `;
 const ProfileNumContainer = styled.div`
   display: flex;
@@ -67,4 +80,12 @@ const ProfileNumContainer = styled.div`
 
   margin-right: 10px;
   margin-left: 10px;
+
+  .number {
+    font-size: 25px;
+  }
+
+  &.left {
+    font-size: 30px;
+  }
 `;
