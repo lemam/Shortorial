@@ -16,6 +16,7 @@ let record_count = 0;
 let save_count = 0;
 let learn_count = 0;
 let rslt_count = 0;
+let canvas_count = 0;
 
 let play_count = 0;
 let challenge_count = 0;
@@ -30,6 +31,7 @@ let recorderBtnSize: DOMRect | null | undefined = null;
 let saveBtnSize: DOMRect | null | undefined = null;
 let learnBtnSize: DOMRect | null | undefined = null;
 let rsltBtnSize: DOMRect | null | undefined = null;
+let canvasBtnSize: DOMRect | null | undefined = null;
 
 let playSize: DOMRect | null | undefined = null;
 let challengeSize: DOMRect | null | undefined = null;
@@ -239,6 +241,8 @@ function btn_with_landmark_learn(
         useMotionDetectionStore.getState().setFlipCount(0);
         speed_count = 0;
         useMotionDetectionStore.getState().setSpeedCount(0);
+        canvas_count = 0;
+        useMotionDetectionStore.getState().setCanvasCount(0);
       }
     } else if (
       challengeSize &&
@@ -261,6 +265,8 @@ function btn_with_landmark_learn(
         useMotionDetectionStore.getState().setFlipCount(0);
         speed_count = 0;
         useMotionDetectionStore.getState().setSpeedCount(0);
+        canvas_count = 0;
+        useMotionDetectionStore.getState().setCanvasCount(0);
       }
     } else if (
       repeatSize &&
@@ -283,6 +289,8 @@ function btn_with_landmark_learn(
         useMotionDetectionStore.getState().setFlipCount(0);
         speed_count = 0;
         useMotionDetectionStore.getState().setSpeedCount(0);
+        canvas_count = 0;
+        useMotionDetectionStore.getState().setCanvasCount(0);
       }
     } else if (
       flipSize &&
@@ -305,6 +313,8 @@ function btn_with_landmark_learn(
           .setFlipCount((flip_count / SMALL_COUNT) * 100);
         speed_count = 0;
         useMotionDetectionStore.getState().setSpeedCount(0);
+        canvas_count = 0;
+        useMotionDetectionStore.getState().setCanvasCount(0);
       }
     } else if (
       speedSize &&
@@ -327,6 +337,32 @@ function btn_with_landmark_learn(
         useMotionDetectionStore
           .getState()
           .setSpeedCount((speed_count / SMALL_COUNT) * 100);
+        canvas_count = 0;
+        useMotionDetectionStore.getState().setCanvasCount(0);
+      }
+    } else if (
+      canvasBtnSize &&
+      handLandmarkerY >= canvasBtnSize.top &&
+      handLandmarkerY <= canvasBtnSize.bottom
+    ) {
+      if (canvas_count >= SMALL_COUNT) {
+        setBtn("canvas");
+      } else {
+        setBtn("none");
+        play_count = 0;
+        useMotionDetectionStore.getState().setPlayCount(0);
+        challenge_count = 0;
+        useMotionDetectionStore.getState().setChallengeCount(0);
+        repeat_count = 0;
+        useMotionDetectionStore.getState().setRepeatCount(0);
+        flip_count = 0;
+        useMotionDetectionStore.getState().setFlipCount(0);
+        speed_count = 0;
+        useMotionDetectionStore.getState().setFlipCount(0);
+        canvas_count++;
+        useMotionDetectionStore
+          .getState()
+          .setCanvasCount((canvas_count / SMALL_COUNT) * 100);
       }
     }
   } else {
@@ -341,6 +377,8 @@ function btn_with_landmark_learn(
     useMotionDetectionStore.getState().setFlipCount(0);
     speed_count = 0;
     useMotionDetectionStore.getState().setSpeedCount(0);
+    canvas_count = 0;
+    useMotionDetectionStore.getState().setCanvasCount(0);
   }
 }
 
@@ -617,6 +655,7 @@ export function setBtnInfo() {
   const saveBtn = btnPlace("save");
   const learnBtn = btnPlace("learn");
   const rsltBtn = btnPlace("rslt");
+  const canvasBtn = btnPlace("canvasBtn");
 
   const play = btnPlace("play");
   const challenge = btnPlace("challenge");
@@ -631,6 +670,7 @@ export function setBtnInfo() {
   useDomStore.getState().setSaveBtnSize(saveBtn);
   useDomStore.getState().setLearnBtnSize(learnBtn);
   useDomStore.getState().setRsltBtnSize(rsltBtn);
+  useDomStore.getState().setCanvasBtnSize(canvasBtn);
 
   useDomStore.getState().setPlaySize(play);
   useDomStore.getState().setChallengeSize(challenge);
@@ -645,6 +685,7 @@ export function setBtnInfo() {
   saveBtnSize = useDomStore.getState().saveBtnSize;
   learnBtnSize = useDomStore.getState().learnBtnSize;
   rsltBtnSize = useDomStore.getState().rsltBtnSize;
+  canvasBtnSize = useDomStore.getState().canvasBtnSize;
 
   playSize = useDomStore.getState().playSize;
   challengeSize = useDomStore.getState().challengeSize;
