@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 volumes:
   letsdance-volume:
     external: true
@@ -16,7 +16,8 @@ volumes:
 services:
   letsdance_nginx_proxy_manager:
     container_name: letsdance-nginx-proxy-manager-container
-    image: 'jc21/nginx-proxy-manager:2.11.1'
+    image: "jc21/nginx-proxy-manager:2.11.1"
+    restart: always
     ports:
       - "80:80"
       - "443:443"
@@ -69,13 +70,13 @@ services:
     container_name: letsdance-frontend-container
     restart: always
     ports:
+      - "80:80"
       - "3000:3000"
     environment:
       - TZ=Asia/Seoul
   letsdance_backend:
     image: letsdance-backend
     container_name: letsdance-backend-container
-    restart: always
     ports:
       - "8089:8089"
     environment:
@@ -122,3 +123,23 @@ services:
     environment:
       - TZ=Asia/Seoul
       - REDIS_PASSWORD=b1234
+  letsdance_node:
+    image: letsdance-node
+    container_name: letsdance-node-container
+    ports:
+      - "3001:3001"
+    environment:
+      - TZ=Asia/Seoul
+  letsdance_flask:
+    build: .
+    image: letsdance-flask
+    container_name: letsdance-flask-container
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: development
+    volumes:
+      - .:/app
+    networks:
+      - webnet
