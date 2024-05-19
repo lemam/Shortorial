@@ -90,7 +90,7 @@ const MainPage = () => {
               <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
             </SectionHeaderContainer>
             <SectionConents className="nowrap">
-              {recommendedShorts?.map((shorts) => (
+              {popularShortsList?.map((shorts) => (
                 <ShortsVideoItem
                   key={shorts.shortsNo}
                   shortsInfo={shorts}
