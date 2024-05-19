@@ -1,10 +1,11 @@
 import InputComponent from "../components/signUp/InputComponent";
 import BasicButton from "../components/button/BasicButton";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { useEffect, useState } from "react";
 import { check } from "../modules/Member";
 import { signUp } from "../apis/member";
+import logo from "/src/assets/logo.png";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -61,9 +62,7 @@ const SignUpPage = () => {
       try {
         setIsPass(await check("pass", pass, setCheckPass));
         if (passConfirm) {
-          setIsPassConfirm(
-            await check("passConfirm", passConfirm, setCheckPassConfirm, pass)
-          );
+          setIsPassConfirm(await check("passConfirm", passConfirm, setCheckPassConfirm, pass));
         }
       } catch (err) {
         console.log(err);
@@ -76,9 +75,7 @@ const SignUpPage = () => {
     // 비동기 작업을 수행할 함수를 선언
     (async () => {
       try {
-        setIsPassConfirm(
-          await check("passConfirm", passConfirm, setCheckPassConfirm, pass)
-        );
+        setIsPassConfirm(await check("passConfirm", passConfirm, setCheckPassConfirm, pass));
       } catch (err) {
         console.log(err);
       }
@@ -99,7 +96,14 @@ const SignUpPage = () => {
 
   return (
     <TotalPage>
-      <Title>Let's Dance</Title>
+      <Title>
+        <LogoContainer to="/">
+          <LogoImg
+            src={logo}
+            alt=""
+          />
+        </LogoContainer>
+      </Title>
       <SignUp>
         <Input>
           <NameContainer> 회원가입 </NameContainer>
@@ -131,7 +135,10 @@ const SignUpPage = () => {
           />
         </Input>
         <Btn>
-          <BasicButton text="완료" onClick={signUpForm} />
+          <BasicButton
+            text="완료"
+            onClick={signUpForm}
+          />
         </Btn>
       </SignUp>
     </TotalPage>
@@ -139,6 +146,20 @@ const SignUpPage = () => {
 };
 
 export default SignUpPage;
+
+const LogoContainer = styled(Link)`
+  height: 40px;
+
+  @media screen and (max-width: 479px) {
+    height: 26px;
+  }
+`;
+
+const LogoImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
 
 const TotalPage = styled.div`
   width: 100%;
