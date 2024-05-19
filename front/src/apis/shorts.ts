@@ -229,3 +229,15 @@ export async function deleteShorts(deletingShorts: Map<string, string>) {
     console.error("Error Deleting data:", error);
   }
 }
+
+// 인기순 쇼츠 조회
+export async function getTopRankingShorts() {
+  const token = "Bearer " + localStorage.getItem("accessToken");
+  const data = await axios.get(`${REST_SHORTS_LIST_URL}/topRanking`, {
+    headers: {
+      Authorization: token,
+    },
+  });
+
+  return data.data;
+}

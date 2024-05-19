@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { Shorts } from "../constants/types";
-import { getShortsList, getTryCount } from "../apis/shorts";
+import { getShortsList, getTopRankingShorts, getTryCount } from "../apis/shorts";
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
 import { CancelPresentation, Copyright, EmojiPeople, TimerOutlined } from "@mui/icons-material";
@@ -45,8 +45,8 @@ const MainPage = () => {
   };
 
   const loadPopularShortsList = async () => {
-    const data = await getShortsList();
-    if (data) setPopularShortsList([data[0], data[1], data[2]]);
+    const data = await getTopRankingShorts();
+    if (data) setPopularShortsList(data);
   };
 
   useEffect(() => {
@@ -66,7 +66,7 @@ const MainPage = () => {
       <SectionWrapper>
         <SeriesSection style={{ background: "#fefae0" }}>
           <SectionHeaderContainer>
-            <SectionTitle>이런 챌린지는 어떠세요?</SectionTitle>
+            <SectionTitle>⭐ 이런 챌린지는 어떠세요?</SectionTitle>
             <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
           </SectionHeaderContainer>
           <SectionConents className="nowrap">
@@ -83,7 +83,7 @@ const MainPage = () => {
         </SeriesSection>
         <SeriesSection style={{ background: "#ffe5ec" }}>
           <SectionHeaderContainer>
-            <SectionTitle>요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
+            <SectionTitle>🔥 요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
             <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
           </SectionHeaderContainer>
           <SectionConents className="nowrap">
@@ -200,7 +200,7 @@ const SectionHeaderContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: 16px;
+  margin-right: 16px;
   word-break: keep-all;
   white-space: pre-line;
 
