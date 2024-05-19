@@ -65,8 +65,7 @@ export const useDomStore = create<DomState>((set) => ({
   speedSize: null,
 
   setDomSize: (newDomSize: DOMRect) => set({ domSize: newDomSize }),
-  setVisibleBtnSize: (newBtnSize: DOMRect) =>
-    set({ visibleBtnSize: newBtnSize }),
+  setVisibleBtnSize: (newBtnSize: DOMRect) => set({ visibleBtnSize: newBtnSize }),
   setTimeBtnSize: (newBtnSize: DOMRect) => set({ timerBtnSize: newBtnSize }),
   setRecordBtnSize: (newBtnSize: DOMRect) => set({ recordBtnSize: newBtnSize }),
   setSaveBtnSize: (newBtnSize: DOMRect) => set({ saveBtnSize: newBtnSize }),
@@ -91,6 +90,7 @@ interface MotionDetection {
   repeatCount: number;
   flipCount: number;
   speedCount: number;
+  saveCount: number;
 
   setVisibleCount: (newVisibleCount: number) => void;
   setTimerCount: (newTimerCount: number) => void;
@@ -102,6 +102,7 @@ interface MotionDetection {
   setRepeatCount: (newRepeatCount: number) => void;
   setFlipCount: (newFlipCount: number) => void;
   setSpeedCount: (newSpeedCount: number) => void;
+  setSaveCount: (newSaveCount: number) => void;
 }
 
 export const useMotionDetectionStore = create<MotionDetection>((set) => ({
@@ -115,20 +116,17 @@ export const useMotionDetectionStore = create<MotionDetection>((set) => ({
   repeatCount: 0,
   flipCount: 0,
   speedCount: 0,
+  saveCount: 0,
 
-  setVisibleCount: (newVisibleCount: number) =>
-    set({ visibleCount: newVisibleCount }),
+  setVisibleCount: (newVisibleCount: number) => set({ visibleCount: newVisibleCount }),
   setTimerCount: (newTimerCount: number) => set({ timerCount: newTimerCount }),
-  setRecordCount: (newRecordCount: number) =>
-    set({ recordCount: newRecordCount }),
+  setRecordCount: (newRecordCount: number) => set({ recordCount: newRecordCount }),
   setLearnCount: (newLearnCount: number) => set({ learnCount: newLearnCount }),
-  setResultCount: (newResultCount: number) =>
-    set({ resultCount: newResultCount }),
+  setResultCount: (newResultCount: number) => set({ resultCount: newResultCount }),
   setPlayCount: (newPlayCount: number) => set({ playCount: newPlayCount }),
-  setChallengeCount: (newChallengeCount: number) =>
-    set({ challengeCount: newChallengeCount }),
-  setRepeatCount: (newRepeatCount: number) =>
-    set({ repeatCount: newRepeatCount }),
+  setChallengeCount: (newChallengeCount: number) => set({ challengeCount: newChallengeCount }),
+  setRepeatCount: (newRepeatCount: number) => set({ repeatCount: newRepeatCount }),
   setFlipCount: (newFlipCount: number) => set({ flipCount: newFlipCount }),
   setSpeedCount: (newSpeedCount: number) => set({ speedCount: newSpeedCount }),
+  setSaveCount: (newSaveCount: number) => set({ saveCount: newSaveCount }),
 }));
