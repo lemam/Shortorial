@@ -70,7 +70,7 @@ const MainPage = () => {
     <Container>
       <Header />
       <SectionWrapper>
-        <Section>
+        {/* <Section>
           <SectionTitle>오늘의 챌린지</SectionTitle>
           <div
             style={{
@@ -138,9 +138,12 @@ const MainPage = () => {
               </>
             )}
           </div>
-        </Section>
-        <Section>
-          <SectionTitle>당신을 위한 추천 챌린지</SectionTitle>
+        </Section> */}
+        <SeriesSection>
+          <SectionHeaderContainer>
+            <SectionTitle>당신을 위한 추천 챌린지</SectionTitle>
+            <p>무언가의 설명...</p>
+          </SectionHeaderContainer>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
               <ShortsVideoItem
@@ -152,9 +155,12 @@ const MainPage = () => {
               ></ShortsVideoItem>
             ))}
           </SectionConents>
-        </Section>
-        <Section>
-          <SectionTitle>실시간 인기 챌린지</SectionTitle>
+        </SeriesSection>
+        <SeriesSection>
+          <SectionHeaderContainer>
+            <SectionTitle>실시간 인기 챌린지</SectionTitle>
+            <p>무언가의 설명...</p>
+          </SectionHeaderContainer>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
               <ShortsVideoItem
@@ -166,7 +172,7 @@ const MainPage = () => {
               />
             ))}
           </SectionConents>
-        </Section>
+        </SeriesSection>
         <Section>
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
@@ -252,10 +258,40 @@ const SectionTitle = styled.h3`
 const SectionConents = styled.div`
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
+  /* width: 100%; */
 
   &.nowrap {
     flex-wrap: nowrap;
+  }
+`;
+
+const SeriesSection = styled.section`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background: #ededed;
+  border-radius: 16px;
+  border: 2px solid #333;
+  padding: 16px;
+  margin: 48px 16px;
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+`;
+
+const SectionHeaderContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  word-break: keep-all;
+
+  h3 {
+    margin: 1rem 0;
+  }
+
+  @media screen and (max-width: 768px) {
+    margin: calc(var(--grid-item-margin) / 2);
   }
 `;
 
