@@ -2,6 +2,8 @@ export interface VideoSection {
   id: number;
   start: number;
   end: number;
+  acc: number;
+  maxAcc: number;
 }
 
 export default interface Member {

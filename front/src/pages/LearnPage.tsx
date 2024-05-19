@@ -88,6 +88,7 @@ const LearnPage = () => {
   ]);
 
   const currentSection = useLearnStore((state) => state.currentSection);
+  // const setCurrentSection = useLearnStore((state) => state.setCurrentSection);
 
   const btn = useBtnStore((state) => state.btn);
   const action = useActionStore((state) => state.action);
@@ -125,6 +126,8 @@ const LearnPage = () => {
         id: i,
         start: i * secondsPerSection,
         end: (i + 1) * secondsPerSection,
+        acc: 0,
+        maxAcc: 0,
       });
     }
 
@@ -177,32 +180,31 @@ const LearnPage = () => {
       initInterval();
       moveVideoTime(currentSection.start); // 현재 구간 시작 시간으로 이동
       setState("PAUSE");
-      setAccFlag(false);
+      // setAccFlag(false);
     }
   }, [currentSection.start, initInterval, moveVideoTime, video]);
 
   // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
   const handleTimeUpdate = useCallback(() => {
     if (video) {
-      setAccFlag(true);
       // 반복하지 않는 경우
       if (!isLooping) {
         console.log("not Loop");
         setCurrentTime(video.currentTime);
         if (video.ended) {
           setState("PAUSE");
-          setAccFlag(false);
+          // setAccFlag(false);
         }
-        return;
+        // return;
       }
 
       // 반복하는 경우
-      if (isLooping && loopSection) {
+      else if (isLooping && loopSection) {
         if (video.currentTime >= loopSection.end || video.ended) {
           video.currentTime = loopSection.start;
           setCurrentTime(loopSection.start);
           if (video.ended) playVideo();
-          return;
+          // return;
         }
       }
     }
@@ -377,7 +379,6 @@ const LearnPage = () => {
   const videoLandmark = useVideoLandmarkStore.getState().videoLandmark;
   const motionLandmark = useMotionLandmarkStore.getState().motionLandmark;
   const [acc, setAcc] = useState(0);
-  const [accFlag, setAccFlag] = useState(false);
   const [accValue, setAccValue] = useValueStore((state) => [
     state.accValue,
     state.setAccValue,
@@ -386,6 +387,32 @@ const LearnPage = () => {
     state.count,
     state.setCount,
   ]);
+
+  // 정확도 계산하기
+  // useEffect(() => {
+  //   if (sectionList.length > 0) {
+  //     console.log(sectionList);
+  //     let sectionListTmp = sectionList;
+
+  //     if (currentSection.id > 0) {
+  //       sectionListTmp[currentSection.id - 1].maxAcc = Math.max(
+  //         acc / count,
+  //         sectionListTmp[currentSection.id - 1].acc
+  //       );
+  //       sectionListTmp[currentSection.id - 1].acc = acc / count;
+  //     } else {
+  //       sectionListTmp[sectionListTmp.length - 1].maxAcc = Math.max(
+  //         acc / count,
+  //         sectionListTmp[sectionListTmp.length - 1].acc
+  //       );
+  //       sectionListTmp[sectionListTmp.length - 1].acc = acc / count;
+  //     }
+  //     setSectionList(sectionListTmp);
+  //     setAccValue(0);
+  //     setCount(0);
+  //   }
+  // }, [currentSection.id]);
+
   useEffect(() => {
     const fetchData = async () => {
       if (videoLandmark && motionLandmark) {
@@ -394,27 +421,112 @@ const LearnPage = () => {
           setAccValue(acc + accValue);
           setCount(count + 1);
         }
-        if (state === "READY") {
-          setAccValue(0);
-          setCount(0);
-        }
       }
     };
 
     fetchData();
   }, [videoLandmark, motionLandmark]);
 
-  useEffect(() => {
-    if (count == 0) setAccValue(accValue / 1);
-    else {
-      if (state === "PAUSE") {
-        setAccValue(accValue / count);
-        console.log(accValue);
-        console.log(count);
-        console.log("++++++++++++++++");
+  const throttling = (throttleTimePerMs = 3000) => {
+    let timer: NodeJS.Timeout | null = null;
+
+    const throttleFunc = (callbackFunc: () => void) => {
+      if (!timer) {
+        timer = setInterval(() => {
+          callbackFunc();
+        }, throttleTimePerMs);
+        // callbackFunc();
       }
+    };
+    // 타이머를 중지하고 리셋하는 함수도 제공
+    const stopThrottle = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
+
+    return { throttleFunc, stopThrottle };
+  };
+
+  const callbackFunc = () => {
+    let sectionListTmp = sectionList;
+    console.log(currentSection.id);
+    if (!isLooping) {
+      if (currentSection.id > 0) {
+        console.log("A");
+        sectionListTmp[currentSection.id - 1].maxAcc = Math.max(
+          acc / count,
+          sectionListTmp[currentSection.id - 1].acc
+        );
+        sectionListTmp[currentSection.id - 1].acc = acc / count;
+      } else {
+        console.log("B");
+        sectionListTmp[sectionListTmp.length - 1].maxAcc = Math.max(
+          acc / count,
+          sectionListTmp[sectionListTmp.length - 1].acc
+        );
+        sectionListTmp[sectionListTmp.length - 1].acc = acc / count;
+      }
+      setSectionList(sectionListTmp);
+      setAccValue(0);
+      setCount(0);
+    } else {
+      console.log("C");
+      sectionListTmp[currentSection.id].maxAcc = Math.max(
+        acc / count,
+        sectionListTmp[currentSection.id].acc
+      );
+      sectionListTmp[currentSection.id].acc = acc / count;
+      setSectionList(sectionListTmp);
+      setAccValue(0);
+      setCount(0);
     }
-  }, [accFlag]);
+  };
+
+  // let flag = false;
+  // useRef에 적절한 타입을 명시
+  const throttledCallbackRef = useRef<{
+    throttleFunc: (callbackFunc: () => void) => void;
+    stopThrottle: () => void;
+  }>();
+
+  useEffect(() => {
+    // 함수 초기화
+    console.log("A");
+    const throttled = throttling(3000);
+    throttledCallbackRef.current = {
+      throttleFunc: throttled.throttleFunc,
+      stopThrottle: throttled.stopThrottle,
+    };
+  }, [currentSection.id]);
+
+  useEffect(() => {
+    if (state === "PLAY") {
+      throttledCallbackRef.current?.throttleFunc(callbackFunc);
+    } else if (state === "PAUSE") {
+      throttledCallbackRef.current?.stopThrottle();
+    }
+
+    return () => {
+      // 컴포넌트 언마운트 시 타이머 정지
+      throttledCallbackRef.current?.stopThrottle();
+    };
+  }, [state]);
+
+  // useEffect(() => {
+  //   if (state === "PLAY") {
+  //     flag = true;
+  //     const throttledCallbackFunc = throttling();
+  //     throttledCallbackFunc(callbackFunc);
+  //   } else if (state === "PAUSE") {
+  //     if (flag) {
+  //       const throttledCallbackFunc = throttling(0);
+  //       throttledCallbackFunc(callbackFunc);
+  //       flag = false;
+  //     }
+  //   }
+  // }, [state]);
   return (
     <Container>
       {state === "LOADING" ? (
@@ -449,7 +561,12 @@ const LearnPage = () => {
                 autoPlay
                 isCanvas={isCanvas}
               ></MotionCamera>
-              <Score accFlag={accFlag}>{accValue}</Score>
+              <Score>
+                {sectionList.length > 0 && currentSection.id >= 0
+                  ? sectionList[currentSection.id - 1]?.acc || 0
+                  : 0}
+              </Score>
+
               <VideoMotionButtonList>
                 {state === "PAUSE" ? (
                   <VideoMotionButton
@@ -644,7 +761,7 @@ const LoadingText = styled.div`
   color: #fff;
 `;
 
-const Score = styled.div<{ accFlag: boolean }>`
+const Score = styled.div`
   position: absolute;
   font-size: xx-large;
   color: red;

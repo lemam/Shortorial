@@ -28,9 +28,9 @@ interface test {
 
 const useLearnStore = create<test>((set, get) => ({
   currentTime: 0,
-  currentSection: { id: 0, start: 0, end: 0 },
+  currentSection: { id: 0, start: 0, end: 0, acc: 0, maxAcc: 0 },
   isLooping: false,
-  loopSection: { id: 0, start: 0, end: 0 },
+  loopSection: { id: 0, start: 0, end: 0, acc: 0, maxAcc: 0 },
   timer: 0,
   isFlipped: false,
   playSpeed: 1,
