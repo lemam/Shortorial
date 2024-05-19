@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   PoseLandmarker,
   FilesetResolver,
@@ -91,7 +91,6 @@ export default function MotionVideo({
       videoRef.current?.removeEventListener("pause", handlePause);
     };
   }, []);
-
   return (
     <video
       width={width}

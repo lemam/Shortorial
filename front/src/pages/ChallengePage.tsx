@@ -339,7 +339,7 @@ const ChallengePage = () => {
             lastWebcamTime,
             before_handmarker,
             curr_handmarker,
-            false,
+            // false,
             setBtn
           );
         });
