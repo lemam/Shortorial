@@ -43,7 +43,17 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/").hasRole("USER")
-                        .anyRequest().permitAll())
+                                .requestMatchers("/api/member/reissue").permitAll()
+                                .requestMatchers("/api/member/check/").permitAll()
+                                .requestMatchers("/api/member/join").permitAll()
+                                .requestMatchers("/api/member/login").permitAll()
+                                .requestMatchers("/api/shorts/**").permitAll()
+                                .requestMatchers("/api/s3/**").permitAll()
+                                .requestMatchers("/swagger-resources/**",
+                                                "/v3/api-docs/**","/swagger-ui/**").permitAll()
+
+
+                                .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers((headerConfig)->headerConfig.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
