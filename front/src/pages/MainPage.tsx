@@ -30,16 +30,12 @@ const MainPage = () => {
 
   const openModal = (shorts: Shorts) => {
     return () => {
-      console.log(popularShortsList);
-
       setSelectedShorts(shorts);
       setShowDetails(true);
     };
   };
 
   const closeModal = () => {
-    console.log(allShortsList);
-    console.log(selectedShorts);
     setShowDetails(false);
     setSelectedShorts(null);
   };
@@ -145,7 +141,6 @@ const MainPage = () => {
           </CancelIcon>
           <Details>
             <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="23px"></Detail>
-
             <div>
               <Detail
                 icon={<MusicNote />}
@@ -170,6 +165,7 @@ const MainPage = () => {
               ></Detail>
             </div>
           </Details>
+
           <ButtonContainer>
             <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>
               연습모드
