@@ -4,13 +4,27 @@ import { Flip, Pause, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import noRepeat from "/src/assets/icon/repeat-off.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import { VideoSection, Shorts } from "../constants/types";
-import { setBtnInfo } from "../modules/Motion";
+import { predictVideo, setBtnInfo } from "../modules/Motion";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
-import { useActionStore, useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
+import {
+  useActionStore,
+  useBtnStore,
+  useMotionDetectionStore,
+} from "../store/useMotionStore";
 import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
+import { Acc } from "../modules/Acc";
+import {
+  useMotionLandmarkStore,
+  useVideoLandmarkStore,
+  useValueStore,
+  useCountStore,
+} from "../store/useAccStore";
+
+import greatImage from "../assets/score/great.png";
+import goodImage from "../assets/score/good.png";
 import StarEffect from "../components/style/StarEffect";
 
 const LearnPage = () => {
@@ -27,6 +41,7 @@ const LearnPage = () => {
     height: 0,
   });
 
+  const [startFlag, setStartFlag] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const interval = intervalRef.current;
 
@@ -59,14 +74,19 @@ const LearnPage = () => {
     state.countdownTimer,
   ]);
 
-  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore((state) => [
-    state.isLooping,
-    state.loopSection,
-    state.setIsLooping,
-    state.setLoopSection,
-  ]);
+  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore(
+    (state) => [
+      state.isLooping,
+      state.loopSection,
+      state.setIsLooping,
+      state.setLoopSection,
+    ]
+  );
 
-  const [isFlipped, setIsFlipped] = useLearnStore((state) => [state.isFlipped, state.setIsFlipped]);
+  const [isFlipped, setIsFlipped] = useLearnStore((state) => [
+    state.isFlipped,
+    state.setIsFlipped,
+  ]);
 
   const [playSpeed, changePlaySpeed] = useLearnStore((state) => [
     state.playSpeed,
@@ -74,20 +94,20 @@ const LearnPage = () => {
   ]);
 
   const currentSection = useLearnStore((state) => state.currentSection);
+  // const setCurrentSection = useLearnStore((state) => state.setCurrentSection);
 
   const btn = useBtnStore((state) => state.btn);
   const action = useActionStore((state) => state.action);
   const [canAction, setCanAction] = useState(true);
 
-  const [playCount, challengeCount, repeatCount, flipCount, speedCount] = useMotionDetectionStore(
-    (state) => [
+  const [playCount, challengeCount, repeatCount, flipCount, speedCount] =
+    useMotionDetectionStore((state) => [
       state.playCount,
       state.challengeCount,
       state.repeatCount,
       state.flipCount,
       state.speedCount,
-    ]
-  );
+    ]);
 
   // 영상 정보 가져오기
   const loadVideo = useCallback(async () => {
@@ -112,6 +132,8 @@ const LearnPage = () => {
         id: i,
         start: i * secondsPerSection,
         end: (i + 1) * secondsPerSection,
+        acc: 0,
+        maxAcc: 0,
       });
     }
 
@@ -148,12 +170,18 @@ const LearnPage = () => {
     if (video) {
       if (video.ended) {
         video.currentTime = 0;
+        setStartFlag(false);
         setCurrentTime(0);
       }
 
       video.playbackRate = playSpeed;
       video.play();
       setState("PLAY");
+      if (!startFlag) {
+        setTimeout(() => {
+          setStartFlag(true);
+        }, 3000);
+      }
     }
   }, [playSpeed, setCurrentTime, video]);
 
@@ -164,25 +192,37 @@ const LearnPage = () => {
       initInterval();
       moveVideoTime(currentSection.start); // 현재 구간 시작 시간으로 이동
       setState("PAUSE");
+      setStartFlag(false);
+      // setAccFlag(false);
     }
   }, [currentSection.start, initInterval, moveVideoTime, video]);
 
+  const [flag, setFlag] = useState(false);
   // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
   const handleTimeUpdate = useCallback(() => {
     if (video) {
       // 반복하지 않는 경우
       if (!isLooping) {
+        console.log("not Loop");
         setCurrentTime(video.currentTime);
         if (video.ended) {
-          video.currentTime = 0;
-          setState("PAUSE");
+          {
+            video.currentTime = 0;
+            setState("PAUSE");
+            setFlag(true);
+            setTimeout(() => {
+              setStartFlag(false);
+            }, 500);
+            // setAccFlag(false);
+          }
         }
         return;
       }
 
       // 반복하는 경우
-      if (isLooping && loopSection) {
+      else if (isLooping && loopSection) {
         if (video.currentTime >= loopSection.end || video.ended) {
+          setFlag(true);
           video.currentTime = loopSection.start;
           setCurrentTime(loopSection.start);
           if (video.ended) playVideo();
@@ -248,7 +288,8 @@ const LearnPage = () => {
   // 화면 크기 바뀔 때마다 실행 - videoSize 초기화
   const handleResize = useCallback(() => {
     if (centerSectionRef.current) {
-      const { width, height } = centerSectionRef.current.getBoundingClientRect();
+      const { width, height } =
+        centerSectionRef.current.getBoundingClientRect();
       setCenterSectionSize({ width, height });
       initVideoSize();
     }
@@ -259,7 +300,8 @@ const LearnPage = () => {
     setTimeout(handleResize, 100);
     window.addEventListener("resize", () => setTimeout(handleResize, 100));
 
-    return () => window.removeEventListener("resize", () => setTimeout(handleResize, 200));
+    return () =>
+      window.removeEventListener("resize", () => setTimeout(handleResize, 200));
   }, [handleResize, initVideoSize]);
 
   // 화면의 준비가 모두 완료했을 때 실행
@@ -276,6 +318,7 @@ const LearnPage = () => {
     if (interval && timer <= 0) {
       initInterval();
       playVideo();
+      if (video) predictVideo(video);
     }
   }, [initInterval, interval, playVideo, timer]);
 
@@ -302,18 +345,12 @@ const LearnPage = () => {
         if (canAction) {
           moveToPrevSection();
           setCanAction(false);
-          // setTimeout(() => {
-          //   setCanAction(true);
-          // }, 1000);
         }
         break;
       case "next":
         if (canAction) {
           moveToNextSection();
           setCanAction(false);
-          // setTimeout(() => {
-          //   setCanAction(true);
-          // }, 1000);
         }
         break;
       case "none":
@@ -348,6 +385,103 @@ const LearnPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [btn]);
 
+  const [isCanvas, setIsCanvas] = useState(false);
+
+  const canvasSetting = () => {
+    setIsCanvas(!isCanvas);
+  };
+
+  // landmark 정보
+  const videoLandmark = useVideoLandmarkStore.getState().videoLandmark;
+  const motionLandmark = useMotionLandmarkStore.getState().motionLandmark;
+  const [acc, setAcc] = useState(0);
+  const [accValue, setAccValue] = useValueStore((state) => [
+    state.accValue,
+    state.setAccValue,
+  ]);
+  const [count, setCount] = useCountStore((state) => [
+    state.count,
+    state.setCount,
+  ]);
+
+  const [scoreImage, setScoreImage] = useState("");
+  // 정확도 계산하기
+  useEffect(() => {
+    if (sectionList.length > 0 || state === "PAUSE") {
+      console.log(sectionList);
+      let sectionListTmp = sectionList;
+
+      if (currentSection.id > 0) {
+        sectionListTmp[currentSection.id - 1].maxAcc = Math.max(
+          acc / count,
+          sectionListTmp[currentSection.id - 1].acc
+        );
+        sectionListTmp[currentSection.id - 1].acc = acc / count;
+        switch (sectionListTmp[currentSection.id - 1].acc) {
+        }
+      } else {
+        sectionListTmp[sectionListTmp.length - 1].maxAcc = Math.max(
+          acc / count,
+          sectionListTmp[sectionListTmp.length - 1].acc
+        );
+        sectionListTmp[sectionListTmp.length - 1].acc = acc / count;
+      }
+      settingImage(acc / count);
+      setSectionList(sectionListTmp);
+      setAccValue(0);
+      setCount(0);
+    }
+  }, [currentSection.id, state]);
+
+  useEffect(() => {
+    if (sectionList.length > 0 && flag) {
+      let sectionListTmp = sectionList;
+      sectionListTmp[currentSection.id].maxAcc = Math.max(
+        acc / count,
+        sectionListTmp[currentSection.id].acc
+      );
+      sectionListTmp[currentSection.id].acc = acc / count;
+      console.log(sectionListTmp);
+      setSectionList(sectionListTmp);
+    }
+    settingImage(acc / count);
+    setAccValue(0);
+    setCount(0);
+    setFlag(false);
+  }, [flag]);
+
+  const [isVisible, setIsVisible] = useState(false);
+  const settingImage = (score: number) => {
+    setIsVisible(true);
+    if (score > 40) {
+      setScoreImage(greatImage);
+    } else {
+      setScoreImage(goodImage);
+    }
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 500);
+  };
+
+  useEffect(() => {
+    if (state !== "PLAY") {
+      setIsVisible(false);
+    }
+  }, [state]);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (videoLandmark && motionLandmark) {
+        setAcc(await Acc(videoLandmark, motionLandmark));
+        if (state === "PLAY") {
+          setAccValue(acc + accValue);
+          setCount(count + 1);
+        }
+      }
+    };
+
+    fetchData();
+  }, [videoLandmark, motionLandmark]);
+
   return (
     <Container>
       <StarEffect numStars={80} />
@@ -381,7 +515,9 @@ const LearnPage = () => {
                 height={videoSize.height}
                 className="camera flip"
                 autoPlay
+                isCanvas={isCanvas}
               ></MotionCamera>
+              <Image src={scoreImage} $visible={isVisible && startFlag} />
               <VideoMotionButtonList>
                 {state === "PAUSE" ? (
                   <VideoMotionButton
@@ -444,6 +580,9 @@ const LearnPage = () => {
                     progress={challengeCount}
                     isVisible={state === "PAUSE"}
                   />
+                  <button onClick={canvasSetting} style={{ color: "white" }}>
+                    canvas
+                  </button>
                 </FoldList>
               </VideoMotionButtonList>
               {state === "READY" && <Timer>{timer}</Timer>}
@@ -521,7 +660,7 @@ const VideoContainer = styled.div`
   position: relative;
   display: flex;
   height: 100%;
-
+  justify-content: center;
   video {
     display: flex;
     object-fit: cover;
@@ -585,4 +724,10 @@ const LoadingText = styled.div`
   color: #fff;
 `;
 
+const Image = styled.img<{ $visible: boolean }>`
+  position: absolute;
+  width: 50%;
+  display: ${(props) => (props.$visible ? "flex" : "none")};
+  z-index: 2;
+`;
 export default LearnPage;

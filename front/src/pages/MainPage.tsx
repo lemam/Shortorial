@@ -5,7 +5,12 @@ import { Shorts } from "../constants/types";
 import { getShortsList, getTryCount } from "../apis/shorts";
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
-import { CancelPresentation, Copyright, EmojiPeople, TimerOutlined } from "@mui/icons-material";
+import {
+  CancelPresentation,
+  Copyright,
+  EmojiPeople,
+  TimerOutlined,
+} from "@mui/icons-material";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -118,14 +123,21 @@ const MainPage = () => {
             <CancelPresentation onClick={closeModal} fontSize="large" />
           </CancelIcon>
           <Details>
-            <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="28px"></Detail>
+            <Detail
+              text={selectedShorts.shortsTitle}
+              fontWeight="bold"
+              fontSize="28px"
+            ></Detail>
             <div>
               <Detail
                 icon={<Copyright />}
                 text={selectedShorts.shortsDirector}
                 fontSize="18px"
               ></Detail>
-              <Detail icon={<TimerOutlined />} text={`${selectedShorts.shortsTime}초`}></Detail>
+              <Detail
+                icon={<TimerOutlined />}
+                text={`${selectedShorts.shortsTime}초`}
+              ></Detail>
               <Detail
                 icon={<EmojiPeople />}
                 text={`${selectedShorts.shortsChallengers}명의 챌린저`}
@@ -136,7 +148,9 @@ const MainPage = () => {
             <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>
               연습모드
             </RouteButton>
-            <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>
+            <RouteButton
+              onClick={() => goToChallengeMode(selectedShorts.shortsNo)}
+            >
               챌린지모드
             </RouteButton>
           </ButtonContainer>
@@ -187,7 +201,7 @@ const SeriesSection = styled.section`
   justify-content: space-between;
   background: #ededed;
   border-radius: 16px;
-  border: 2px solid #333;
+  // border: 2px solid #333;
   padding: 36px;
   margin: 48px 16px;
 
@@ -265,7 +279,9 @@ interface DetailType {
 
 const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
   return (
-    <div style={{ fontSize: fontSize, fontWeight: fontWeight, margin: "5px 0px" }}>
+    <div
+      style={{ fontSize: fontSize, fontWeight: fontWeight, margin: "5px 0px" }}
+    >
       {icon} {text}
     </div>
   );

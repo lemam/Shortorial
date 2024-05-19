@@ -2,12 +2,14 @@ import { NormalizedLandmark, DrawingUtils } from "@mediapipe/tasks-vision";
 import { useEffect } from "react";
 import { createPoseLandmarker, predictWebcam } from "../../modules/Motion";
 import { useBtnStore, useActionStore } from "../../store/useMotionStore";
+import { styled } from "styled-components";
 
 interface MotionCameraType {
   width: number;
   height: number;
   className: string;
   autoPlay: boolean;
+  isCanvas: boolean;
 }
 
 export default function MotionCamera({
@@ -15,21 +17,17 @@ export default function MotionCamera({
   height,
   className,
   autoPlay,
+  isCanvas,
 }: MotionCameraType) {
   const { setBtn } = useBtnStore();
   const { setAction } = useActionStore();
 
+  // console.log(isCanvas);
   useEffect(() => {
-    // 모드 분류
-    // let webcamRunning = false;
-
-    // poseLandmarker 초기화
-    // 모션인식 모델 불러오기
-
     // 모델 초기화
     createPoseLandmarker();
     const canvasElement = document.getElementById(
-      "output_canvas"
+      "canvas"
     ) as HTMLCanvasElement | null;
     let canvasCtx: CanvasRenderingContext2D | null = null;
     // 그리기 도구
@@ -40,7 +38,6 @@ export default function MotionCamera({
 
     // camera가 있을 HTML
     const webcam = document.getElementById("webcam") as HTMLVideoElement | null;
-
     // 최종 그림이 나갈 HTML
 
     // 카메라가 있는지 확인
@@ -65,7 +62,6 @@ export default function MotionCamera({
       navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
         if (webcam) {
           webcam.srcObject = stream;
-          // while (!poseLandmarker) console.log("loading poselandmarker");
           webcam.addEventListener("loadeddata", () =>
             predictWebcam(
               "learn",
@@ -83,6 +79,20 @@ export default function MotionCamera({
         }
       });
     }
+    if (webcam) {
+      const cleanup = () => {
+        const stream = webcam?.srcObject as MediaStream;
+        const tracks = stream?.getTracks();
+        tracks?.forEach((track) => track.stop());
+        webcam.srcObject = null;
+      };
+
+      window.addEventListener("popstate", cleanup);
+      return () => {
+        cleanup();
+        window.removeEventListener("popstate", cleanup);
+      };
+    }
   }, [setBtn, setAction]);
 
   return (
@@ -91,18 +101,25 @@ export default function MotionCamera({
         id="webcam"
         width={width}
         height={height}
-        // style={{ objectFit: "cover" }}
         className={className}
         autoPlay={autoPlay}
         playsInline
-        // style={{}}
       ></video>
-      {/* <canvas
-        id="output_canvas"
+      <Canvas
+        id="canvas"
         width={width}
         height={height}
         style={{ objectFit: "cover" }}
-      ></canvas> */}
+        isCanvas={isCanvas}
+      ></Canvas>
     </div>
   );
 }
+
+const Canvas = styled.canvas<{ isCanvas: boolean }>`
+  position: absolute;
+  display: ${(props) => (props.isCanvas ? "flex" : "none")};
+  color: black;
+  top: 0;
+  left: 0;
+`;
