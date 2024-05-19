@@ -14,6 +14,7 @@ import {
   CancelPresentation,
   Copyright,
   EmojiPeople,
+  MusicNote,
   TimerOutlined,
 } from "@mui/icons-material";
 
@@ -139,34 +140,37 @@ const MainPage = () => {
             <CancelPresentation onClick={closeModal} fontSize="large" />
           </CancelIcon>
           <Details>
-            <Detail
-              text={selectedShorts.shortsTitle}
-              fontWeight="bold"
-              fontSize="28px"
-            ></Detail>
+            <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="23px"></Detail>
             <div>
+              <Detail
+                icon={<MusicNote />}
+                text={`${selectedShorts.singerName} - ${selectedShorts.musicName}`}
+                fontSize="18px"
+              ></Detail>
+
+              <Detail
+                icon={<TimerOutlined />}
+                text={`${selectedShorts.shortsTime}초`}
+                fontSize="18px"
+              ></Detail>
+              <Detail
+                icon={<EmojiPeople />}
+                text={`${selectedShorts.shortsChallengers}명의 챌린저`}
+                fontSize="18px"
+              ></Detail>
               <Detail
                 icon={<Copyright />}
                 text={selectedShorts.shortsDirector}
                 fontSize="18px"
               ></Detail>
-              <Detail
-                icon={<TimerOutlined />}
-                text={`${selectedShorts.shortsTime}초`}
-              ></Detail>
-              <Detail
-                icon={<EmojiPeople />}
-                text={`${selectedShorts.shortsChallengers}명의 챌린저`}
-              ></Detail>
             </div>
           </Details>
+
           <ButtonContainer>
             <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>
               연습모드
             </RouteButton>
-            <RouteButton
-              onClick={() => goToChallengeMode(selectedShorts.shortsNo)}
-            >
+            <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>
               챌린지모드
             </RouteButton>
           </ButtonContainer>
@@ -264,7 +268,6 @@ const Modal = styled.div`
   z-index: 1;
   padding: 20px;
   width: 50%;
-  height: 50%;
   animation: ${pulse} 0.5s ease-in-out;
 
   @media (max-width: 700px) {
@@ -283,7 +286,7 @@ const Details = styled.div`
   justify-content: space-evenly;
   flex-direction: column;
   align-items: center;
-  height: 65%;
+  margin-bottom: 10px;
 `;
 
 interface DetailType {
@@ -295,9 +298,7 @@ interface DetailType {
 
 const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
   return (
-    <div
-      style={{ fontSize: fontSize, fontWeight: fontWeight, margin: "5px 0px" }}
-    >
+    <div style={{ fontSize: fontSize, fontWeight: fontWeight, margin: "5px 0px" }}>
       {icon} {text}
     </div>
   );
@@ -314,7 +315,7 @@ const ButtonContainer = styled.div`
 `;
 
 const RouteButton = styled.button`
-  border: 1px solid #fb2576;
+  border: 2px solid #fb2576;
   border-radius: 10px;
   background-color: white;
   color: black;
