@@ -237,19 +237,25 @@ export async function deleteShorts(deletingShorts: Map<string, string>) {
 
 // 인기순 쇼츠 조회
 export async function getTopRankingShorts() {
-  // const token = "Bearer " + localStorage.getItem("accessToken");
-  const data = await axios.get(`${REST_SHORTS_LIST_URL}/topRanking`);
-  return data.data;
+  try {
+    const data = await axios.get(`${REST_SHORTS_LIST_URL}/topRanking`);
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
 }
 
 // 추천 쇼츠 조회
 export async function getRecommendedShorts() {
-  const token = "Bearer " + localStorage.getItem("accessToken");
-  const data = await pyaxios.get("/pyapi/music", {
-    headers: {
-      Authorization: token,
-    },
-  });
-  console.log(data.data);
-  return data.data;
+  try {
+    const token = "Bearer " + localStorage.getItem("accessToken");
+    const data = await pyaxios.get("/pyapi/music", {
+      headers: {
+        Authorization: token,
+      },
+    });
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
 }
