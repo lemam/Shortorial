@@ -144,7 +144,8 @@ const MainPage = () => {
             <CancelPresentation onClick={closeModal} fontSize="large" />
           </CancelIcon>
           <Details>
-            <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="28px"></Detail>
+            <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="23px"></Detail>
+
             <div>
               <Detail
                 icon={<MusicNote />}
