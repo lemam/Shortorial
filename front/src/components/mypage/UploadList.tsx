@@ -17,6 +17,10 @@ export default function UploadList() {
     }
   };
 
+  const handleDeleteShort = (uploadNo: number) => {
+    setShortsList((prevList) => prevList.filter((short) => short.uploadNo !== uploadNo));
+  };
+
   useEffect(() => {
     getShorts();
     const handleResize = () => {
@@ -33,16 +37,14 @@ export default function UploadList() {
         (_, index) => index * (isPortrait ? 2 : 4)
       ).map((startIndex) => (
         <div key={startIndex}>
-          {/* 4개씩 묶어서 렌더링 */}
           <Container style={{ display: "flex" }}>
-            {shortsList
-              .slice(startIndex, startIndex + (isPortrait ? 2 : 4))
-              .map((uploadShorts, i) => (
-                <UploadComponent
-                  key={i}
-                  uploadShorts={uploadShorts}
-                />
-              ))}
+            {shortsList.slice(startIndex, startIndex + (isPortrait ? 2 : 4)).map((uploadShorts) => (
+              <UploadComponent
+                key={uploadShorts.uploadNo}
+                uploadShorts={uploadShorts}
+                onDelete={handleDeleteShort}
+              />
+            ))}
           </Container>
         </div>
       ))}
