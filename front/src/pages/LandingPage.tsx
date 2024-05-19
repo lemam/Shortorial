@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import heroImg from "/src/assets/landing/hero.jpg";
 import deviceLandscape from "/src/assets/landing/device_landscape.png";
-import serviceMotionGif from "/src/assets/landing/serviceMotion.gif";
+// import serviceMotionGif from "/src/assets/landing/serviceMotion.gif";
+import serviceMotionGif1 from "/src/assets/landing/serviceMotion1.gif";
+import serviceMotionGif2 from "/src/assets/landing/serviceMotion2.gif";
+import serviceMotionGif3 from "/src/assets/landing/serviceMotion3.gif";
+
 import Header from "../components/header/Header";
 import useLoginStore from "../store/useLoginStore";
 import BasicButton from "../components/button/BasicButton";
@@ -44,7 +48,10 @@ const LandingPage = () => {
     <Container>
       <Header />
       <HeroContainer>
-        <HeroImg src={heroImg} alt="" />
+        <HeroImg
+          src={heroImg}
+          alt=""
+        />
         <HeroTextContainer {...HeroTextScroll}>
           <h1 className="sectionTitle">{`SHORTORIAL에서\n쉽고 빠르게\n챌린지에 도전하세요`}</h1>
           <h2 className="subTitle">모션 인식 기반 댄스 챌린지 연습 서비스</h2>
@@ -63,8 +70,14 @@ const LandingPage = () => {
           {`웹캠 또는 스마트폰 카메라 하나로\n언제 어디서나 챌린지를 연습해보세요.`}
         </p>
         <ImageContainer>
-          <ServiceImg src={serviceMotionGif} alt="" />
-          <DeviceImg src={deviceLandscape} alt="" />
+          <ServiceImg
+            src={serviceMotionGif1}
+            alt=""
+          />
+          <DeviceImg
+            src={deviceLandscape}
+            alt=""
+          />
         </ImageContainer>
       </Section>
       <Section {...SecondSectionScroll}>
@@ -73,8 +86,14 @@ const LandingPage = () => {
           <p className="subTitle">{`춤추다가 걸어와서 버튼 누르고...\n이런 귀찮은 과정은 저희가 해결해드릴게요.`}</p>
         </div>
         <ImageContainer>
-          <ServiceImg src={serviceMotionGif} alt="" />
-          <DeviceImg src={deviceLandscape} alt="" />
+          <ServiceImg
+            src={serviceMotionGif2}
+            alt=""
+          />
+          <DeviceImg
+            src={deviceLandscape}
+            alt=""
+          />
         </ImageContainer>
         <p className="text">
           {`별다른 기기 부착 없이 카메라로 모션을 인식하여 멀리서도 버튼 조작이 가능해요.`}
@@ -90,7 +109,11 @@ const LandingPage = () => {
           </SectionHeaderContainer>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
-              <ShortsVideoItem key={shorts.shortsNo} shortsInfo={shorts} isSerise />
+              <ShortsVideoItem
+                key={shorts.shortsNo}
+                shortsInfo={shorts}
+                isSerise
+              />
             ))}
           </SectionConents>
         </SeriesSection>
@@ -107,8 +130,14 @@ const LandingPage = () => {
         <h1 className="sectionTitle">촬영에서 업로드까지</h1>
         <p className="subTitle">{`연습한 그 자리에서 바로 촬영하고\nSNS에 공유해보세요.`}</p>
         <ImageContainer>
-          <ServiceImg src={serviceMotionGif} alt="" />
-          <DeviceImg src={deviceLandscape} alt="" />
+          <ServiceImg
+            src={serviceMotionGif3}
+            alt=""
+          />
+          <DeviceImg
+            src={deviceLandscape}
+            alt=""
+          />
         </ImageContainer>
       </Section>
       <CenterSection {...LastSectionScroll}>
