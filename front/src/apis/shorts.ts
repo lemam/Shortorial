@@ -12,6 +12,8 @@ export interface shorts {
   shortsChallengers: number;
   shortsLink: string;
   shortsDate: string;
+  musicName: string;
+  singerName: string;
 }
 
 export interface UploadShorts {
@@ -67,6 +69,8 @@ export const getShortsList = async () => {
 export const getShortsInfo = async (shortsNo: string) => {
   try {
     const response = await axios.get(`${REST_SHORTS_LIST_URL}/${shortsNo}`);
+    console.log(response.data);
+
     return response.data;
   } catch (error) {
     console.error(error);
@@ -97,6 +101,7 @@ export async function getTryCount(shortsNo: number) {
 export async function getS3Blob(fileName: string) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
+    console.log(fileName);
 
     const data = await axios.post(
       `${REST_SHORTS_URL}/bring/blob/${fileName}`,

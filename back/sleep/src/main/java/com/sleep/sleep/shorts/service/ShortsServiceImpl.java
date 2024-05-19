@@ -7,10 +7,7 @@ import com.sleep.sleep.member.repository.MemberRepository;
 import com.sleep.sleep.shorts.dto.ShortsDto;
 import com.sleep.sleep.shorts.dto.TryShortsDto;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
-import com.sleep.sleep.shorts.entity.MusicSinger;
-import com.sleep.sleep.shorts.entity.Shorts;
-import com.sleep.sleep.shorts.entity.TryShorts;
-import com.sleep.sleep.shorts.entity.UploadShorts;
+import com.sleep.sleep.shorts.entity.*;
 import com.sleep.sleep.shorts.repository.*;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -54,14 +51,14 @@ public class ShortsServiceImpl implements ShortsService{
         shortsInfo.setShortDate(shorts.getShortsDate());
 
         int musicNo = shorts.getMusicNo();
-
-        com.sleep.sleep.shorts.entity.Music music = musicRepository.findByMusicNo(musicNo);
+        Music music = musicRepository.findByMusicNo(musicNo);
 
         MusicSinger musicSinger= musicSingerRepository.findByMusicNo(musicNo);
-        com.sleep.sleep.shorts.entity.Singer singer = singerRepository.findBySingerNo(musicSinger.getSingerNo());
+
+        Singer singer = singerRepository.findBySingerNo(musicSinger.getSingerNo());
+
         shortsInfo.setMusicName(music.getMusicName());
         shortsInfo.setSingerName(singer.getSingerName());
-
 
         return shortsInfo;
     }
@@ -83,6 +80,15 @@ public class ShortsServiceImpl implements ShortsService{
             shortsDto.setShortsDirector(value.getShortsDirector());
             shortsDto.setShortsChallengers(value.getShortsChallengers());
             shortsDto.setShortsLink(value.getShortsLink());
+            shortsDto.setShortDate(value.getShortsDate());
+
+            int musicNo = value.getMusicNo();
+            Music music = musicRepository.findByMusicNo(musicNo);
+            MusicSinger musicSinger= musicSingerRepository.findByMusicNo(musicNo);
+            Singer singer = singerRepository.findBySingerNo(musicSinger.getSingerNo());
+            shortsDto.setMusicName(music.getMusicName());
+            shortsDto.setSingerName(singer.getSingerName());
+
             shortsList.add(shortsDto);
         }
         return shortsList;
@@ -104,8 +110,19 @@ public class ShortsServiceImpl implements ShortsService{
             shortsDto.setShortsDirector(value.getShortsDirector());
             shortsDto.setShortsChallengers(value.getShortsChallengers());
             shortsDto.setShortsLink(value.getShortsLink());
+            shortsDto.setShortDate(value.getShortsDate());
+
+            int musicNo = value.getMusicNo();
+            Music music = musicRepository.findByMusicNo(musicNo);
+            MusicSinger musicSinger= musicSingerRepository.findByMusicNo(musicNo);
+            Singer singer = singerRepository.findBySingerNo(musicSinger.getSingerNo());
+            shortsDto.setMusicName(music.getMusicName());
+            shortsDto.setSingerName(singer.getSingerName());
+
             shortsList.add(shortsDto);
+
         }
+
         return shortsList;
 
     }
@@ -229,6 +246,13 @@ public class ShortsServiceImpl implements ShortsService{
             shortsDto.setShortsChallengers(shorts.getShortsChallengers());
             shortsDto.setShortsLink(shorts.getShortsLink());
             shortsDto.setShortDate(shorts.getShortsDate());
+
+            int musicNo = shorts.getMusicNo();
+            Music music = musicRepository.findByMusicNo(musicNo);
+            MusicSinger musicSinger= musicSingerRepository.findByMusicNo(musicNo);
+            Singer singer = singerRepository.findBySingerNo(musicSinger.getSingerNo());
+            shortsDto.setMusicName(music.getMusicName());
+            shortsDto.setSingerName(singer.getSingerName());
 
             // DTO 리스트에 DTO 추가
             shortsDtoList.add(shortsDto);
