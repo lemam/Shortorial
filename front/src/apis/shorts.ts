@@ -184,6 +184,8 @@ export async function checkTitle(title: string) {
 // 유튜브 업로드
 const youtubeUrl = import.meta.env.VITE_YOUTUBE_URL;
 export async function shareShorts(filePath: string, uploadNo: number) {
+  console.log(filePath);
+
   try {
     const response = await axios.get(
       `${youtubeUrl}/authenticate?filePath=${encodeURIComponent(filePath)}&uploadNo=${uploadNo}`

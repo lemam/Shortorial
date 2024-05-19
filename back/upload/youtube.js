@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 var fs = require("fs");
 var { google } = require("googleapis");
 var OAuth2 = google.auth.OAuth2;
@@ -17,6 +19,8 @@ var SCOPES = [
   "https://www.googleapis.com/auth/youtube.readonly", // 유튜브 계정 조회
   "https://www.googleapis.com/auth/youtube.upload", // 유튜브 업로드
 ];
+
+const homeUrl = process.env.VITE_HOME_URL;
 
 // 토큰 저장 경로
 var TOKEN_DIR =
@@ -155,7 +159,7 @@ function uploadVideo(auth, filePath, uploadNo) {
         console.log(`Uploaded video ID: ${videoId}`);
 
         axios
-          .put(`http://localhost:8089/api/shorts/youtubeUrl/${uploadNo}/${videoId}`)
+          .put(`${homeUrl}/api/shorts/youtubeUrl/${uploadNo}/${videoId}`)
           .then((res) => console.log("url save sucess:"))
           .catch((err) => console.log("url save fail:", err));
 
