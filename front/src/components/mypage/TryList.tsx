@@ -1,62 +1,226 @@
 import { useEffect, useState } from "react";
-import { shorts } from "../../apis/shorts";
+import { getTryCount } from "../../apis/shorts";
 import { getTryShorts } from "../../apis/mypage";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+import ShortsVideoItem from "../shorts/ShortsVideoItem";
+import {
+  CancelPresentation,
+  Copyright,
+  EmojiPeople,
+  MusicNote,
+  TimerOutlined,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { Shorts } from "../../constants/types";
 
 export default function TryList() {
-  const [shortsList, setShortsList] = useState<shorts[]>([]);
-  const [isPortrait, setIsPortrait] = useState<boolean>(window.innerHeight > window.innerWidth);
+  const navigate = useNavigate();
+  const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [selectedShorts, setSelectedShorts] = useState<Shorts | null>(null);
 
-  const getShorts = async () => {
-    try {
-      const data = await getTryShorts();
-      setShortsList(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
+  const [isLoading, setIsLoading] = useState(true);
+  const [tryShortsList, settryShortsList] = useState<Shorts[]>();
+
+  const openModal = (shorts: Shorts) => {
+    return () => {
+      setSelectedShorts(shorts);
+      setShowDetails(true);
+    };
+  };
+
+  const closeModal = () => {
+    setShowDetails(false);
+    setSelectedShorts(null);
+  };
+
+  const goToLearnMode = (shortsNo: number) => {
+    getTryCount(shortsNo);
+    navigate(`/learn/${shortsNo}`);
+  };
+
+  const goToChallengeMode = (shortsNo: number) => {
+    getTryCount(shortsNo);
+    navigate(`/challenge/${shortsNo}`);
+  };
+
+  // 둘러보기 쇼츠 리스트 가져오기
+  const loadtryShortsList = async () => {
+    const data = await getTryShorts();
+    if (data) settryShortsList(data);
   };
 
   useEffect(() => {
-    getShorts();
-    const handleResize = () => {
-      setIsPortrait(window.innerHeight > window.innerWidth);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    loadtryShortsList();
   }, []);
 
+  useEffect(() => {
+    if (tryShortsList) {
+      setIsLoading(false);
+    }
+  }, [tryShortsList]);
+
   return (
-    <div>
-      {Array.from(
-        { length: Math.ceil(shortsList.length / (isPortrait ? 2 : 4)) },
-        (_, index) => index * (isPortrait ? 2 : 4)
-      ).map((startIndex) => (
-        <div key={startIndex}>
-          <div style={{ display: "flex" }}>
-            {shortsList.slice(startIndex, startIndex + (isPortrait ? 2 : 4)).map((uploadShorts) => (
-              // <TryComponent shorts={uploadShorts} />
-              <Video
-                crossOrigin="anonymous"
-                src={uploadShorts.shortsLink}
-                controls
-                key={uploadShorts.shortsLink} // 각 비디오에 고유한 키 부여
-              ></Video>
+    <Container>
+      <SectionWrapper>
+        <Section>
+          <SectionConents>
+            {tryShortsList?.map((shorts) => (
+              <ShortsVideoItem
+                key={shorts.shortsNo}
+                shortsInfo={shorts}
+                isLoading={isLoading}
+                onClick={openModal(shorts)}
+              />
             ))}
-          </div>
-        </div>
-      ))}
-    </div>
+          </SectionConents>
+        </Section>
+      </SectionWrapper>
+      {showDetails && selectedShorts && (
+        <Modal>
+          <CancelIcon>
+            <CancelPresentation
+              onClick={closeModal}
+              fontSize="large"
+            />
+          </CancelIcon>
+          <Details>
+            <Detail
+              icon={<MusicNote />}
+              text={selectedShorts.shortsTitle}
+              fontWeight="bold"
+              fontSize="30px"
+            ></Detail>
+            <Detail
+              icon={<Copyright />}
+              text={selectedShorts.shortsDirector}
+              fontSize="20px"
+            ></Detail>
+            <Detail
+              icon={<TimerOutlined />}
+              fontSize="18px"
+              text={`${selectedShorts.shortsTime}초`}
+            ></Detail>
+            <Detail
+              icon={<EmojiPeople />}
+              fontSize="18px"
+              text={`${selectedShorts.shortsChallengers}명의 챌린저`}
+            ></Detail>
+          </Details>
+          <ButtonContainer>
+            <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>
+              연습모드
+            </RouteButton>
+            <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>
+              챌린지모드
+            </RouteButton>
+          </ButtonContainer>
+        </Modal>
+      )}
+    </Container>
   );
 }
 
-const Video = styled.video`
-  width: calc(100% / 4);
+const Container = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
 
-  @media screen and (orientation: portrait) {
-    width: calc(100% / 2);
+const Section = styled.section`
+  position: relative;
+  margin: 16px;
+  box-sizing: border-box;
+`;
+
+const SectionWrapper = styled.div`
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+`;
+
+const SectionConents = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+
+  &.nowrap {
+    justify-content: center;
   }
+`;
 
-  @media screen and (orientation: landscape) {
-    width: calc(100% / 4);
+const pulse = keyframes`
+  0% { 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.1); 
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+`;
+
+const Modal = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1;
+  padding: 10px;
+  width: 50%;
+  height: 50%;
+  animation: ${pulse} 0.5s ease-in-out;
+`;
+
+const CancelIcon = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const Details = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
+  align-items: center;
+  height: 60%;
+`;
+
+interface DetailType {
+  text?: string;
+  fontSize?: string;
+  fontWeight?: string;
+  icon?: JSX.Element;
+}
+
+const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
+  return (
+    <div style={{ fontSize: fontSize, fontWeight: fontWeight }}>
+      {icon} {text}
+    </div>
+  );
+};
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+
+  @media (max-aspect-ratio: 1/1) {
+    flex-direction: column;
+    padding: 0px 25px;
+  }
+`;
+
+const RouteButton = styled.button`
+  border: 3px solid black;
+  border-radius: 20px;
+  background-color: #f3f3f3;
+  color: black;
+  padding: 8px;
+  cursor: pointer;
+  margin: 5px;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #ff7ea0;
   }
 `;
