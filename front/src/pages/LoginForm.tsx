@@ -55,67 +55,23 @@ export default function LoginForm() {
     if (getIsLogin()) navigate("/");
   }, [getIsLogin, navigate]);
 
-  // return (
-  //   <form onSubmit={handleSubmit}>
-  //     <div className="">
-  //       <Link to="/">
-  //         <img src="" alt="로고자리" className="" />
-  //       </Link>
-  //     </div>
-  //     {hasError && (
-  //       <div className="">
-  //         <WarningIcon color="error" className="" />
-  //         <span className="">아이디 또는 비밀번호가 맞지 않습니다.</span>
-  //       </div>
-  //     )}
-  //     <Login>
-  //       <Input>
-  //         <InputComponent cate="id"  getValue={setId} />
-  //         <InputComponent cate="password" getValue={setPassword} />
-  //       </Input>
-  //       <ButtonAsset text="로그인" />
-  //       <div className="">
-  //         <Link to="/help/idInquiry">아이디 찾기</Link>
-  //         <VerticalDivider />
-  //         <Link to="/help/pwInquiry">비밀번호 찾기</Link>
-  //         <VerticalDivider />
-  //         <Link to="/signup">회원가입</Link>
-  //       </div>
-  //     </Login>
-  //   </form>
-  // );
   return (
     <TotalPage>
       <Title>
         <LogoContainer to="/">
-          <LogoImg
-            src={logo}
-            alt=""
-          />
+          <LogoImg src={logo} alt="" />
         </LogoContainer>
       </Title>
       <Login>
         <Input>
           <NameContainer> 로그인 </NameContainer>
-          <InputComponent
-            cate="아이디"
-            getValue={setId}
-          />
-          <InputComponent
-            cate="비밀번호"
-            type="password"
-            getValue={setPassword}
-          />
+          <InputComponent cate="아이디" getValue={setId} />
+          <InputComponent cate="비밀번호" type="password" getValue={setPassword} />
         </Input>
         <Btn>
-          <BasicButton
-            text="완료"
-            onClick={handleSubmit}
-          />
+          <BasicButton text="완료" onClick={handleSubmit} />
         </Btn>
         <FindContent>
-          <Find to="/help/idInquiry">아이디 찾기&nbsp;|&nbsp;</Find>
-          <Find to="/help/pwInquiry">비밀번호 찾기&nbsp;|&nbsp;</Find>
           <Find to="/sign-up">회원가입</Find>
         </FindContent>
       </Login>
@@ -178,7 +134,7 @@ const Title = styled.div`
 const Login = styled.div`
   background-color: white;
   display: flex;
-  justiy-content: center;
+  justify-content: center;
   align-items: center;
   width: 25rem;
   height: 23rem;
@@ -199,7 +155,8 @@ const NameContainer = styled.div`
   height: 20%;
   margin-bottom: 10%;
   color: black;
-  text-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
   border-bottom: 2px solid #fb2576;
 
   @media screen and (max-width: 479px) {
@@ -238,8 +195,8 @@ const FindContent = styled.div`
 `;
 
 const Find = styled(Link)`
-  font-size: x-small;
-  color: #c3c3c3;
+  font-size: small;
+  color: #9f9f9f;
 
   @media screen and (max-width: 479px) {
     font-size: xx-small;
@@ -248,6 +205,5 @@ const Find = styled(Link)`
   // 가로모드
   @media screen and (orientation: landscape) and (hover: none) and (pointer: coarse) {
     font-size: xx-small;
-  }
   }
 `;
