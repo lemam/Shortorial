@@ -5,7 +5,10 @@ import {
   FilesetResolver,
 } from "@mediapipe/tasks-vision";
 import { useDomStore, useMotionDetectionStore } from "../store/useMotionStore";
-
+import {
+  useMotionLandmarkStore,
+  useVideoLandmarkStore,
+} from "../store/useAccStore";
 // 버튼 모션에 활용되는 함수
 let visible_count = 0;
 let timer_count = 0;
@@ -20,19 +23,19 @@ let repeat_count = 0;
 let flip_count = 0;
 let speed_count = 0;
 
-let domSize: DOMRect | null = null;
-let visibleBtnSize: DOMRect | null = null;
-let timerBtnSize: DOMRect | null = null;
-let recorderBtnSize: DOMRect | null = null;
-let saveBtnSize: DOMRect | null = null;
-let learnBtnSize: DOMRect | null = null;
-let rsltBtnSize: DOMRect | null = null;
+let domSize: DOMRect | null | undefined = null;
+let visibleBtnSize: DOMRect | null | undefined = null;
+let timerBtnSize: DOMRect | null | undefined = null;
+let recorderBtnSize: DOMRect | null | undefined = null;
+let saveBtnSize: DOMRect | null | undefined = null;
+let learnBtnSize: DOMRect | null | undefined = null;
+let rsltBtnSize: DOMRect | null | undefined = null;
 
-let playSize: DOMRect | null = null;
-let challengeSize: DOMRect | null = null;
-let repeatSize: DOMRect | null = null;
-let flipSize: DOMRect | null = null;
-let speedSize: DOMRect | null = null;
+let playSize: DOMRect | null | undefined = null;
+let challengeSize: DOMRect | null | undefined = null;
+let repeatSize: DOMRect | null | undefined = null;
+let flipSize: DOMRect | null | undefined = null;
+let speedSize: DOMRect | null | undefined = null;
 
 // 좌우 모션 인식에 활용되는 변수
 let left_count = 0;
@@ -51,10 +54,6 @@ export function btn_with_landmark_challenge(
   // console.log(handLandmarkerX);
   const handLandmarkerX = makeAbsoluteLandmarkX(handLandmarker.x);
   const handLandmarkerY = makeAbsoluteLandmarkY(handLandmarker.y);
-  // if (handLandmarker.visibility > 0.5) {
-  //   console.log("X : ", handLandmarker.x);
-  //   console.log("Y : ", handLandmarker.y);
-  // }
 
   if (
     visibleBtnSize &&
@@ -414,6 +413,8 @@ export const createPoseLandmarker = async () => {
 
 createPoseLandmarker();
 
+const setMotionLandmark = useMotionLandmarkStore.getState().setMotionLandmark;
+
 export async function predictWebcam(
   cate: string,
   webcam: HTMLVideoElement | null,
@@ -426,91 +427,162 @@ export async function predictWebcam(
   setBtn: (newBtn: string) => void,
   setAction?: (newAction: string) => void
 ) {
-  // console.log("loading...s");
-  if (webcam && poseLandmarker) {
-    // console.log("Start");
-    const startTimeMs = performance.now();
-    if (lastWebcamTime !== webcam.currentTime) {
-      // console.log("Test");
-      lastWebcamTime = webcam.currentTime;
+  if (
+    !webcam ||
+    !poseLandmarker ||
+    !canvasCtx ||
+    !canvasElement ||
+    !drawingUtils
+  )
+    return;
+  const startTimeMs = performance.now();
+  if (lastWebcamTime !== webcam.currentTime) {
+    lastWebcamTime = webcam.currentTime;
 
-      poseLandmarker.detectForVideo(webcam, startTimeMs, (result) => {
-        // if (!canvasCtx || !drawingUtils || !canvasElement) return null;
-        // canvasCtx.save();
-        // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    const result = await poseLandmarker.detectForVideo(webcam, startTimeMs);
 
-        for (const landmark of result.landmarks) {
-          // 오른손이 우측 상단에 가면 알려주는 함수
-          if (cate == "challenge")
-            btn_with_landmark_challenge(landmark[18], setBtn);
-          else btn_with_landmark_learn(landmark[18], setBtn);
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-          if (!before_handmarker) {
-            if (landmark[18].visibility > 0.5) {
-              before_handmarker = landmark[18];
-              console.log("설정완");
-            }
-          } else {
-            curr_handmarker = landmark[18];
-            const minY = landmark[11].y;
-            const maxY = (landmark[23].y + landmark[11].y) / 2;
-            if (setAction)
-              action_with_landmark(
-                before_handmarker,
-                curr_handmarker,
-                minY,
-                maxY,
-                setAction
-              );
-            // console.log(cnt);
-            before_handmarker = curr_handmarker;
-          }
-          // drawingUtils.drawLandmarks(landmark, {
-          //   radius: (data: any) =>
-          //     DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
-          // });
-          // drawingUtils.drawConnectors(
-          //   landmark,
-          //   PoseLandmarker.POSE_CONNECTIONS
-          // );
+    for (const landmark of result.landmarks) {
+      for (let oneLandmark of landmark) {
+        oneLandmark.x = 1 - oneLandmark.x;
+      }
+      setMotionLandmark(landmark);
+
+      if (cate === "challenge") {
+        btn_with_landmark_challenge(landmark[18], setBtn);
+      } else {
+        btn_with_landmark_learn(landmark[18], setBtn);
+      }
+
+      if (!before_handmarker) {
+        if (landmark[18].visibility > 0.5) {
+          before_handmarker = landmark[18];
+          console.log("설정완");
         }
-        // canvasCtx.restore();
+      } else {
+        curr_handmarker = landmark[18];
+        const minY = landmark[11].y;
+        const maxY = (landmark[23].y + landmark[11].y) / 2;
+        if (setAction) {
+          action_with_landmark(
+            before_handmarker,
+            curr_handmarker,
+            minY,
+            maxY,
+            setAction
+          );
+        }
+        before_handmarker = curr_handmarker;
+      }
+
+      drawingUtils.drawLandmarks(landmark, {
+        radius: (data: any) => DrawingUtils.lerp(data.from.z, -0.15, 0.1, 5, 1),
       });
+      drawingUtils.drawConnectors(landmark, PoseLandmarker.POSE_CONNECTIONS);
     }
   }
-  // 모션인식 계속 진행
-  window.requestAnimationFrame(() =>
-    predictWebcam(
-      cate,
-      webcam,
-      canvasCtx,
-      canvasElement,
-      drawingUtils,
-      lastWebcamTime,
-      before_handmarker,
-      curr_handmarker,
-      setBtn,
-      setAction
-    )
-  );
-  // 뒤로 가기 하면 webcam 멈추기
-  // window.addEventListener("popstate", () => {
-  //   webcam.pause();
 
-  // });
-  // Call this function again to keep predicting when the browser is ready.
-  // if (webcamRunning === true) {
-  //   webcam.style.display = "block";
-  //   window.requestAnimationFrame(predictWebcam);
-  // } else {
-  //   webcam.pause();
-  //   const stream = webcam.srcObject as MediaStream;
-  //   if (stream) {
-  //     const tracks = stream.getTracks();
-  //     tracks.forEach((track) => track.stop());
-  //   }
-  //   webcam.style.display = "none";
-  // }
+  if (webcam) {
+    window.requestAnimationFrame(() =>
+      predictWebcam(
+        cate,
+        webcam,
+        canvasCtx,
+        canvasElement,
+        drawingUtils,
+        lastWebcamTime,
+        before_handmarker,
+        curr_handmarker,
+        setBtn,
+        setAction
+      )
+    );
+  }
+}
+
+export async function predictWebcamChallenge(
+  cate: string,
+  webcam: HTMLVideoElement | null,
+  lastWebcamTime: number,
+  before_handmarker: NormalizedLandmark | null,
+  curr_handmarker: NormalizedLandmark | null,
+  setBtn: (newBtn: string) => void,
+  setAction?: (newAction: string) => void
+) {
+  if (!webcam || !poseLandmarker) return;
+  const startTimeMs = performance.now();
+  if (lastWebcamTime !== webcam.currentTime) {
+    lastWebcamTime = webcam.currentTime;
+
+    const result = await poseLandmarker.detectForVideo(webcam, startTimeMs);
+
+    for (const landmark of result.landmarks) {
+      for (let oneLandmark of landmark) {
+        oneLandmark.x = 1 - oneLandmark.x;
+      }
+      setMotionLandmark(landmark);
+
+      if (cate === "challenge") {
+        btn_with_landmark_challenge(landmark[18], setBtn);
+      } else {
+        btn_with_landmark_learn(landmark[18], setBtn);
+      }
+
+      if (!before_handmarker) {
+        if (landmark[18].visibility > 0.5) {
+          before_handmarker = landmark[18];
+          console.log("설정완");
+        }
+      } else {
+        curr_handmarker = landmark[18];
+        const minY = landmark[11].y;
+        const maxY = (landmark[23].y + landmark[11].y) / 2;
+        if (setAction) {
+          action_with_landmark(
+            before_handmarker,
+            curr_handmarker,
+            minY,
+            maxY,
+            setAction
+          );
+        }
+        before_handmarker = curr_handmarker;
+      }
+    }
+  }
+
+  if (webcam) {
+    window.requestAnimationFrame(() =>
+      predictWebcamChallenge(
+        cate,
+        webcam,
+        lastWebcamTime,
+        before_handmarker,
+        curr_handmarker,
+        setBtn,
+        setAction
+      )
+    );
+  }
+}
+
+// 동영상 모션인식
+let lastVideoTime = -1;
+const setVideoLandmark = useVideoLandmarkStore.getState().setVideoLandmark;
+export async function predictVideo(video: HTMLVideoElement) {
+  if (!video || !poseLandmarker) return null;
+
+  let startTimeMs = performance.now();
+  if (lastVideoTime !== video.currentTime) {
+    lastVideoTime = video.currentTime;
+    poseLandmarker.detectForVideo(video, startTimeMs, (result) => {
+      for (const landmark of result.landmarks) {
+        setVideoLandmark(landmark);
+      }
+    });
+  }
+  window.requestAnimationFrame(() => predictVideo(video));
 }
 
 function makeAbsoluteLandmarkX(relativeX: number): number {
@@ -518,7 +590,7 @@ function makeAbsoluteLandmarkX(relativeX: number): number {
   if (domSize) {
     // console.log(domSize.left + (1 - relativeX) * domSize?.width);
     // console.log("A " + visibleBtnSize?.right);
-    return domSize.left + (1 - relativeX) * domSize?.width;
+    return domSize.left + relativeX * domSize?.width;
   }
   return -1;
 }
@@ -532,7 +604,8 @@ function makeAbsoluteLandmarkY(relativeY: number): number {
 function btnPlace(id: string): DOMRect | undefined {
   const btnElement = document.getElementById(id);
   const btnRect = btnElement?.getBoundingClientRect();
-  console.log(`${id} 요소:`, btnRect);
+
+  console.log(`${id}`, btnRect);
   return btnRect;
 }
 
@@ -551,19 +624,19 @@ export function setBtnInfo() {
   const flip = btnPlace("flip");
   const speed = btnPlace("speed");
 
-  if (dom) useDomStore.getState().setDomSize(dom);
-  if (visibleBtn) useDomStore.getState().setVisibleBtnSize(visibleBtn);
-  if (timerBtn) useDomStore.getState().setTimeBtnSize(timerBtn);
-  if (recordBtn) useDomStore.getState().setRecordBtnSize(recordBtn);
-  if (saveBtn) useDomStore.getState().setSaveBtnSize(saveBtn);
-  if (learnBtn) useDomStore.getState().setLearnBtnSize(learnBtn);
-  if (rsltBtn) useDomStore.getState().setRsltBtnSize(rsltBtn);
+  useDomStore.getState().setDomSize(dom);
+  useDomStore.getState().setVisibleBtnSize(visibleBtn);
+  useDomStore.getState().setTimeBtnSize(timerBtn);
+  useDomStore.getState().setRecordBtnSize(recordBtn);
+  useDomStore.getState().setSaveBtnSize(saveBtn);
+  useDomStore.getState().setLearnBtnSize(learnBtn);
+  useDomStore.getState().setRsltBtnSize(rsltBtn);
 
-  if (play) useDomStore.getState().setPlaySize(play);
-  if (challenge) useDomStore.getState().setChallengeSize(challenge);
-  if (repeat) useDomStore.getState().setRepeatSize(repeat);
-  if (flip) useDomStore.getState().setFlipSize(flip);
-  if (speed) useDomStore.getState().setSpeedSize(speed);
+  useDomStore.getState().setPlaySize(play);
+  useDomStore.getState().setChallengeSize(challenge);
+  useDomStore.getState().setRepeatSize(repeat);
+  useDomStore.getState().setFlipSize(flip);
+  useDomStore.getState().setSpeedSize(speed);
 
   domSize = useDomStore.getState().domSize;
   visibleBtnSize = useDomStore.getState().visibleBtnSize;

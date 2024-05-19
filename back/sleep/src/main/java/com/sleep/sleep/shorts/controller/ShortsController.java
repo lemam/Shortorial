@@ -94,6 +94,16 @@ public class ShortsController {
         }
     }
 
+    @Operation(summary = "인기순 쇼츠 조회", description = "헤더에 accessToken 넣기")
+    @GetMapping("/topRanking")
+    public ResponseEntity<?> shortsGetOrderByChallengers() {
+
+        List<ShortsDto> shortRankingList = shortsService.getShortRankingList();
+
+        return ResponseEntity.ok(shortRankingList);
+    }
+
+
 
 
     private String resolveToken(String accessToken) {
