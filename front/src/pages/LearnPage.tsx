@@ -34,7 +34,6 @@ import {
 import greatImage from "../assets/score/great.png";
 import goodImage from "../assets/score/good.png";
 import StarEffect from "../components/style/StarEffect";
-import { link } from "fs";
 
 const LearnPage = () => {
   type LearnState = "LOADING" | "PAUSE" | "READY" | "PLAY";
