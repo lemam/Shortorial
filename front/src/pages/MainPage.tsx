@@ -95,7 +95,7 @@ const MainPage = () => {
               <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
             </SectionHeaderContainer>
             <SectionConents className="nowrap">
-              {popularShortsList?.map((shorts) => (
+              {recommendedShorts?.map((shorts) => (
                 <ShortsVideoItem
                   key={shorts.shortsNo}
                   shortsInfo={shorts}
@@ -144,7 +144,11 @@ const MainPage = () => {
             <CancelPresentation onClick={closeModal} fontSize="large" />
           </CancelIcon>
           <Details>
-            <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="28px"></Detail>
+            <Detail
+              text={selectedShorts.shortsTitle}
+              fontWeight="bold"
+              fontSize="28px"
+            ></Detail>
             <div>
               <Detail
                 icon={<MusicNote />}
@@ -173,7 +177,9 @@ const MainPage = () => {
             <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>
               연습모드
             </RouteButton>
-            <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>
+            <RouteButton
+              onClick={() => goToChallengeMode(selectedShorts.shortsNo)}
+            >
               챌린지모드
             </RouteButton>
           </ButtonContainer>
@@ -301,7 +307,9 @@ interface DetailType {
 
 const Detail = ({ icon, text, fontSize, fontWeight }: DetailType) => {
   return (
-    <div style={{ fontSize: fontSize, fontWeight: fontWeight, margin: "5px 0px" }}>
+    <div
+      style={{ fontSize: fontSize, fontWeight: fontWeight, margin: "5px 0px" }}
+    >
       {icon} {text}
     </div>
   );
