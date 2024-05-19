@@ -23,6 +23,8 @@ public class Shorts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int shortsNo;
 
+    private int musicNo;
+
     private String shortsUrl;
 
     private double shortsTime;

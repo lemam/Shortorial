@@ -7,12 +7,8 @@ import com.sleep.sleep.member.repository.MemberRepository;
 import com.sleep.sleep.shorts.dto.ShortsDto;
 import com.sleep.sleep.shorts.dto.TryShortsDto;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
-import com.sleep.sleep.shorts.entity.Shorts;
-import com.sleep.sleep.shorts.entity.TryShorts;
-import com.sleep.sleep.shorts.entity.UploadShorts;
-import com.sleep.sleep.shorts.repository.ShortsRepository;
-import com.sleep.sleep.shorts.repository.TryShortsRepository;
-import com.sleep.sleep.shorts.repository.UploadShortsRepository;
+import com.sleep.sleep.shorts.entity.*;
+import com.sleep.sleep.shorts.repository.*;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +31,9 @@ public class ShortsServiceImpl implements ShortsService{
     private final UploadShortsRepository uploadShortsRepository;
     private final MemberRepository memberRepository;
     private final TryShortsRepository tryShortsRepository;
+    private final MusicRepository musicRepository;
+    private final SingerRepository singerRepository;
+    private final MusicSingerRepository musicSingerRepository;
 
     //특정 쇼츠 조회
     public ShortsDto getShortsInfo(int shortsNo) {
@@ -50,6 +49,16 @@ public class ShortsServiceImpl implements ShortsService{
         shortsInfo.setShortsTime(shorts.getShortsTime());
         shortsInfo.setShortsLink(shorts.getShortsLink());
         shortsInfo.setShortDate(shorts.getShortsDate());
+
+        int musicNo = shorts.getMusicNo();
+
+        Music music = musicRepository.findByMusicNo(musicNo);
+
+        MusicSinger musicSinger= musicSingerRepository.findByMusicNo(musicNo);
+        Singer singer = singerRepository.findBySingerNo(musicSinger.getSingerNo());
+        shortsInfo.setMusicName(music.getMusicName());
+        shortsInfo.setSingerName(singer.getSingerName());
+
 
         return shortsInfo;
     }
