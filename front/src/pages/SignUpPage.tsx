@@ -98,10 +98,7 @@ const SignUpPage = () => {
     <TotalPage>
       <Title>
         <LogoContainer to="/">
-          <LogoImg
-            src={logo}
-            alt=""
-          />
+          <LogoImg src={logo} alt="" />
         </LogoContainer>
       </Title>
       <SignUp>
@@ -135,10 +132,7 @@ const SignUpPage = () => {
           />
         </Input>
         <Btn>
-          <BasicButton
-            text="완료"
-            onClick={signUpForm}
-          />
+          <BasicButton text="완료" onClick={signUpForm} />
         </Btn>
       </SignUp>
     </TotalPage>
@@ -202,7 +196,7 @@ const Title = styled.div`
 const SignUp = styled.div`
   background-color: white;
   display: flex;
-  justiy-content: center;
+  justify-content: center;
   align-items: center;
   width: 25rem;
   height: 30rem;
@@ -223,7 +217,8 @@ const NameContainer = styled.div`
   height: 10%;
   margin-bottom: 10%;
   color: black;
-  text-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
   border-bottom: 2px solid #fb2576;
 `;
 
