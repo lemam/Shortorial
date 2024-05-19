@@ -70,7 +70,6 @@ services:
     container_name: letsdance-frontend-container
     restart: always
     ports:
-      # - "80:80"
       - "3000:3000"
     environment:
       - TZ=Asia/Seoul
@@ -134,7 +133,6 @@ services:
     build: .
     image: letsdance-flask
     container_name: letsdance-flask-container
-    restart: always
     ports:
       - "5000:5000"
     environment:
