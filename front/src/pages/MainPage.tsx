@@ -20,14 +20,16 @@ import {
 const MainPage = () => {
   const navigate = useNavigate();
   const [showDetails, setShowDetails] = useState<boolean>(false);
-  const [selectedShorts, setSelectedShorts] = useState<Shorts | null>(null);
+  const [selectedShorts, setSelectedShorts] = useState<
+    Shorts | RecomShorts | null
+  >(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [allShortsList, setAllShortsList] = useState<Shorts[]>();
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>();
   const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>();
 
-  const openModal = (shorts: Shorts) => {
+  const openModal = (shorts: Shorts | RecomShorts) => {
     return () => {
       setSelectedShorts(shorts);
       setShowDetails(true);
@@ -90,7 +92,7 @@ const MainPage = () => {
               <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
             </SectionHeaderContainer>
             <SectionConents className="nowrap">
-              {popularShortsList?.map((shorts) => (
+              {recommendedShorts?.map((shorts) => (
                 <ShortsVideoItem
                   key={shorts.shortsNo}
                   shortsInfo={shorts}

@@ -27,5 +27,5 @@ def get_music_info(music_list):
         # music_list에 있는 음악 번호를 콤마로 구분하여 플레이스홀더에 넣습니다.
         placeholders = ','.join(map(str, music_list))
         # SQL 쿼리에서 IN 연산자와 함께 플레이스홀더를 사용합니다.
-        sql_query = f"SELECT * FROM shorts WHERE music_no IN ({placeholders})"
+        sql_query = f"select music_data.*, music_info.music_name from (select music_singer.*, singer_info.singer_name from (select short.*, music_singer.singer_no from (select * from shorts where shorts_no IN ({placeholders})) short, music_singer where short.music_no = music_singer.music_no) music_singer, singer_info where music_singer.singer_no = singer_info.singer_no) music_data, music_info where music_data.music_no = music_info.music_no;"
         return pd.read_sql(sql_query, con=db.engine)
