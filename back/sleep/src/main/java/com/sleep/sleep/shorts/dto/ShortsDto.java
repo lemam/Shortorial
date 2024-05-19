@@ -25,4 +25,8 @@ public class ShortsDto {
     private String shortsLink;
 
     private LocalDate shortDate;
+
+    private String musicName;
+
+    private String SingerName;
 }

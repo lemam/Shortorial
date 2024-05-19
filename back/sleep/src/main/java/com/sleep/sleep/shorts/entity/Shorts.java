@@ -24,7 +24,7 @@ public class Shorts {
     private int shortsNo;
 
     private String shortsUrl;
-
+    private int musicNo;
     private double shortsTime;
 
     private String shortsTitle;
