@@ -22,6 +22,7 @@ import loading from "../assets/challenge/loading.gif";
 import complete from "../assets/challenge/complete.svg";
 import recordingImg from "../assets/challenge/recording.svg";
 import uncomplete from "../assets/challenge/uncomplete.svg";
+import StarEffect from "../components/style/StarEffect";
 
 const ChallengePage = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const ChallengePage = () => {
   const [state, setState] = useState<LearnState>("READY");
   // 모션 인식 카운트
   const { btn, setBtn } = useBtnStore();
-  const { visibleCount, timerCount, recordCount, learnCount, resultCount } =
+  const { visibleCount, timerCount, recordCount, learnCount, resultCount, saveCount } =
     useMotionDetectionStore();
 
   const loadDanceVideo = async () => {
@@ -343,13 +344,14 @@ const ChallengePage = () => {
         case "landscape-primary":
         case "landscape-secondary":
           videoRef.current.height = window.innerHeight;
-          videoRef.current.width = Math.floor((videoRef.current.height * 9) / 16);
+          videoRef.current.width = Math.floor((window.innerHeight * 9) / 16);
           console.log(videoRef.current.height, videoRef.current.width);
           break;
         case "portrait-primary":
         case "portrait-secondary":
           videoRef.current.width = window.innerWidth;
-          videoRef.current.height = Math.floor((videoRef.current.width * 16) / 9);
+          videoRef.current.height = Math.floor((window.innerWidth * 16) / 9);
+          console.log(videoRef.current.height, videoRef.current.width);
       }
     }
   };
@@ -375,6 +377,10 @@ const ChallengePage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    setBtnInfo();
+  }, [state]);
+
   // 모션인식 설정
   useEffect(() => {
     switch (btn) {
@@ -390,19 +396,25 @@ const ChallengePage = () => {
         console.log("timer");
         if (state === "READY") {
           changeTimer();
-        } else {
-          handleShowModal();
         }
         break;
+      case "save":
+        console.log("save");
+        if (state === "READY") break;
+        handleShowModal();
+        break;
       case "record":
+        if (state == "RECORD") break;
         console.log("flip");
         setIsFlipped(!isFlipped);
         break;
       case "learn":
+        if (state == "RECORD") break;
         console.log("learn");
         goToLearnMode();
         break;
       case "rslt":
+        if (state == "RECORD") break;
         console.log("result");
         goToResult();
         break;
@@ -411,10 +423,12 @@ const ChallengePage = () => {
 
   useEffect(() => {
     setBtnInfo();
-  }, []);
+  }, [state]);
 
   return (
     <ChallengeContainer>
+      <StarEffect numStars={100} />
+
       <VideoContainer
         ref={danceVideoRef}
         src={danceVideoPath}
@@ -423,6 +437,7 @@ const ChallengePage = () => {
         className={isFlipped ? "flip" : ""}
         crossOrigin="anonymous"
       ></VideoContainer>
+
       <UserContainer id="dom">
         <UserVideoContainer ref={userVideoRef} autoPlay playsInline></UserVideoContainer>
         {state === "READY" ? (
@@ -462,7 +477,7 @@ const ChallengePage = () => {
               />
               <VideoMotionButton
                 icon={<Movie />}
-                toolTip="결과 확인"
+                toolTip="마이페이지"
                 onClick={goToResult}
                 id="rslt"
                 progress={resultCount}
@@ -478,7 +493,7 @@ const ChallengePage = () => {
               />
             </div>
           ) : (
-            <div className="foldList">
+            <div className="recordfoldlist">
               <VideoMotionButton
                 icon={<DoDisturb />}
                 toolTip="취소"
@@ -491,8 +506,8 @@ const ChallengePage = () => {
                 icon={<Save />}
                 toolTip="저장"
                 onClick={handleShowModal}
-                id="timer"
-                progress={recordCount}
+                id="save"
+                progress={saveCount}
                 isVisible={state === "RECORD"}
               />
             </div>
@@ -508,6 +523,16 @@ const ChallengePage = () => {
     </ChallengeContainer>
   );
 };
+
+const ChallengeContainer = styled.div`
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+`;
 
 const VideoContainer = styled.video`
   position: relative;
@@ -536,14 +561,6 @@ const UserVideoContainer = styled.video`
 
   object-fit: cover;
   transform: scaleX(-1);
-`;
-
-const ChallengeContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  background-color: black;
 `;
 
 const blinkEffect = keyframes`
@@ -585,6 +602,7 @@ const Timer = styled.div`
   transform: translate(-50%, -50%);
   z-index: 1;
   font-size: 130px;
+  color: #fb2576;
 `;
 
 const VideoMotionButtonList = styled.div`
@@ -599,9 +617,18 @@ const VideoMotionButtonList = styled.div`
   .foldList {
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: space-around;
     height: auto;
     min-height: 80%;
+    max-height: 100%;
+  }
+
+  .recordfoldlist {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: auto;
+    min-height: 33%;
     max-height: 100%;
   }
 
