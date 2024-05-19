@@ -48,6 +48,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/member/join").permitAll()
                                 .requestMatchers("/api/member/login").permitAll()
                                 .requestMatchers("/api/shorts/topRanking").permitAll()
+                                .requestMatchers("/api/s3").permitAll()
+                                
 
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
