@@ -14,7 +14,6 @@ import {
   CancelPresentation,
   Copyright,
   EmojiPeople,
-  MusicNote,
   TimerOutlined,
 } from "@mui/icons-material";
 
@@ -30,16 +29,12 @@ const MainPage = () => {
 
   const openModal = (shorts: Shorts) => {
     return () => {
-      console.log(popularShortsList);
-
       setSelectedShorts(shorts);
       setShowDetails(true);
     };
   };
 
   const closeModal = () => {
-    console.log(allShortsList);
-    console.log(selectedShorts);
     setShowDetails(false);
     setSelectedShorts(null);
   };
@@ -95,7 +90,7 @@ const MainPage = () => {
               <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
             </SectionHeaderContainer>
             <SectionConents className="nowrap">
-              {recommendedShorts?.map((shorts) => (
+              {popularShortsList?.map((shorts) => (
                 <ShortsVideoItem
                   key={shorts.shortsNo}
                   shortsInfo={shorts}
@@ -151,25 +146,17 @@ const MainPage = () => {
             ></Detail>
             <div>
               <Detail
-                icon={<MusicNote />}
-                text={`${selectedShorts.singerName} - ${selectedShorts.musicName}`}
+                icon={<Copyright />}
+                text={selectedShorts.shortsDirector}
                 fontSize="18px"
               ></Detail>
-
               <Detail
                 icon={<TimerOutlined />}
                 text={`${selectedShorts.shortsTime}초`}
-                fontSize="18px"
               ></Detail>
               <Detail
                 icon={<EmojiPeople />}
                 text={`${selectedShorts.shortsChallengers}명의 챌린저`}
-                fontSize="18px"
-              ></Detail>
-              <Detail
-                icon={<Copyright />}
-                text={selectedShorts.shortsDirector}
-                fontSize="18px"
               ></Detail>
             </div>
           </Details>
@@ -277,6 +264,7 @@ const Modal = styled.div`
   z-index: 1;
   padding: 20px;
   width: 50%;
+  height: 50%;
   animation: ${pulse} 0.5s ease-in-out;
 
   @media (max-width: 700px) {
@@ -295,7 +283,7 @@ const Details = styled.div`
   justify-content: space-evenly;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 10px;
+  height: 65%;
 `;
 
 interface DetailType {
@@ -326,7 +314,7 @@ const ButtonContainer = styled.div`
 `;
 
 const RouteButton = styled.button`
-  border: 2px solid #fb2576;
+  border: 1px solid #fb2576;
   border-radius: 10px;
   background-color: white;
   color: black;
