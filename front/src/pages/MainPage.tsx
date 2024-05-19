@@ -64,79 +64,10 @@ const MainPage = () => {
     <Container>
       <Header />
       <SectionWrapper>
-        {/* <Section>
-          <SectionTitle>오늘의 챌린지</SectionTitle>
-          <div
-            style={{
-              display: "flex",
-              backgroundColor: "#ededed",
-              position: "relative",
-              width: "100%",
-              alignItems: "center",
-              padding: "16px",
-              borderRadius: "16px",
-            }}
-          >
-            {allShortsList && (
-              <>
-                <div style={{ width: "260px" }}>
-                  <video
-                    style={{
-                      width: "100%",
-                      objectFit: "cover",
-                      borderRadius: "12px",
-                    }}
-                    src={allShortsList[0].shortsLink}
-                    crossOrigin="anonymous"
-                  />
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    marginLeft: "16px",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Details style={{ alignItems: "flex-start" }}>
-                    <Detail
-                      icon={<MusicNote />}
-                      text={allShortsList[0].shortsTitle}
-                      fontWeight="bold"
-                      fontSize="30px"
-                    ></Detail>
-                    <Detail
-                      icon={<Copyright />}
-                      text={allShortsList[0].shortsDirector}
-                      fontSize="20px"
-                    ></Detail>
-                    <Detail
-                      icon={<TimerOutlined />}
-                      fontSize="18px"
-                      text={`${allShortsList[0].shortsTime}초`}
-                    ></Detail>
-                    <Detail
-                      icon={<EmojiPeople />}
-                      fontSize="18px"
-                      text={`${allShortsList[0].shortsChallengers}명의 챌린저`}
-                    ></Detail>
-                  </Details>
-                  <ButtonContainer>
-                    <RouteButton onClick={() => goToLearnMode(allShortsList[0].shortsNo)}>
-                      연습모드
-                    </RouteButton>
-                    <RouteButton onClick={() => goToChallengeMode(allShortsList[0].shortsNo)}>
-                      챌린지모드
-                    </RouteButton>
-                  </ButtonContainer>
-                </div>
-              </>
-            )}
-          </div>
-        </Section> */}
-        <SeriesSection>
+        <SeriesSection style={{ background: "#fefae0" }}>
           <SectionHeaderContainer>
-            <SectionTitle>당신을 위한 추천 챌린지</SectionTitle>
-            <p>무언가의 설명...</p>
+            <SectionTitle>이런 챌린지는 어떠세요?</SectionTitle>
+            <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
           </SectionHeaderContainer>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
@@ -150,10 +81,10 @@ const MainPage = () => {
             ))}
           </SectionConents>
         </SeriesSection>
-        <SeriesSection>
+        <SeriesSection style={{ background: "#ffe5ec" }}>
           <SectionHeaderContainer>
-            <SectionTitle>실시간 인기 챌린지</SectionTitle>
-            <p>무언가의 설명...</p>
+            <SectionTitle>요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
+            <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
           </SectionHeaderContainer>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
@@ -244,24 +175,23 @@ const SectionTitle = styled.h3`
 const SectionConents = styled.div`
   display: flex;
   flex-wrap: wrap;
-  /* width: 100%; */
 
   &.nowrap {
-    flex-wrap: nowrap;
+    justify-content: center;
   }
 `;
 
 const SeriesSection = styled.section`
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   background: #ededed;
   border-radius: 16px;
   border: 2px solid #333;
-  padding: 16px;
+  padding: 36px;
   margin: 48px 16px;
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     flex-direction: column;
     justify-content: flex-start;
   }
@@ -270,13 +200,15 @@ const SeriesSection = styled.section`
 const SectionHeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
+  margin-left: 16px;
   word-break: keep-all;
+  white-space: pre-line;
 
   h3 {
     margin: 1rem 0;
   }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     margin: calc(var(--grid-item-margin) / 2);
   }
 `;

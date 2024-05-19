@@ -173,7 +173,10 @@ const LearnPage = () => {
       // 반복하지 않는 경우
       if (!isLooping) {
         setCurrentTime(video.currentTime);
-        if (video.ended) setState("PAUSE");
+        if (video.ended) {
+          video.currentTime = 0;
+          setState("PAUSE");
+        }
         return;
       }
 

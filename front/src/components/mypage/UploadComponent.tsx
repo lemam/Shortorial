@@ -15,7 +15,12 @@ interface ContainerProps {
   isPortrait: boolean;
 }
 
-const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) => {
+interface UploadComponentProps {
+  uploadShorts: UploadShorts;
+  onDelete: (uploadNo: number) => void;
+}
+
+const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
   // 제목에서 '/' 이후의 부분을 추출하는 함수
   const extractTitle = (fullTitle: string): string => {
     const titleParts = fullTitle.split("/");
@@ -45,6 +50,7 @@ const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) =
 
     await deleteShorts(deletingShorts);
     // 재렌더링 필요
+    onDelete(uploadShorts.uploadNo); // 삭제 후 상위 컴포넌트에 uploadNo 전달
   };
 
   const saveTitle = async () => {
@@ -274,4 +280,4 @@ const CheckIcon = styled(Check)`
   cursor: pointer;
 `;
 
-export default ChallengeResultPage;
+export default UploadComponent;

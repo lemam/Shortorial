@@ -35,81 +35,36 @@ export default function Profile() {
 
   return (
     <ProfileContainer>
-      <ProfileInfoContainer>
-        <div>
-          <ProfileImage
-            src={`/src/assets/profiles/profile${memberInfo?.memberProfile}.jpeg`}
-            alt="프로필 이미지"
-          />
-        </div>
-        <div>{memberInfo?.memberNickname}</div>
-      </ProfileInfoContainer>
-
-      <ProfileNumContainer>
-        <div
-          key="tryShorts"
-          className="innerDiv"
-        >
-          <div>{counting?.tryShortsCount}</div>
-          <div>참여</div>
-        </div>
-        <div
-          key="uploadShorts"
-          className="innerDiv"
-        >
-          <div>{counting?.uploadShortsCount}</div>
-          <div>완료</div>
-        </div>
-        <div
-          key="youtubeUrl"
-          className="innerDiv"
-        >
-          <div>{counting?.youtubeUrlCount}</div>
-          <div>게시</div>
-        </div>
+      <ProfileNumContainer key="memberNickname">{memberInfo?.memberNickname}</ProfileNumContainer>
+      <ProfileNumContainer key="tryShorts">
+        <div>{counting?.tryShortsCount}</div>
+        <div>참여</div>
+      </ProfileNumContainer>
+      <ProfileNumContainer key="uploadShorts">
+        <div>{counting?.uploadShortsCount}</div>
+        <div>완료</div>
+      </ProfileNumContainer>
+      <ProfileNumContainer key="youtubeUrl">
+        <div>{counting?.youtubeUrlCount}</div>
+        <div>게시</div>
       </ProfileNumContainer>
     </ProfileContainer>
   );
 }
-
 const ProfileContainer = styled.div`
   display: flex;
-  height: 100%;
-  flex-direction: column; /* 세로로 나열 */
-  justify-content: center; /* 수평 가운데 정렬 */
-  align-items: center; /* 수직 가운데 정렬 */
-  border: 1px solid black;
-  padding: 10px;
-`;
-const ProfileInfoContainer = styled.div`
-  display: flex;
-  justify-content: center; /* 수평 가운데 정렬 */
-  align-items: center; /* 수직 가운데 정렬 */
+  justify-content: center;
   padding: 10px;
   height: 100%;
   width: 100%;
-`;
-const ProfileImage = styled.img`
-  height: 50px;
-  padding-right: 50px;
+  border: 1px solid black;
 `;
 const ProfileNumContainer = styled.div`
   display: flex;
-  justify-content: center;
-  border-top: 1px solid black;
-  padding: 10px;
-  height: 100%;
-  width: 100%;
+  flex-direction: column; /* 세로로 나열 */
+  justify-content: center; /* 수평 가운데 정렬 */
+  align-items: center; /* 수직 가운데 정렬 */
 
-  .innerDiv {
-    display: flex;
-    flex-direction: column; /* 세로로 나열 */
-    justify-content: center; /* 수평 가운데 정렬 */
-    align-items: center; /* 수직 가운데 정렬 */
-
-    width: 20vw;
-
-    margin-right: 10px;
-    margin-left: 10px;
-  }
+  margin-right: 10px;
+  margin-left: 10px;
 `;

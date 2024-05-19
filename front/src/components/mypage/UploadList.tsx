@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { UploadShorts } from "../../apis/shorts";
 import { getUploadedShorts } from "../../apis/mypage";
-import ChallengeResultPage from "./ChallengeComponent";
 import styled from "styled-components";
+import UploadComponent from "./UploadComponent";
 
 export default function UploadList() {
   const [shortsList, setShortsList] = useState<UploadShorts[]>([]);
@@ -15,6 +15,10 @@ export default function UploadList() {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  };
+
+  const handleDeleteShort = (uploadNo: number) => {
+    setShortsList((prevList) => prevList.filter((short) => short.uploadNo !== uploadNo));
   };
 
   useEffect(() => {
@@ -33,16 +37,14 @@ export default function UploadList() {
         (_, index) => index * (isPortrait ? 2 : 4)
       ).map((startIndex) => (
         <div key={startIndex}>
-          {/* 4개씩 묶어서 렌더링 */}
           <Container style={{ display: "flex" }}>
-            {shortsList
-              .slice(startIndex, startIndex + (isPortrait ? 2 : 4))
-              .map((uploadShorts, i) => (
-                <ChallengeResultPage
-                  key={i}
-                  uploadShorts={uploadShorts}
-                />
-              ))}
+            {shortsList.slice(startIndex, startIndex + (isPortrait ? 2 : 4)).map((uploadShorts) => (
+              <UploadComponent
+                key={uploadShorts.uploadNo}
+                uploadShorts={uploadShorts}
+                onDelete={handleDeleteShort}
+              />
+            ))}
           </Container>
         </div>
       ))}
