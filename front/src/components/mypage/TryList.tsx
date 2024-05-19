@@ -19,7 +19,7 @@ export default function TryList() {
   const [selectedShorts, setSelectedShorts] = useState<Shorts | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [tryShortsList, settryShortsList] = useState<Shorts[]>();
+  const [tryShortsList, settryShortsList] = useState<Shorts[]>([]);
 
   const openModal = (shorts: Shorts) => {
     return () => {
@@ -64,14 +64,18 @@ export default function TryList() {
       <SectionWrapper>
         <Section>
           <SectionConents>
-            {tryShortsList?.map((shorts) => (
-              <ShortsVideoItem
-                key={shorts.shortsNo}
-                shortsInfo={shorts}
-                isLoading={isLoading}
-                onClick={openModal(shorts)}
-              />
-            ))}
+            {tryShortsList.length === 0 ? (
+              <P>시도한 영상이 없습니다</P>
+            ) : (
+              tryShortsList?.map((shorts) => (
+                <ShortsVideoItem
+                  key={shorts.shortsNo}
+                  shortsInfo={shorts}
+                  isLoading={isLoading}
+                  onClick={openModal(shorts)}
+                />
+              ))
+            )}
           </SectionConents>
         </Section>
       </SectionWrapper>
@@ -119,11 +123,15 @@ export default function TryList() {
     </Container>
   );
 }
+const P = styled.p`
+  text-align: center;
+`;
 
 const Container = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+  background: white;
 `;
 
 const Section = styled.section`

@@ -4,6 +4,7 @@ import UploadList from "../components/mypage/UploadList";
 import styled from "styled-components";
 import TryList from "../components/mypage/TryList";
 import Header from "../components/header/Header";
+import StarEffect from "../components/style/StarEffect";
 
 export default function MyPage() {
   const [currentTab, clickTab] = useState(0);
@@ -17,7 +18,8 @@ export default function MyPage() {
     clickTab(index);
   };
   return (
-    <div>
+    <OutSide>
+      <StarEffect numStars={80} />
       <Header />
       <MypageContainer>
         <ProfileContainer>
@@ -37,9 +39,18 @@ export default function MyPage() {
           <div>{menuArr[currentTab].content}</div>
         </div>
       </MypageContainer>
-    </div>
+    </OutSide>
   );
 }
+const OutSide = styled.div`
+  // height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(48, 13, 45, 1) 80%,
+    rgba(112, 0, 102, 1) 100%
+  );
+`;
 const MypageContainer = styled.div`
   display: flex;
   margin-right: 20px; /* 오른쪽 마진을 20px로 설정 */
@@ -71,8 +82,6 @@ const TabMenu = styled.div`
   flex-direction: row;
   align-items: center;
   list-style: none;
-  margin-bottom: 0.2rem;
-  margin-top: 10px;
   text-align: center;
 
   .submenu {
@@ -87,12 +96,17 @@ const TabMenu = styled.div`
     font-size: 15px;
     transition: 0.5s;
     border-bottom: 2px solid #fb2576;
+    border: 2px solid #fb2576;
+    border-radius: 5px 5px 0px 0px;
+    background: white;
   }
 
   .focused {
     //선택된 Tabmenu 에만 적용되는 CSS를 구현
 
     border: 2px solid #fb2576;
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 20px 20px 0px 0px;
+    background: #fb2576;
+    color: white;
   }
 `;

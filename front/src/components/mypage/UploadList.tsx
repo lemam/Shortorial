@@ -29,13 +29,17 @@ export default function UploadList() {
       <SectionWrapper>
         <Section>
           <SectionConents>
-            {shortsList.map((uploadShorts) => (
-              <UploadComponent
-                key={uploadShorts.uploadNo}
-                uploadShorts={uploadShorts}
-                onDelete={handleDeleteShort}
-              />
-            ))}
+            {shortsList.length === 0 ? (
+              <P>저장한 영상이 없습니다</P>
+            ) : (
+              shortsList.map((uploadShorts) => (
+                <UploadComponent
+                  key={uploadShorts.uploadNo}
+                  uploadShorts={uploadShorts}
+                  onDelete={handleDeleteShort}
+                />
+              ))
+            )}
           </SectionConents>
         </Section>
       </SectionWrapper>
@@ -43,10 +47,15 @@ export default function UploadList() {
   );
 }
 
+const P = styled.p`
+  text-align: center;
+`;
+
 const Container = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+  background: white;
 `;
 
 const Section = styled.section`
