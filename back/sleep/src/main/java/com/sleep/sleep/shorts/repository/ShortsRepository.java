@@ -14,4 +14,7 @@ public interface ShortsRepository extends JpaRepository<Shorts,Integer> {
 
     @Query(nativeQuery = true, value = "select * from shorts")
     List<Shorts> findShortList();
+
+    @Query(nativeQuery = true, value = "select * from shorts order by shortsChallengers DESC limit 3")
+    List<Shorts> findShortTopRanking();
 }

@@ -10,6 +10,7 @@ public interface ShortsService {
     public ShortsDto getShortsInfo(int shortsNo);
     //리스트 조회
      public List<ShortsDto> getShortList();
+     public List<ShortsDto> getShortRankingList();
 
      //사용자의 업로드한 쇼츠 리스트
      public List<UploadShortsDto> getUploadShortsList(String memberId);
