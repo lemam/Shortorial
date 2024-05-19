@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { UploadShorts } from "../../apis/shorts";
 import { getUploadedShorts } from "../../apis/mypage";
-import ChallengeResultPage from "./ChallengeComponent";
 import styled from "styled-components";
+import UploadComponent from "./UploadComponent";
 
 export default function UploadList() {
   const [shortsList, setShortsList] = useState<UploadShorts[]>([]);
@@ -38,7 +38,7 @@ export default function UploadList() {
             {shortsList
               .slice(startIndex, startIndex + (isPortrait ? 2 : 4))
               .map((uploadShorts, i) => (
-                <ChallengeResultPage
+                <UploadComponent
                   key={i}
                   uploadShorts={uploadShorts}
                 />
