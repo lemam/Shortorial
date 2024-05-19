@@ -14,7 +14,6 @@ import VideoTrimPage from "./pages/VideoTrimPage";
 import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 // import VideoResizePage from "./pages/VideoResizePage";
 import MyPage from "./pages/MyPage";
-import ShortsDetailPage from "./pages/ShortsDetailPage";
 import FeedPage from "./pages/FeedPage";
 
 function App() {
@@ -41,10 +40,6 @@ function App() {
           <Route path="/video-marker" element={<VideoMarkerPage />} />
           {/* <Route path="/video-resize" element={<VideoResizePage />} /> */}
           <Route path="/mypage" element={<MyPage />} />
-          <Route
-            path="/shorts/:shortsNo"
-            element={<PrivateRoute component={<ShortsDetailPage />} />}
-          />
           <Route path="/feed" element={<FeedPage />} />
         </Routes>
       </BrowserRouter>

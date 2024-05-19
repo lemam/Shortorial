@@ -260,11 +260,11 @@ const RouteButton = styled.button`
   color: black;
   padding: 8px;
   cursor: pointer;
-  margin: 5px; 0px;
+  margin: 5px;
   font-size: 16px;
 
   &:hover {
-    background-color: #FF7EA0;; 
+    background-color: #ff7ea0;
   }
 `;
 
