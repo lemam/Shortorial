@@ -2,7 +2,7 @@
 FROM python:3.11.8
 
 # 작업 디렉토리 설정
-WORKDIR /app
+WORKDIR /app_flask
 
 # 필요한 Python 라이브러리 설치
 COPY requirements.txt ./
