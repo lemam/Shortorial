@@ -76,6 +76,28 @@ public class ShortsServiceImpl implements ShortsService{
         return shortsList;
     }
 
+    @Override
+    public List<ShortsDto> getShortRankingList() {
+        List<Shorts> shorts = shortsRepository.findShortTopRanking();
+
+        List<ShortsDto> shortsList = new ArrayList<>();
+
+        for(Shorts value : shorts){
+            ShortsDto shortsDto = new ShortsDto();
+
+            shortsDto.setShortsNo(value.getShortsNo());
+            shortsDto.setShortsUrl(value.getShortsUrl());
+            shortsDto.setShortsTime(value.getShortsTime());
+            shortsDto.setShortsTitle(value.getShortsTitle());
+            shortsDto.setShortsDirector(value.getShortsDirector());
+            shortsDto.setShortsChallengers(value.getShortsChallengers());
+            shortsDto.setShortsLink(value.getShortsLink());
+            shortsList.add(shortsDto);
+        }
+        return shortsList;
+
+    }
+
     public List<UploadShortsDto> getUploadShortsList(String username){
         int memberNo = memberRepository.findByMemberId(username)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found")).getMemberIndex();
