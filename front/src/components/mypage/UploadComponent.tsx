@@ -15,7 +15,7 @@ interface ContainerProps {
   isPortrait: boolean;
 }
 
-const ChallengeResultPage = ({ uploadShorts }: { uploadShorts: UploadShorts }) => {
+const UploadComponent = ({ uploadShorts }: { uploadShorts: UploadShorts }) => {
   // 제목에서 '/' 이후의 부분을 추출하는 함수
   const extractTitle = (fullTitle: string): string => {
     const titleParts = fullTitle.split("/");
@@ -274,4 +274,4 @@ const CheckIcon = styled(Check)`
   cursor: pointer;
 `;
 
-export default ChallengeResultPage;
+export default UploadComponent;
