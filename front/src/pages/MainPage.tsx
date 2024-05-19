@@ -21,9 +21,7 @@ import {
 const MainPage = () => {
   const navigate = useNavigate();
   const [showDetails, setShowDetails] = useState<boolean>(false);
-  const [selectedShorts, setSelectedShorts] = useState<
-    Shorts | RecomShorts | null
-  >(null);
+  const [selectedShorts, setSelectedShorts] = useState<Shorts | RecomShorts | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [allShortsList, setAllShortsList] = useState<Shorts[]>();
@@ -146,7 +144,7 @@ const MainPage = () => {
             <div>
               <Detail
                 icon={<MusicNote />}
-                text={`${selectedShorts.singerName} - ${selectedShorts.musicName}`}
+                text={`${selectedShorts.musicName}`}
                 fontSize="18px"
               ></Detail>
 
