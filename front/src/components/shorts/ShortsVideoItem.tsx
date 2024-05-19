@@ -39,11 +39,7 @@ const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise, onClick }: ShortsVid
         </SkeletonContainer>
       ) : (
         shortsInfo && (
-          <VideoContainer
-            // to={`/shorts/${shortsInfo.shortsNo}`}
-            className={isSerise ? "serise" : ""}
-            onClick={onClick}
-          >
+          <VideoContainer className={isSerise ? "serise" : ""} onClick={onClick}>
             <VideoBox>
               <Video ref={videoRef} src={shortsInfo.shortsLink} crossOrigin="anonymous" />
               <Gradient className="gradient" />
@@ -104,21 +100,6 @@ const VideoBox = styled.div`
   }
 `;
 
-// const VideoContainer = styled(Link)`
-//   position: relative;
-//   width: calc(100% / var(--grid-items-per-row) - var(--grid-item-margin));
-//   margin: calc(var(--grid-item-margin) / 2);
-//   color: #000;
-
-//   &.serise {
-//     --grid-items-per-row: 3;
-//   }
-
-//   @media screen and (min-width: 600px) {
-//     max-width: var(--grid-item-max-width);
-//   }
-// `;
-
 const VideoContainer = styled.div`
   position: relative;
   width: calc(100% / var(--grid-items-per-row) - var(--grid-item-margin));
@@ -145,8 +126,15 @@ const DetailsContainer = styled.div`
   width: 100%;
 
   .title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    height: 48px;
+    line-height: 24px;
     font-size: 16px;
     font-weight: bold;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   .detail {
