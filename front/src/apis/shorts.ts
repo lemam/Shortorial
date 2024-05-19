@@ -177,11 +177,11 @@ export async function checkTitle(title: string) {
 }
 
 // 유튜브 업로드
-//const youtubeUrl = import.meta.env.VITE_YOUTUBE_URL;
+const youtubeUrl = import.meta.env.VITE_YOUTUBE_URL;
 export async function shareShorts(filePath: string, uploadNo: number) {
   try {
     const response = await axios.get(
-      `/authenticate?filePath=${encodeURIComponent(filePath)}&uploadNo=${uploadNo}`
+      `${youtubeUrl}/authenticate?filePath=${encodeURIComponent(filePath)}&uploadNo=${uploadNo}`
     );
     // 서버에서 응답받은 authUrl로 이동
     window.location.href = response.data.authUrl;
