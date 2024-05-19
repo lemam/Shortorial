@@ -26,9 +26,7 @@ export default function MotionCamera({
   useEffect(() => {
     // 모델 초기화
     createPoseLandmarker();
-    const canvasElement = document.getElementById(
-      "canvas"
-    ) as HTMLCanvasElement | null;
+    const canvasElement = document.getElementById("canvas") as HTMLCanvasElement | null;
     let canvasCtx: CanvasRenderingContext2D | null = null;
     // 그리기 도구
     let drawingUtils: DrawingUtils | null = null;
@@ -80,17 +78,17 @@ export default function MotionCamera({
       });
     }
     if (webcam) {
-      const cleanup = () => {
-        const stream = webcam?.srcObject as MediaStream;
-        const tracks = stream?.getTracks();
-        tracks?.forEach((track) => track.stop());
-        webcam.srcObject = null;
-      };
+      // const cleanup = () => {
+      //   const stream = webcam?.srcObject as MediaStream;
+      //   const tracks = stream?.getTracks();
+      //   tracks?.forEach((track) => track.stop());
+      //   webcam.srcObject = null;
+      // };
 
-      window.addEventListener("popstate", cleanup);
+      // window.addEventListener("popstate", cleanup);
       return () => {
-        cleanup();
-        window.removeEventListener("popstate", cleanup);
+        // cleanup();
+        // window.removeEventListener("popstate", cleanup);
       };
     }
   }, [setBtn, setAction]);
