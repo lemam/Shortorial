@@ -1,5 +1,5 @@
 import { CSSProperties, MouseEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import logo from "/src/assets/logo.png";
 import useLoginStore from "../../store/useLoginStore";
@@ -12,6 +12,7 @@ const Header = ({ style }: HeaderProps) => {
   const isLogin = useLoginStore((state) => state.getIsLogin());
   const logout = useLoginStore((state) => state.logout);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogoutClick = (e: MouseEvent) => {
     e.preventDefault();
@@ -19,10 +20,16 @@ const Header = ({ style }: HeaderProps) => {
     navigate("/");
   };
 
+  const handleLogoClick = (e: MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname === "/") window.location.reload();
+    else navigate("/");
+  };
+
   return (
     <Container style={style}>
       <Wrapper>
-        <LogoContainer to="/main">
+        <LogoContainer to="/" onClick={handleLogoClick}>
           <LogoImg src={logo} alt="" />
         </LogoContainer>
         <LinkWrapper>

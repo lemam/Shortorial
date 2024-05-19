@@ -60,7 +60,7 @@ const ChallengePage = () => {
     setShort(thisShort);
     if (thisShort) {
       setDanceVideoPath(thisShort.shortsLink); // 쇼츠 s3 링크
-      const s3blob = await getS3Blob(thisShort.shortsTitle); // 쇼츠 블롭화
+      const s3blob = await getS3Blob(thisShort.musicName); // 쇼츠 블롭화
       setDanceVideoS3blob(s3blob);
     } else {
       alert("새로고침 해주세요.");
