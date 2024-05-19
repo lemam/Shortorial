@@ -110,6 +110,7 @@ public class ShortsServiceImpl implements ShortsService{
             shortsDto.setShortsDirector(value.getShortsDirector());
             shortsDto.setShortsChallengers(value.getShortsChallengers());
             shortsDto.setShortsLink(value.getShortsLink());
+            shortsDto.setShortDate(value.getShortsDate());
 
             int musicNo = value.getMusicNo();
             Music music = musicRepository.findByMusicNo(musicNo);

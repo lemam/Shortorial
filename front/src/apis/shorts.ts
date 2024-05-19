@@ -101,6 +101,7 @@ export async function getTryCount(shortsNo: number) {
 export async function getS3Blob(fileName: string) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
+    console.log(fileName);
 
     const data = await axios.post(
       `${REST_SHORTS_URL}/bring/blob/${fileName}`,
