@@ -39,7 +39,7 @@ def start_predict(dataset,  K=51 ,learning_rate = 0.01, steps = 500 ):
 
     
 def get_recommend_music_list(user_Id):
-    userId = get_user_id(user_Id)
+    userId = get_user_id(user_Id)-1
     global predicted_R
     user_predict_R = predicted_R[userId].copy()
     music_idx = []
