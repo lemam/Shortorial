@@ -1,13 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import heroImg from "/src/assets/landing/hero.jpg";
 import deviceLandscape from "/src/assets/landing/device_landscape.png";
-import serviceLandscape from "/src/assets/landing/service_landscape.png";
+import serviceMotionGif from "/src/assets/landing/serviceMotion.gif";
 import Header from "../components/header/Header";
 import useLoginStore from "../store/useLoginStore";
 import BasicButton from "../components/button/BasicButton";
 import useScrollFadeIn from "../hooks/useScrollFadeIn";
+import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
+import { Shorts } from "../constants/types";
+import { getTopRankingShorts } from "../apis/shorts";
 
 const LandingPage = () => {
   const isLogin = useLoginStore((state) => state.getIsLogin());
@@ -20,6 +23,17 @@ const LandingPage = () => {
   const ThirdSectionScroll = useScrollFadeIn();
   const ForthSectionScroll = useScrollFadeIn();
   const LastSectionScroll = useScrollFadeIn({ direction: "none", duration: 1 });
+
+  const [popularShortsList, setPopularShortsList] = useState<Shorts[] | null>(null);
+
+  const loadPopularShortsList = async () => {
+    const data = await getTopRankingShorts();
+    if (data) setPopularShortsList(data);
+  };
+
+  useEffect(() => {
+    loadPopularShortsList();
+  }, []);
 
   // 로그인한 유저의 접근 막기
   useEffect(() => {
@@ -49,7 +63,7 @@ const LandingPage = () => {
           {`웹캠 또는 스마트폰 카메라 하나로\n언제 어디서나 챌린지를 연습해보세요.`}
         </p>
         <ImageContainer>
-          <ServiceImg src={serviceLandscape} alt="" />
+          <ServiceImg src={serviceMotionGif} alt="" />
           <DeviceImg src={deviceLandscape} alt="" />
         </ImageContainer>
       </Section>
@@ -59,7 +73,7 @@ const LandingPage = () => {
           <p className="subTitle">{`춤추다가 걸어와서 버튼 누르고...\n이런 귀찮은 과정은 저희가 해결해드릴게요.`}</p>
         </div>
         <ImageContainer>
-          <ServiceImg src={serviceLandscape} alt="" />
+          <ServiceImg src={serviceMotionGif} alt="" />
           <DeviceImg src={deviceLandscape} alt="" />
         </ImageContainer>
         <p className="text">
@@ -69,13 +83,24 @@ const LandingPage = () => {
       <Section {...ThirdSectionScroll}>
         <h1 className="title">인기 챌린지를 한눈에</h1>
         <p className="subTitle">지금 유행하는 다양한 댄스 챌린지에 도전해보세요.</p>
+        <SeriesSection style={{ background: "#ffe5ec" }}>
+          <SectionHeaderContainer>
+            <SectionTitle>🔥 요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
+            <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
+          </SectionHeaderContainer>
+          <SectionConents className="nowrap">
+            {popularShortsList?.map((shorts) => (
+              <ShortsVideoItem key={shorts.shortsNo} shortsInfo={shorts} isSerise />
+            ))}
+          </SectionConents>
+        </SeriesSection>
         <p className="text">당신이 좋아할만한 챌린지도 추천해드릴게요.</p>
       </Section>
       <Section {...ForthSectionScroll}>
         <h1 className="title">촬영에서 업로드까지</h1>
         <p className="subTitle">{`연습한 그 자리에서 바로 촬영하고\nSNS에 공유해보세요.`}</p>
         <ImageContainer>
-          <ServiceImg src={serviceLandscape} alt="" />
+          <ServiceImg src={serviceMotionGif} alt="" />
           <DeviceImg src={deviceLandscape} alt="" />
         </ImageContainer>
       </Section>
@@ -114,9 +139,10 @@ const DeviceImg = styled.img`
 
 const ServiceImg = styled.img`
   position: absolute;
-  top: 53%;
-  left: 50%;
-  width: 90%;
+  top: 52%;
+  left: 51%;
+  width: 87%;
+  height: 84%;
   border-radius: 1rem;
   box-shadow: 12px 12px 15px rgba(0, 0, 0, 0.3);
   transform: translate(-50%, -50%);
@@ -242,6 +268,54 @@ const Container = styled.div`
     @media screen and (min-width: 1024px) {
       font-size: 20px;
     }
+  }
+`;
+
+const SeriesSection = styled.section`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: #ededed;
+  border-radius: 16px;
+  padding: 36px;
+  margin: 48px 16px;
+
+  @media screen and (max-width: 1024px) {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+`;
+
+const SectionHeaderContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 16px;
+  word-break: keep-all;
+  white-space: pre-line;
+
+  h3 {
+    margin: 1rem 0;
+  }
+
+  @media screen and (max-width: 1024px) {
+    margin: calc(var(--grid-item-margin) / 2);
+  }
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 22px;
+  font-weight: bold;
+  margin: 1rem;
+  margin-left: calc(var(--grid-item-margin) / 2);
+`;
+
+const SectionConents = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+
+  &.nowrap {
+    justify-content: center;
   }
 `;
 
