@@ -22,4 +22,6 @@ export interface Shorts {
   shortsChallengers: number;
   shortsLink: string;
   shortsDate: string;
+  musicName: string;
+  singerName: string;
 }
