@@ -70,8 +70,80 @@ const MainPage = () => {
     <Container>
       <Header />
       <SectionWrapper>
-        <Section>
-          <SectionTitle>이 쇼츠에 도전해보세요!</SectionTitle>
+        {/* <Section>
+          <SectionTitle>오늘의 챌린지</SectionTitle>
+          <div
+            style={{
+              display: "flex",
+              backgroundColor: "#ededed",
+              position: "relative",
+              width: "100%",
+              alignItems: "center",
+              padding: "16px",
+              borderRadius: "16px",
+            }}
+          >
+            {allShortsList && (
+              <>
+                <div style={{ width: "260px" }}>
+                  <video
+                    style={{
+                      width: "100%",
+                      objectFit: "cover",
+                      borderRadius: "12px",
+                    }}
+                    src={allShortsList[0].shortsLink}
+                    crossOrigin="anonymous"
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    marginLeft: "16px",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Details style={{ alignItems: "flex-start" }}>
+                    <Detail
+                      icon={<MusicNote />}
+                      text={allShortsList[0].shortsTitle}
+                      fontWeight="bold"
+                      fontSize="30px"
+                    ></Detail>
+                    <Detail
+                      icon={<Copyright />}
+                      text={allShortsList[0].shortsDirector}
+                      fontSize="20px"
+                    ></Detail>
+                    <Detail
+                      icon={<TimerOutlined />}
+                      fontSize="18px"
+                      text={`${allShortsList[0].shortsTime}초`}
+                    ></Detail>
+                    <Detail
+                      icon={<EmojiPeople />}
+                      fontSize="18px"
+                      text={`${allShortsList[0].shortsChallengers}명의 챌린저`}
+                    ></Detail>
+                  </Details>
+                  <ButtonContainer>
+                    <RouteButton onClick={() => goToLearnMode(allShortsList[0].shortsNo)}>
+                      연습모드
+                    </RouteButton>
+                    <RouteButton onClick={() => goToChallengeMode(allShortsList[0].shortsNo)}>
+                      챌린지모드
+                    </RouteButton>
+                  </ButtonContainer>
+                </div>
+              </>
+            )}
+          </div>
+        </Section> */}
+        <SeriesSection>
+          <SectionHeaderContainer>
+            <SectionTitle>당신을 위한 추천 챌린지</SectionTitle>
+            <p>무언가의 설명...</p>
+          </SectionHeaderContainer>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
               <ShortsVideoItem
@@ -83,9 +155,12 @@ const MainPage = () => {
               ></ShortsVideoItem>
             ))}
           </SectionConents>
-        </Section>
-        <Section>
-          <SectionTitle>실시간 인기 쇼츠</SectionTitle>
+        </SeriesSection>
+        <SeriesSection>
+          <SectionHeaderContainer>
+            <SectionTitle>실시간 인기 챌린지</SectionTitle>
+            <p>무언가의 설명...</p>
+          </SectionHeaderContainer>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
               <ShortsVideoItem
@@ -97,7 +172,7 @@ const MainPage = () => {
               />
             ))}
           </SectionConents>
-        </Section>
+        </SeriesSection>
         <Section>
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
@@ -183,10 +258,40 @@ const SectionTitle = styled.h3`
 const SectionConents = styled.div`
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
+  /* width: 100%; */
 
   &.nowrap {
     flex-wrap: nowrap;
+  }
+`;
+
+const SeriesSection = styled.section`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background: #ededed;
+  border-radius: 16px;
+  border: 2px solid #333;
+  padding: 16px;
+  margin: 48px 16px;
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+`;
+
+const SectionHeaderContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  word-break: keep-all;
+
+  h3 {
+    margin: 1rem 0;
+  }
+
+  @media screen and (max-width: 768px) {
+    margin: calc(var(--grid-item-margin) / 2);
   }
 `;
 

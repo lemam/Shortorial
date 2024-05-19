@@ -100,9 +100,9 @@ const VideoContainer = styled.div`
   margin: calc(var(--grid-item-margin) / 2);
   color: #000;
 
-  // TODO: 반응형으로 수정할 것 또는 스크롤
   &.serise {
-    --grid-items-per-row: 4;
+    --grid-items-per-row: 3;
+    max-width: 220px;
   }
 
   @media screen and (min-width: 600px) {
