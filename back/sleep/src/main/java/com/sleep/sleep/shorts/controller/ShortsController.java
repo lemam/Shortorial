@@ -98,7 +98,7 @@ public class ShortsController {
     @GetMapping("/topRanking")
     public ResponseEntity<?> shortsGetOrderByChallengers() {
 
-        List<ShortsDto> shortRankingList = shortsService.getShortList();
+        List<ShortsDto> shortRankingList = shortsService.getShortRankingList();
 
         return ResponseEntity.ok(shortRankingList);
     }
