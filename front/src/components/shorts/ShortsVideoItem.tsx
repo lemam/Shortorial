@@ -1,17 +1,22 @@
 import styled from "styled-components";
 import { Pause, PlayArrow } from "@mui/icons-material";
 import { Skeleton } from "@mui/material";
-import { Shorts } from "../../constants/types";
+import { RecomShorts, Shorts } from "../../constants/types";
 import { MouseEvent, useRef, useState } from "react";
 
 interface ShortsVideoPrpos {
-  shortsInfo: Shorts | undefined;
+  shortsInfo: RecomShorts | Shorts | undefined;
   isLoading?: boolean;
   isSerise?: boolean;
   onClick?: () => void;
 }
 
-const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise, onClick }: ShortsVideoPrpos) => {
+const ShortsVideoItem = ({
+  shortsInfo,
+  isLoading,
+  isSerise,
+  onClick,
+}: ShortsVideoPrpos) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -39,9 +44,16 @@ const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise, onClick }: ShortsVid
         </SkeletonContainer>
       ) : (
         shortsInfo && (
-          <VideoContainer className={isSerise ? "serise" : ""} onClick={onClick}>
+          <VideoContainer
+            className={isSerise ? "serise" : ""}
+            onClick={onClick}
+          >
             <VideoBox>
-              <Video ref={videoRef} src={shortsInfo.shortsLink} crossOrigin="anonymous" />
+              <Video
+                ref={videoRef}
+                src={shortsInfo.shortsLink}
+                crossOrigin="anonymous"
+              />
               <Gradient className="gradient" />
               <PlayButton onClick={handlePlayButtonClick}>
                 {!isPlaying ? (
@@ -53,7 +65,9 @@ const ShortsVideoItem = ({ shortsInfo, isLoading, isSerise, onClick }: ShortsVid
             </VideoBox>
             <DetailsContainer>
               <div className="title">{shortsInfo.shortsTitle}</div>
-              <div className="detail">챌린저 {shortsInfo.shortsChallengers}명</div>
+              <div className="detail">
+                챌린저 {shortsInfo.shortsChallengers}명
+              </div>
             </DetailsContainer>
           </VideoContainer>
         )

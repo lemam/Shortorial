@@ -23,3 +23,15 @@ export interface Shorts {
   shortsLink: string;
   shortsDate: string;
 }
+
+export interface RecomShorts {
+  musicNo: number;
+  shortsChallengers: number;
+  shortsDate: string;
+  shortsDirector: string;
+  shortsLink: string;
+  shortsNo: number;
+  shortsTime: number;
+  shortsTitle: string;
+  shortsUrl: string;
+}

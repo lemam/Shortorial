@@ -256,6 +256,7 @@ export async function getTopRankingShorts() {
     },
   });
 
+  console.log(data.data);
   return data.data;
 }
 
@@ -267,6 +268,6 @@ export async function getRecommendedShorts() {
       Authorization: token,
     },
   });
-  console.log(data);
+  console.log(data.data);
   return data.data;
 }
