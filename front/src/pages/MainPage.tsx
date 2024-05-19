@@ -141,8 +141,8 @@ const MainPage = () => {
         </Section> */}
         <SeriesSection>
           <SectionHeaderContainer>
-            <SectionTitle>당신을 위한 추천 챌린지</SectionTitle>
-            <p>무언가의 설명...</p>
+            <SectionTitle>이런 챌린지는 어떠세요?</SectionTitle>
+            <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
           </SectionHeaderContainer>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
@@ -158,8 +158,8 @@ const MainPage = () => {
         </SeriesSection>
         <SeriesSection>
           <SectionHeaderContainer>
-            <SectionTitle>실시간 인기 챌린지</SectionTitle>
-            <p>무언가의 설명...</p>
+            <SectionTitle>요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
+            <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
           </SectionHeaderContainer>
           <SectionConents className="nowrap">
             {popularShortsList?.map((shorts) => (
@@ -259,6 +259,7 @@ const SectionConents = styled.div`
   display: flex;
   flex-wrap: wrap;
   /* width: 100%; */
+  justify-content: center;
 
   &.nowrap {
     flex-wrap: nowrap;
@@ -268,14 +269,14 @@ const SectionConents = styled.div`
 const SeriesSection = styled.section`
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   background: #ededed;
   border-radius: 16px;
   border: 2px solid #333;
   padding: 16px;
   margin: 48px 16px;
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     flex-direction: column;
     justify-content: flex-start;
   }
@@ -284,13 +285,15 @@ const SeriesSection = styled.section`
 const SectionHeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
+  margin-left: 16px;
   word-break: keep-all;
+  white-space: pre-line;
 
   h3 {
     margin: 1rem 0;
   }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     margin: calc(var(--grid-item-margin) / 2);
   }
 `;
