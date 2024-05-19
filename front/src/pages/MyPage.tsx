@@ -44,7 +44,7 @@ const MypageContainer = styled.div`
   display: flex;
   margin-right: 20px; /* 오른쪽 마진을 20px로 설정 */
   margin-left: 20px; /* 왼쪽 마진을 20px로 설정 */
-  padding-top: 60px;
+  padding-top: 80px;
   height: 100%;
   flex-direction: column; /* 세로로 나열 */
 
@@ -55,7 +55,7 @@ const MypageContainer = styled.div`
 `;
 
 const ProfileContainer = styled.div`
-  height: 40vh;
+  height: 15vh;
 
   @media screen and (orientation: landscape) {
     padding-right: 15%; /* 오른쪽 마진을 20px로 설정 */
