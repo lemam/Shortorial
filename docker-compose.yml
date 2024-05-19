@@ -139,5 +139,7 @@ services:
       FLASK_ENV: development
     volumes:
       - .:/app
+    networks:
+      - webnet
 networks:
   webnet:
