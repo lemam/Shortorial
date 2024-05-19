@@ -143,40 +143,11 @@ public class S3Controller {
     }
 
     // 파일 로컬 저장
-//    @PostMapping("/save/{uploadNo}")
-//    public ResponseEntity<?> getLocalFilePath(@RequestHeader("Authorization") String accessToken, @PathVariable int uploadNo) {
-//        try {
-//            String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
-//            //String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
-//            System.out.println(username);
-//
-//            UploadShorts uploadShorts = uploadShortsRepository.findByUploadNo(uploadNo);
-//
-//            // S3에서 파일 다운로드
-//            InputStream inputStream = s3Service.downloadFile(uploadShorts.getUploadTitle());
-//
-//            // 임시 파일 생성
-//            File tempFile = File.createTempFile("downloaded-", ".mp4", new File(System.getProperty("java.io.tmpdir")));
-//            //tempFile.deleteOnExit();  // 프로그램 종료 시 파일 삭제
-//
-//            // 파일로 스트림 복사
-//            Files.copy(inputStream, Paths.get(tempFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
-//
-//            // 블롭(바이트 배열) 반환
-//            return ResponseEntity.ok()
-//                    .body(tempFile.getAbsolutePath());
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
     @PostMapping("/save/{uploadNo}")
     public ResponseEntity<?> getLocalFilePath(@RequestHeader("Authorization") String accessToken, @PathVariable int uploadNo) {
         try {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
+            //String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
             System.out.println(username);
 
             UploadShorts uploadShorts = uploadShortsRepository.findByUploadNo(uploadNo);
@@ -184,18 +155,16 @@ public class S3Controller {
             // S3에서 파일 다운로드
             InputStream inputStream = s3Service.downloadFile(uploadShorts.getUploadTitle());
 
-            // 업로드 디렉토리 생성
-            File uploadDirectory = new File(uploadDir);
-            if (!uploadDirectory.exists()) {
-                uploadDirectory.mkdirs();
-            }
+            // 임시 파일 생성
+            File tempFile = File.createTempFile("downloaded-", ".mp4", new File(System.getProperty("java.io.tmpdir")));
+            //tempFile.deleteOnExit();  // 프로그램 종료 시 파일 삭제
 
-            // 고정된 경로에 파일 저장
-            File savedFile = new File(uploadDirectory, "downloaded-" + System.currentTimeMillis() + ".mp4");
-            Files.copy(inputStream, savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            // 파일로 스트림 복사
+            Files.copy(inputStream, Paths.get(tempFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
 
-            // 파일 경로 반환
-            return ResponseEntity.ok().body(savedFile.getAbsolutePath());
+            // 블롭(바이트 배열) 반환
+            return ResponseEntity.ok()
+                    .body(tempFile.getAbsolutePath());
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
