@@ -5,8 +5,8 @@ ENV PATH /app/node_modules/.bin:$PATH
 
 COPY . /app
 RUN npm install
-RUN npm run build
+# RUN npm run build
 
 EXPOSE 3001
 
-CMD [ "node", "youtube.js" ]
+CMD ["node", "youtube.js" ]
