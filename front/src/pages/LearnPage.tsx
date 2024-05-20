@@ -13,7 +13,6 @@ import noRepeat from "/src/assets/icon/repeat-off.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import { VideoSection, Shorts } from "../constants/types";
 import { predictVideo, setBtnInfo } from "../modules/Motion";
-// import { setBtnInfo } from "../modules/Motion";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
 import {
@@ -457,7 +456,7 @@ const LearnPage = () => {
 
   useEffect(() => {
     if (sectionList.length > 0 && flag) {
-      let sectionListTmp = sectionList;
+      const sectionListTmp = sectionList;
       sectionListTmp[currentSection.id].maxAcc = Math.max(
         acc / count,
         sectionListTmp[currentSection.id].acc

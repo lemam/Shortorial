@@ -43,7 +43,8 @@ export default function MyPage() {
   );
 }
 const OutSide = styled.div`
-  // height: 100%;
+  position: relative;
+  /* height: 100%; */
   background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 1) 0%,
@@ -66,7 +67,7 @@ const MypageContainer = styled.div`
 `;
 
 const ProfileContainer = styled.div`
-  height: 17vh;
+  height: 96px;
   margin-top: 1rem;
   margin-bottom: 2rem;
 
