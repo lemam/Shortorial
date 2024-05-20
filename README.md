@@ -38,7 +38,7 @@
 
 
 ## Stack
-![image](/uploads/21d4bd258a58958aa69ed8c6fafd56eb/서비스아키텍처.png)
+![자율_서비스아키텍처](/uploads/c84d4b3d34096a382757e013f35ebe56/자율_서비스아키텍처.jpg)
 
 **Environment**  
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)
@@ -106,4 +106,5 @@
 ![음식_추천](/uploads/7512e4d8fb84b86357055d016ffd1efd/음식_추천.gif){: width="688" }
 
 ## 사용 기술
+
 
