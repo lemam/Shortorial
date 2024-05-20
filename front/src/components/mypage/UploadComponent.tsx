@@ -128,7 +128,7 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
           {download && (
             <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>
           )}
-          {/* {!share && !link && (
+          {!share && !link && (
             <IosShareIcon onClick={shareShortsToYoutube} fontSize="large"></IosShareIcon>
           )}
           {!share && link && (
@@ -137,7 +137,7 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
               onClick={() => (window.location.href = link)}
             ></YoutubeIcon>
           )}
-          {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>} */}
+          {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>}
           <DeleteIcon fontSize="large" onClick={deleteUploadedShorts}></DeleteIcon>
         </MyVideoControlComponent>
       </VideoContainer>
