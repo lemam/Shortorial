@@ -88,10 +88,10 @@
 
 ## 주요 화면
 #### 랜딩 페이지
-![메인페이지](/uploads/53a872d66ec55599ba02a0e95d30268f/메인페이지.gif){: width="688" }
+![메인페이지](/uploads/90fb755cf60b4af1b1ae7549cbdca2c1/메인페이지.gif)
 
 #### 메인 페이지
-![대화주제](/uploads/c6eedbe7f45091847784a1f4391913e6/대화주제.gif){: width="688" }
+![메인페이지](/uploads/b7540b2aac4d031e9d4c0b3801f0b5f4/메인페이지.gif){: width="688" }
 
 #### 쇼츠 상세 정보
 ![로그인](/uploads/1888c99d58d60cbb44233ce0580a04b4/로그인.gif){: width="688" }
