@@ -36,7 +36,7 @@ const ChallengePage = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [danceVideoPath, setDanceVideoPath] = useState<string>("");
-  const [danceVideoS3blob, setDanceVideoS3blob] = useState<Blob | null>(null);
+  // const [danceVideoS3blob, setDanceVideoS3blob] = useState<Blob | null>(null);
 
   const [show, setShow] = useState(false);
   const [recording, setRecording] = useState(false); // 녹화 진행
