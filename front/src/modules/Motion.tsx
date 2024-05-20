@@ -403,8 +403,8 @@ function action_with_landmark(
       if (before_handLandmarker.x - curr_handmarker.x < 0) {
         right_count = 0;
         left_count++;
-        if (left_count > 5) {
-          console.log("next");
+        if (left_count > 10) {
+          // console.log("next");
           setAction("next");
           setTimeout(() => {
             setAction("none");
@@ -415,8 +415,7 @@ function action_with_landmark(
       } else if (before_handLandmarker.x - curr_handmarker.x > 0) {
         left_count = 0;
         right_count++;
-        if (right_count > 5) {
-          console.log("prev");
+        if (right_count > 10) {
           setAction("prev");
           setTimeout(() => {
             setAction("none");

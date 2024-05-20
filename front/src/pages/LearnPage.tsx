@@ -13,6 +13,7 @@ import noRepeat from "/src/assets/icon/repeat-off.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import { VideoSection, Shorts } from "../constants/types";
 import { predictVideo, setBtnInfo } from "../modules/Motion";
+// import { setBtnInfo } from "../modules/Motion";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
 import {
@@ -335,9 +336,12 @@ const LearnPage = () => {
     if (interval && timer <= 0) {
       initInterval();
       playVideo();
-      if (video) predictVideo(video);
     }
   }, [initInterval, interval, playVideo, timer]);
+
+  useEffect(() => {
+    if (video) predictVideo(video);
+  }, []);
 
   // 영상에 timeupdate 이벤트 추가
   useEffect(() => {
@@ -429,7 +433,6 @@ const LearnPage = () => {
   // 정확도 계산하기
   useEffect(() => {
     if (sectionList.length > 0 || state === "PAUSE") {
-      console.log(sectionList);
       let sectionListTmp = sectionList;
 
       if (currentSection.id > 0) {
@@ -438,8 +441,6 @@ const LearnPage = () => {
           sectionListTmp[currentSection.id - 1].acc
         );
         sectionListTmp[currentSection.id - 1].acc = acc / count;
-        switch (sectionListTmp[currentSection.id - 1].acc) {
-        }
       } else {
         sectionListTmp[sectionListTmp.length - 1].maxAcc = Math.max(
           acc / count,
