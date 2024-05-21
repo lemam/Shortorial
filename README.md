@@ -155,7 +155,7 @@
 - 챌린지 모드
   - 세로 - 카메라
   - 가로 - 원본 영상과 카메라
-![반응형](/uploads/37e7eeb60f4707ee4a0c30b778e2049d/반응형.png)
+![반응형](/uploads/37e7eeb60f4707ee4a0c30b778e2049d/반응형.png){: width="688" }  
 
 #### FFmpeg
 
