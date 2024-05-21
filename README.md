@@ -125,11 +125,11 @@
 ![챌린지모드_버튼](/uploads/29ea128059b6d15f2ac45ad6b0492d5e/챌린지모드_버튼.gif){: width="688" }  
 
 - 녹화 후 영상 저장  
-![챌린지저장](/uploads/15195b6c6806a3cbfddaf8b9df69ccd2/챌린지저장.gif)
+![챌린지저장](/uploads/15195b6c6806a3cbfddaf8b9df69ccd2/챌린지저장.gif){: width="688" }  
 
 #### 마이 페이지
 - 촬영한 영상과 시도한 영상 확인  
-![mypage](/uploads/757e7fd8311f4da75c87e7c3f54ad10d/mypage.gif)
+![mypage](/uploads/757e7fd8311f4da75c87e7c3f54ad10d/mypage.gif){: width="688" }  
 
 ## 사용 기술
 
