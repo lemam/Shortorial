@@ -3,6 +3,7 @@ package com.sleep.sleep.s3;
 import com.sleep.sleep.common.JWT.JwtTokenUtil;
 import com.sleep.sleep.shorts.entity.UploadShorts;
 import com.sleep.sleep.shorts.repository.UploadShortsRepository;
+import com.sleep.sleep.shorts.service.ShortsService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ import java.util.Map;
 public class S3Controller {
 
     private final S3Service s3Service;
+    private final ShortsService shortsService;
     private final JwtTokenUtil jwtTokenUtil;
     private final UploadShortsRepository uploadShortsRepository;
 
@@ -172,12 +174,14 @@ public class S3Controller {
 
 
     // S3 파일 Blob 변환(원본 쇼츠 폴더)
-    @PostMapping("/bring/blob/{fileName}")
-    public ResponseEntity<?> getS3Blob(@RequestHeader("Authorization") String accessToken, @PathVariable String fileName) {
+    @PostMapping("/bring/blob/{shortsNo}")
+    public ResponseEntity<?> getS3Blob(@RequestHeader("Authorization") String accessToken, @PathVariable int shortsNo) {
         try {
             String username = jwtTokenUtil.getUsername(resolveToken(accessToken));
             //String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
 
+            String fileName = shortsService.getShortsInfo(shortsNo).getMusicName();
+            System.out.println("fileName"+fileName);
             // S3에서 파일 다운로드
             InputStream inputStream = s3Service.downloadFile("Shorts/" + fileName);
 

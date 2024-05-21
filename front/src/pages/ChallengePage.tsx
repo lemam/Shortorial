@@ -36,7 +36,7 @@ const ChallengePage = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [danceVideoPath, setDanceVideoPath] = useState<string>("");
-  const [danceVideoS3blob, setDanceVideoS3blob] = useState<Blob | null>(null);
+  // const [danceVideoS3blob, setDanceVideoS3blob] = useState<Blob | null>(null);
 
   const [show, setShow] = useState(false);
   const [recording, setRecording] = useState(false); // 녹화 진행
@@ -60,8 +60,6 @@ const ChallengePage = () => {
     setShort(thisShort);
     if (thisShort) {
       setDanceVideoPath(thisShort.shortsLink); // 쇼츠 s3 링크
-      const s3blob = await getS3Blob(thisShort.musicName); // 쇼츠 블롭화
-      setDanceVideoS3blob(s3blob);
     } else {
       alert("새로고침 해주세요.");
     }
@@ -123,6 +121,11 @@ const ChallengePage = () => {
       recorder.ondataavailable = (e) => chunks.push(e.data); // 스트림 조각이 어느 정도 커지면 push하기
 
       recorder.onstop = async () => {
+        let s3blob: Blob | null = null;
+        if (short) {
+          s3blob = await getS3Blob(short.shortsNo); // 쇼츠 블롭화
+          console.log("s3blob:", s3blob);
+        }
         if (!ffmpeg.isLoaded()) {
           await ffmpeg.load(); // ffmpeg 로드
         }
@@ -130,7 +133,8 @@ const ChallengePage = () => {
         const userVideoBlob = new Blob(chunks, { type: "video/mp4" }); // user video blob 생성
 
         const reader = new FileReader();
-        if (danceVideoS3blob) reader.readAsArrayBuffer(danceVideoS3blob); // dance video blob array buffer로 변환
+
+        if (s3blob) reader.readAsArrayBuffer(s3blob); // dance video blob array buffer로 변환
         reader.onloadend = async () => {
           const arrayBuffer = reader.result as ArrayBuffer;
           const uint8Array = new Uint8Array(arrayBuffer);
@@ -309,7 +313,6 @@ const ChallengePage = () => {
         userVideoRef.current.srcObject = mediaStream;
         setStream(mediaStream);
         userVideoRef.current.addEventListener("loadeddata", () => {
-          console.log("이벤트 삽입 완");
           predictWebcamChallenge(
             "challenge",
             userVideoRef.current,

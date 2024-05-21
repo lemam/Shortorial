@@ -24,7 +24,8 @@ const homeUrl = process.env.VITE_HOME_URL;
 
 // 토큰 저장 경로
 var TOKEN_DIR =
-  (process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE) + "/.credentials/";
+  (process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE) +
+  "/.credentials/";
 
 // 토큰 저장 경로 + 이름
 var TOKEN_PATH = TOKEN_DIR + "youtube-nodejs-quickstart.json";
@@ -222,7 +223,7 @@ app.get("/oauth2callback", (req, res) => {
       storeToken(token); // 토큰 저장
 
       // 원래 url로 리다이렉트
-      res.redirect("http://localhost:3000/mypage?auth=true");
+      res.redirect(`${process.env.VITE_FRONT_URL}/mypage?auth=true`);
     });
   });
 });

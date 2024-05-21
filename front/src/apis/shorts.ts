@@ -98,13 +98,11 @@ export async function getTryCount(shortsNo: number) {
 }
 
 // S3에 있는 파일을 Blob으로 받기
-export async function getS3Blob(fileName: string) {
+export async function getS3Blob(shortsNo: number) {
   try {
     const token = "Bearer " + localStorage.getItem("accessToken");
-    console.log(fileName);
-
     const data = await axios.post(
-      `${REST_SHORTS_URL}/bring/blob/${fileName}`,
+      `${REST_SHORTS_URL}/bring/blob/${shortsNo}`,
       {},
       {
         headers: {
@@ -116,7 +114,7 @@ export async function getS3Blob(fileName: string) {
 
     return data.data;
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error getS3Blob:", error);
   }
 }
 

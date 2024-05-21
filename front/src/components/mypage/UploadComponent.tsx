@@ -96,6 +96,8 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
   };
 
   useEffect(() => {
+    console.log(uploadShorts);
+
     if (uploadShorts.youtubeUrl) {
       setLink(uploadShorts.youtubeUrl);
       setShare(false);
@@ -120,26 +122,14 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
     <ResultContainer>
       <VideoContainer>
         <Gradient className="gradient" />
-        <Video
-          crossOrigin="anonymous"
-          src={uploadShorts.uploadUrl}
-          controls
-        ></Video>
+        <Video crossOrigin="anonymous" src={uploadShorts.uploadUrl} controls></Video>
         <MyVideoControlComponent>
-          {!download && (
-            <DownloadIcon
-              onClick={downloadVideo}
-              fontSize="large"
-            ></DownloadIcon>
-          )}
+          {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
           {download && (
             <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>
           )}
           {!share && !link && (
-            <IosShareIcon
-              onClick={shareShortsToYoutube}
-              fontSize="large"
-            ></IosShareIcon>
+            <IosShareIcon onClick={shareShortsToYoutube} fontSize="large"></IosShareIcon>
           )}
           {!share && link && (
             <YoutubeIcon
@@ -148,10 +138,7 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
             ></YoutubeIcon>
           )}
           {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>}
-          <DeleteIcon
-            fontSize="large"
-            onClick={deleteUploadedShorts}
-          ></DeleteIcon>
+          <DeleteIcon fontSize="large" onClick={deleteUploadedShorts}></DeleteIcon>
         </MyVideoControlComponent>
       </VideoContainer>
       {!modify && (
