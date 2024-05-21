@@ -125,14 +125,11 @@
 ![챌린지모드_버튼](/uploads/29ea128059b6d15f2ac45ad6b0492d5e/챌린지모드_버튼.gif){: width="688" }  
 
 - 녹화 후 영상 저장  
-![챌린지모드_저장](/uploads/567e4014fdd9547d3512a9b7abfe306d/챌린지모드_저장.gif){: width="688" }  
+![챌린지저장](/uploads/15195b6c6806a3cbfddaf8b9df69ccd2/챌린지저장.gif)
 
-#### 마이 페이지 
-![음식_추천](/uploads/7512e4d8fb84b86357055d016ffd1efd/음식_추천.gif){: width="688" }
-
-
-#### 마이 페이지 
-![음식_추천](/uploads/7512e4d8fb84b86357055d016ffd1efd/음식_추천.gif){: width="688" }
+#### 마이 페이지
+- 촬영한 영상과 시도한 영상 확인
+![mypage](/uploads/757e7fd8311f4da75c87e7c3f54ad10d/mypage.gif)orial_-_Chrome_2024-05-21_10-34-16.gif)
 
 ## 사용 기술
 
