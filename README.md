@@ -133,3 +133,15 @@
 
 ## 사용 기술
 
+#### BlazePose in mediapipe
+
+- 영상에서 33개의 keypoints를 추출하여 각 관절의 랜드마크 값을 반환 ( x, y, visibility)
+![모션인식](/uploads/a861e2b5da7894d45fe27159646a7593/모션인식.gif)  
+
+- 랜드마크의 좌표값 스케일을 정규화  
+![image](/uploads/cdf9142e317cc1ac9ce063a454aa7e76/image.png){: width="688"}  
+
+- 정규화된 값을 바탕으로 코사인 유사도 실행 -> 결과값을 바탕으로 유사도 비교  
+![image](/uploads/5bb2e1d55d665b90993ecfd373847491/image.png) 
+![image](/uploads/9a3c3394352b0c07c56febd64d20076a/image.png)
+
