@@ -128,7 +128,7 @@
 ![챌린지저장](/uploads/15195b6c6806a3cbfddaf8b9df69ccd2/챌린지저장.gif)
 
 #### 마이 페이지
-- 촬영한 영상과 시도한 영상 확인
+- 촬영한 영상과 시도한 영상 확인  
 ![mypage](/uploads/757e7fd8311f4da75c87e7c3f54ad10d/mypage.gif)
 
 ## 사용 기술
