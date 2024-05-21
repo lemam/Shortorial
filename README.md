@@ -66,7 +66,6 @@
 ![TypeScript](https://img.shields.io/badge/Typescript-3178C6?style=for-the-badge&logo=Typescript&logoColor=white)
 ![Zustand](https://img.shields.io/badge/Zustand-%235B2C6F.svg?style=for-the-badge&logo=React&logoColor=white)
 <img src="https://a11ybadges.com/badge?logo=styledcomponents" height="25"/>
-<img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" height="25"/>
 
 **DataBase**  
 ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
@@ -117,7 +116,20 @@
 
 
 #### 챌린지 모드
-![노래_추천](/uploads/25ecef8fc5d7c14a03ed45c18b65b76f/노래_추천.gif){: width="688" }
+- 챌린지 모드 화면 구성  
+- 영상 녹화 가능  
+- 타이머, 거울 모드(좌우 반전) 기능 사용 가능  
+![챌린지페이지](/uploads/a27e8b2ac78aa06e9ab1f755e991212d/챌린지페이지.png){: width="688" }  
+
+- 모션 인식을 활용한 버튼 클릭  
+![챌린지모드_버튼](/uploads/29ea128059b6d15f2ac45ad6b0492d5e/챌린지모드_버튼.gif){: width="688" }  
+
+- 녹화 후 영상 저장  
+![챌린지모드_저장](/uploads/567e4014fdd9547d3512a9b7abfe306d/챌린지모드_저장.gif){: width="688" }  
+
+#### 마이 페이지 
+![음식_추천](/uploads/7512e4d8fb84b86357055d016ffd1efd/음식_추천.gif){: width="688" }
+
 
 #### 마이 페이지 
 ![음식_추천](/uploads/7512e4d8fb84b86357055d016ffd1efd/음식_추천.gif){: width="688" }
