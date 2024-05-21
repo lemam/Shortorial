@@ -129,7 +129,7 @@
 
 #### 마이 페이지
 - 촬영한 영상과 시도한 영상 확인
-![mypage](/uploads/757e7fd8311f4da75c87e7c3f54ad10d/mypage.gif)orial_-_Chrome_2024-05-21_10-34-16.gif)
+![mypage](/uploads/757e7fd8311f4da75c87e7c3f54ad10d/mypage.gif)
 
 ## 사용 기술
 
