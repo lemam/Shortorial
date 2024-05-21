@@ -38,33 +38,37 @@
 
 
 ## Stack
+
 ![image](/uploads/21d4bd258a58958aa69ed8c6fafd56eb/서비스아키텍처.png)
 
 **Environment**  
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)
-![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-007ACC?style=for-the-badge&logo=Visual%20Studio%20Code&logoColor=white)  
+![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-007ACC?style=for-the-badge&logo=Visual%20Studio%20Code&logoColor=white)
 
 **BackEnd**  
 ![Spring Boot](https://img.shields.io/badge/spring%20boot-%236DB33F.svg?style=for-the-badge&logo=springboot&logoColor=white)
 ![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
-![Spring Security](https://img.shields.io/badge/Spring%20Security-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white) 
+![Spring Security](https://img.shields.io/badge/Spring%20Security-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
 <img src="https://a11ybadges.com/badge?logo=gradle" height="25"/>
 ![FLASK](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
 <img src="https://a11ybadges.com/badge?logo=nodedotjs" height="25"/>
 
-**Data**  
+**Data**
+
+<img src="https://img.shields.io/badge/Anaconda-44A833?style=flat-square&logo=Anaconda&logoColor=white" height="25"/>  
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white)
-<img src="https://a11ybadges.com/badge?logo=pandas" height="25"/> 
-<img src="https://a11ybadges.com/badge?logo=numpy" height="25"/> 
+<img src="https://a11ybadges.com/badge?logo=pandas" height="25"/>
+<img src="https://a11ybadges.com/badge?logo=numpy" height="25"/>
 <img src="https://a11ybadges.com/badge?logo=scikitlearn" height="25"/> <img src="https://a11ybadges.com/badge?logo=scipy" height="25"/>
-   
+
 **FrontEnd**  
 ![React.js](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/Typescript-3178C6?style=for-the-badge&logo=Typescript&logoColor=white)
 ![Zustand](https://img.shields.io/badge/Zustand-%235B2C6F.svg?style=for-the-badge&logo=React&logoColor=white)
-<img src="https://a11ybadges.com/badge?logo=styledcomponents" height="25"/>  
- 
-**DataBase**    
+<img src="https://a11ybadges.com/badge?logo=styledcomponents" height="25"/>
+<img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" height="25"/>
+
+**DataBase**  
 ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
 <img src="https://a11ybadges.com/badge?logo=amazons3" height="25"/>
 <img src="https://a11ybadges.com/badge?logo=redis" height="25"/>
@@ -75,15 +79,16 @@
 **Deployment**  
 ![EC2](https://img.shields.io/badge/EC2-%23FF9900.svg?style=for-the-badge&logo=amazonec2&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
-<img src="https://a11ybadges.com/badge?logo=jenkins" height="25"/>  
+<img src="https://a11ybadges.com/badge?logo=jenkins" height="25"/>
 
 **API**  
-<img src="https://a11ybadges.com/badge?logo=youtube" height="25"/>  
+<img src="https://a11ybadges.com/badge?logo=youtube" height="25"/>
 
 **Communication**  
 ![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white)
 ![Jira](https://img.shields.io/badge/jira-%230A0FFF.svg?style=for-the-badge&logo=jira&logoColor=white)
 ![Mattermost](https://img.shields.io/badge/-Mattermost-blue?style=for-the-badge&logo=mattermost&logoColor=white)
+
 
 
 ## 주요 화면
