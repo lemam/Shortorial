@@ -4,6 +4,9 @@ var fs = require("fs");
 var { google } = require("googleapis");
 var OAuth2 = google.auth.OAuth2;
 const axios = require("axios");
+const multer = require("multer");
+const blobMulter = multer();
+const { Readable } = require("stream");
 
 const express = require("express");
 const cors = require("cors");
@@ -21,27 +24,27 @@ var SCOPES = [
 ];
 
 const homeUrl = process.env.VITE_HOME_URL;
+const frontUrl = process.env.VITE_FRONT_URL;
 
 // 토큰 저장 경로
 var TOKEN_DIR =
-  (process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE) +
-  "/.credentials/";
+  (process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE) + "/.credentials/";
 
 // 토큰 저장 경로 + 이름
 var TOKEN_PATH = TOKEN_DIR + "youtube-nodejs-quickstart.json";
 
 // API키 확인
-function loadCredentialsAndAuthorize(res, filePath, uploadNo) {
+function loadCredentialsAndAuthorize(res, file, uploadNo, uploadTitle) {
   fs.readFile("client_secret.json", (err, content) => {
     if (err) {
       console.log("Error loading client secret file:", err);
       // return res.status(500).send("Failed to load client secret file.");
     }
-    authorize(JSON.parse(content), res, filePath, uploadNo);
+    authorize(JSON.parse(content), res, file, uploadNo, uploadTitle);
   });
 }
 
-function authorize(credentials, res, filePath, uploadNo) {
+function authorize(credentials, res, file, uploadNo, uploadTitle) {
   var { client_secret, client_id, redirect_uris } = credentials.installed;
   var oauth2Client = new OAuth2(client_id, client_secret, redirect_uris[0]);
 
@@ -52,7 +55,7 @@ function authorize(credentials, res, filePath, uploadNo) {
     } else {
       // 토큰 파일이 읽히면
       oauth2Client.credentials = JSON.parse(token); // OAuth2 클라이언트 인스턴스 생성
-      listChannels(oauth2Client, res, filePath, uploadNo); // 유튜브 채널 조회
+      listChannels(oauth2Client, res, file, uploadNo, uploadTitle); // 유튜브 채널 조회
     }
   });
 }
@@ -83,7 +86,7 @@ function storeToken(token) {
 }
 
 // 유튜브 채널 조회
-function listChannels(auth, res, filePath, uploadNo) {
+function listChannels(auth, res, file, uploadNo, uploadTitle) {
   var service = google.youtube("v3");
   service.channels.list(
     {
@@ -111,7 +114,7 @@ function listChannels(auth, res, filePath, uploadNo) {
             // `This channel's ID is ${channel.id}. Its title is '${channel.snippet.title}', and it has ${channel.statistics.viewCount} views.`
           );
 
-          uploadVideo(auth, filePath, uploadNo);
+          uploadVideo(auth, res, file, uploadNo, uploadTitle);
         }
       } catch (err) {
         console.log("Error processing the YouTube API response:", err);
@@ -121,14 +124,13 @@ function listChannels(auth, res, filePath, uploadNo) {
 }
 
 // 유튜브 업로드
-function uploadVideo(auth, filePath, uploadNo) {
-  const service = google.youtube("v3");
+function uploadVideo(auth, res, file, uploadNo, uploadTitle) {
+  const readableFile = new Readable();
+  readableFile._read = () => {};
+  readableFile.push(file);
+  readableFile.push(null);
 
-  const startStr = "downloaded-";
-  const endStr = ".mp4";
-  const startIndex = filePath.indexOf(startStr) + startStr.length;
-  const endIndex = filePath.indexOf(endStr);
-  const fileName = filePath.substring(startIndex, endIndex);
+  const service = google.youtube("v3");
 
   service.videos.insert(
     {
@@ -136,7 +138,7 @@ function uploadVideo(auth, filePath, uploadNo) {
       part: "id,snippet,status,player",
       requestBody: {
         snippet: {
-          title: `${fileName}`, // 영상 제목
+          title: `${uploadTitle}`, // 영상 제목
           // description: "youtube upload api",
           // tags: ["videos.insert"],
         },
@@ -145,12 +147,14 @@ function uploadVideo(auth, filePath, uploadNo) {
         },
       },
       media: {
-        body: fs.createReadStream(filePath), // 파일 경로에서 파일을 읽음
+        body: readableFile,
       },
     },
-    (err, response) => {
+    async (err, response) => {
       if (err) {
-        console.error("Upload Error:", err);
+        const videoUrl = `${frontUrl}/mypage?upload=fail`;
+        res.json({ videoUrl });
+        console.log(err);
         return;
       }
 
@@ -159,40 +163,30 @@ function uploadVideo(auth, filePath, uploadNo) {
         const videoId = response.data.id;
         console.log(`Uploaded video ID: ${videoId}`);
 
-        axios
+        await axios
           .put(`${homeUrl}/api/shorts/youtubeUrl/${uploadNo}/${videoId}`)
-          .then((res) => console.log("url save sucess:"))
+          .then(() => console.log("url save success:"))
           .catch((err) => console.log("url save fail:", err));
 
         const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-        console.log(`Video URL: ${videoUrl}`);
-
-        // console.log("Title:", response.data.snippet.title);
-        // console.log("Description:", response.data.snippet.description);
-        // if (response.data.player) {
-        //   console.log("Embed HTML:", response.data.player.embedHtml);
-        // }
+        //console.log(`Video URL: ${videoUrl}`);
+        //const videoUrl = `${frontUrl}/mypage?upload=${videoId}`;
+        res.json({ videoUrl });
       } catch (err) {
+        const videoUrl = `${frontUrl}/mypage?upload=fail`;
+        res.json({ videoUrl });
         console.log("Error processing response:", err);
-      } finally {
-        // 임시파일 삭제
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            console.error("Failed to delete the file:", err);
-          } else {
-            console.log("File successfully deleted after upload.");
-          }
-        });
       }
     }
   );
 }
 
 // 인증 시작 API
-app.get("/authenticate", (req, res) => {
-  const filePath = req.query.filePath;
+app.post("/authenticate", blobMulter.single("blob"), (req, res) => {
   const uploadNo = req.query.uploadNo;
-  loadCredentialsAndAuthorize(res, filePath, uploadNo);
+  const uploadTitle = req.query.uploadTitle;
+  const file = req.file.buffer;
+  loadCredentialsAndAuthorize(res, file, uploadNo, uploadTitle);
 });
 
 // 인증 후 리다이렉트하는 경로
@@ -223,7 +217,7 @@ app.get("/oauth2callback", (req, res) => {
       storeToken(token); // 토큰 저장
 
       // 원래 url로 리다이렉트
-      res.redirect(`${process.env.VITE_FRONT_URL}/mypage?auth=true`);
+      res.redirect(`${frontUrl}/mypage?auth=true`);
     });
   });
 });

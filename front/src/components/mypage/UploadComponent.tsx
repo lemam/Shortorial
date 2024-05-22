@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Check, Create, Delete, Download, IosShare, YouTube } from "@mui/icons-material";
+import { Check, Create, Delete, Download, IosShare, YouTube, Menu } from "@mui/icons-material";
 import {
   UploadShorts,
   updateTitle,
   getMyS3Blob,
   shareShorts,
-  getFilePath,
   deleteShorts,
   checkTitle,
 } from "../../apis/shorts";
@@ -27,7 +26,8 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
   const [share, setShare] = useState<boolean>(false);
-  const [link, setLink] = useState<string | null>(uploadShorts.youtubeUrl || null);
+  const [short, setShort] = useState<UploadShorts>(uploadShorts);
+  const [show, setShow] = useState<boolean>(false);
 
   const titleCanbeModified = () => setModify(true);
   const titleCanNotbeModified = () => setModify(false);
@@ -40,11 +40,11 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
 
   const deleteUploadedShorts = async () => {
     const deletingShorts = new Map<string, string>();
-    deletingShorts.set("uploadNo", String(uploadShorts.uploadNo));
-    deletingShorts.set("title", uploadShorts.uploadTitle);
+    deletingShorts.set("uploadNo", String(short.uploadNo));
+    deletingShorts.set("title", short.uploadTitle);
 
     await deleteShorts(deletingShorts);
-    onDelete(uploadShorts.uploadNo); // 삭제 후 상위 컴포넌트에 uploadNo 전달
+    onDelete(short.uploadNo); // 삭제 후 상위 컴포넌트에 uploadNo 전달
   };
 
   const saveTitle = async () => {
@@ -54,14 +54,14 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
       titleCanNotbeModified();
 
       const updatingShorts = new Map<string, string>();
-      updatingShorts.set("oldTitle", uploadShorts.uploadTitle);
+      updatingShorts.set("oldTitle", short.uploadTitle);
       updatingShorts.set("newTitle", title);
 
-      await updateTitle(updatingShorts, uploadShorts.uploadNo);
+      await updateTitle(updatingShorts, short.uploadNo);
     } else {
       alert("이미 존재하는 타이틀입니다.");
       setModify(false);
-      setTitle(extractTitle(uploadShorts.uploadTitle));
+      setTitle(extractTitle(short.uploadTitle));
     }
   };
 
@@ -69,7 +69,7 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
     startDownload();
 
     try {
-      const videoBlob = await getMyS3Blob(uploadShorts.uploadNo);
+      const videoBlob = await getMyS3Blob(short.uploadNo);
       const downloadUrl = URL.createObjectURL(videoBlob);
 
       const downloadLink = document.createElement("a");
@@ -91,30 +91,44 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
   const shareShortsToYoutube = async () => {
     setShare(true);
 
-    const filePath = await getFilePath(uploadShorts.uploadNo);
-    await shareShorts(filePath, uploadShorts.uploadNo);
+    try {
+      const s3blob = await getMyS3Blob(short.uploadNo);
+
+      const formData = new FormData();
+      formData.append("blob", s3blob, "uploadedVideo.mp4");
+
+      await shareShorts(formData, short.uploadNo, short.uploadTitle);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
-  useEffect(() => {
-    console.log(uploadShorts);
-
-    if (uploadShorts.youtubeUrl) {
-      setLink(uploadShorts.youtubeUrl);
-      setShare(false);
-    }
-  }, [uploadShorts]);
-
+  // 인증 완료 체크
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const alertParam = urlParams.get("auth");
 
     if (alertParam === "true") {
-      alert(
-        "유튜브 권한 설정이 완료되었습니다.\n공유 버튼을 누르면 채널에 비공개 동영상으로 업로드 됩니다."
-      );
+      alert("유튜브 권한 설정이 완료되었습니다.\n공유 버튼을 누르면 채널에 업로드 됩니다.");
       urlParams.delete("auth");
       const newUrl = window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
+    }
+  }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uploadParam = urlParams.get("upload");
+
+    if (uploadParam) {
+      if (uploadParam === "fail") {
+        alert("유튜브 업로드에 실패하였습니다.");
+      }
+
+      urlParams.delete("upload");
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+      setShare(false);
     }
   }, []);
 
@@ -122,24 +136,27 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
     <ResultContainer>
       <VideoContainer>
         <Gradient className="gradient" />
-        <Video crossOrigin="anonymous" src={uploadShorts.uploadUrl} controls></Video>
-        <MyVideoControlComponent>
-          {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
-          {download && (
-            <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>
-          )}
-          {!share && !link && (
-            <IosShareIcon onClick={shareShortsToYoutube} fontSize="large"></IosShareIcon>
-          )}
-          {!share && link && (
-            <YoutubeIcon
-              fontSize="large"
-              onClick={() => (window.location.href = link)}
-            ></YoutubeIcon>
-          )}
-          {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>}
-          <DeleteIcon fontSize="large" onClick={deleteUploadedShorts}></DeleteIcon>
-        </MyVideoControlComponent>
+        <Video crossOrigin="anonymous" src={short.uploadUrl} controls></Video>
+        <MenuIcon fontSize="large" onClick={() => setShow(!show)}></MenuIcon>
+        {show && (
+          <MyVideoControlContainer>
+            {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
+            {download && (
+              <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>
+            )}
+            {!share && !short.youtubeUrl && (
+              <IosShareIcon onClick={shareShortsToYoutube} fontSize="large"></IosShareIcon>
+            )}
+            {short.youtubeUrl && (
+              <YoutubeIcon
+                fontSize="large"
+                onClick={() => window.open(short.youtubeUrl, "_blank")}
+              ></YoutubeIcon>
+            )}
+            {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>}
+            <DeleteIcon fontSize="large" onClick={deleteUploadedShorts}></DeleteIcon>
+          </MyVideoControlContainer>
+        )}
       </VideoContainer>
       {!modify && (
         <TitleContainer>
@@ -184,6 +201,7 @@ const VideoContainer = styled.div`
   display: flex;
   position: relative;
 `;
+
 const Gradient = styled.div`
   position: absolute;
   bottom: 5px;
@@ -195,17 +213,31 @@ const Gradient = styled.div`
   opacity: 0;
   transition: opacity 0.2s;
 `;
+
 const Video = styled.video`
   width: 100%;
   border-radius: 12px;
   object-fit: cover;
 `;
 
-const MyVideoControlComponent = styled.div`
+const MenuIcon = styled(Menu)`
   position: absolute;
   right: 0;
+  cursor: pointer;
+`;
+
+const MyVideoControlContainer = styled.div`
+  position: absolute;
+  top: 23%;
+  right: 0;
+  border-radius: 15px;
   display: flex;
   flex-direction: column;
+  height: 45%;
+  justify-content: space-evenly;
+  background-color: rgba(255, 255, 255, 0.7);
+
+  border: 1px solid black;
 `;
 
 const DownloadIcon = styled(Download)`

@@ -69,7 +69,7 @@ export const getShortsList = async () => {
 export const getShortsInfo = async (shortsNo: string) => {
   try {
     const response = await axios.get(`${REST_SHORTS_LIST_URL}/${shortsNo}`);
-    console.log(response.data);
+    //console.log(response.data);
 
     return response.data;
   } catch (error) {
@@ -181,17 +181,26 @@ export async function checkTitle(title: string) {
 
 // 유튜브 업로드
 const youtubeUrl = import.meta.env.VITE_YOUTUBE_URL;
-export async function shareShorts(filePath: string, uploadNo: number) {
-  console.log(filePath);
-
+export async function shareShorts(formData: FormData, uploadNo: number, uploadTitle: string) {
   try {
-    const response = await axios.get(
-      `${youtubeUrl}/authenticate?filePath=${encodeURIComponent(filePath)}&uploadNo=${uploadNo}`
-    );
+    // FormData를 서버로 전송
+    const uploadResponse = await axios.post(`${youtubeUrl}/authenticate`, formData, {
+      params: { uploadNo, uploadTitle },
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
     // 서버에서 응답받은 authUrl로 이동
-    window.location.href = response.data.authUrl;
+    if (uploadResponse.data) {
+      if (uploadResponse.data.authUrl) {
+        window.location.href = uploadResponse.data.authUrl;
+      } else if (uploadResponse.data.videoUrl) {
+        window.location.href = uploadResponse.data.videoUrl;
+      }
+    }
   } catch (error) {
-    console.error("Upload Error:", error);
+    console.error(error);
   }
 }
 

@@ -124,7 +124,7 @@ const ChallengePage = () => {
         let s3blob: Blob | null = null;
         if (short) {
           s3blob = await getS3Blob(short.shortsNo); // 쇼츠 블롭화
-          console.log("s3blob:", s3blob);
+          //console.log("s3blob:", s3blob);
         }
         if (!ffmpeg.isLoaded()) {
           await ffmpeg.load(); // ffmpeg 로드
