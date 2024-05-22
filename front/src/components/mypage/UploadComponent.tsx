@@ -26,7 +26,7 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
   const [modify, setModify] = useState<boolean>(false);
   const [download, setDownload] = useState<boolean>(false);
   const [share, setShare] = useState<boolean>(false);
-  const [short, setShort] = useState<UploadShorts>(uploadShorts);
+  const short = uploadShorts;
   const [show, setShow] = useState<boolean>(false);
 
   const titleCanbeModified = () => setModify(true);
