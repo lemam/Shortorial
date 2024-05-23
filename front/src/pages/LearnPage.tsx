@@ -15,11 +15,7 @@ import { VideoSection, Shorts } from "../constants/types";
 import { predictVideo, setBtnInfo } from "../modules/Motion";
 import { getShortsInfo } from "../apis/shorts";
 import useLearnStore from "../store/useLearnStore";
-import {
-  useActionStore,
-  useBtnStore,
-  useMotionDetectionStore,
-} from "../store/useMotionStore";
+import { useActionStore, useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
 import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
@@ -84,19 +80,14 @@ const LearnPage = () => {
     state.countdownTimer,
   ]);
 
-  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore(
-    (state) => [
-      state.isLooping,
-      state.loopSection,
-      state.setIsLooping,
-      state.setLoopSection,
-    ]
-  );
-
-  const [isFlipped, setIsFlipped] = useLearnStore((state) => [
-    state.isFlipped,
-    state.setIsFlipped,
+  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore((state) => [
+    state.isLooping,
+    state.loopSection,
+    state.setIsLooping,
+    state.setLoopSection,
   ]);
+
+  const [isFlipped, setIsFlipped] = useLearnStore((state) => [state.isFlipped, state.setIsFlipped]);
 
   const [playSpeed, changePlaySpeed] = useLearnStore((state) => [
     state.playSpeed,
@@ -110,21 +101,15 @@ const LearnPage = () => {
   const action = useActionStore((state) => state.action);
   const [canAction, setCanAction] = useState(true);
 
-  const [
-    playCount,
-    challengeCount,
-    repeatCount,
-    flipCount,
-    speedCount,
-    canvasCount,
-  ] = useMotionDetectionStore((state) => [
-    state.playCount,
-    state.challengeCount,
-    state.repeatCount,
-    state.flipCount,
-    state.speedCount,
-    state.canvasCount,
-  ]);
+  const [playCount, challengeCount, repeatCount, flipCount, speedCount, canvasCount] =
+    useMotionDetectionStore((state) => [
+      state.playCount,
+      state.challengeCount,
+      state.repeatCount,
+      state.flipCount,
+      state.speedCount,
+      state.canvasCount,
+    ]);
 
   // 영상 정보 가져오기
   const loadVideo = useCallback(async () => {
@@ -305,8 +290,7 @@ const LearnPage = () => {
   // 화면 크기 바뀔 때마다 실행 - videoSize 초기화
   const handleResize = useCallback(() => {
     if (centerSectionRef.current) {
-      const { width, height } =
-        centerSectionRef.current.getBoundingClientRect();
+      const { width, height } = centerSectionRef.current.getBoundingClientRect();
       setCenterSectionSize({ width, height });
       initVideoSize();
     }
@@ -317,8 +301,7 @@ const LearnPage = () => {
     setTimeout(handleResize, 100);
     window.addEventListener("resize", () => setTimeout(handleResize, 100));
 
-    return () =>
-      window.removeEventListener("resize", () => setTimeout(handleResize, 200));
+    return () => window.removeEventListener("resize", () => setTimeout(handleResize, 200));
   }, [handleResize, initVideoSize]);
 
   // 화면의 준비가 모두 완료했을 때 실행
@@ -419,20 +402,14 @@ const LearnPage = () => {
   const videoLandmark = useVideoLandmarkStore.getState().videoLandmark;
   const motionLandmark = useMotionLandmarkStore.getState().motionLandmark;
   const [acc, setAcc] = useState(0);
-  const [accValue, setAccValue] = useValueStore((state) => [
-    state.accValue,
-    state.setAccValue,
-  ]);
-  const [count, setCount] = useCountStore((state) => [
-    state.count,
-    state.setCount,
-  ]);
+  const [accValue, setAccValue] = useValueStore((state) => [state.accValue, state.setAccValue]);
+  const [count, setCount] = useCountStore((state) => [state.count, state.setCount]);
 
   const [scoreImage, setScoreImage] = useState("");
   // 정확도 계산하기
   useEffect(() => {
     if (sectionList.length > 0 || state === "PAUSE") {
-      let sectionListTmp = sectionList;
+      const sectionListTmp = sectionList;
 
       if (currentSection.id > 0) {
         sectionListTmp[currentSection.id - 1].maxAcc = Math.max(
