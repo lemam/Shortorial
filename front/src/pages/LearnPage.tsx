@@ -32,7 +32,7 @@ import goodImage from "../assets/score/good.png";
 import StarEffect from "../components/style/StarEffect";
 
 const LearnPage = () => {
-  type LearnState = "LOADING" | "PAUSE" | "READY" | "PLAY";
+  type LearnState = "INIT" | "PAUSE" | "READY" | "PLAY";
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const video = videoRef.current;
@@ -52,7 +52,7 @@ const LearnPage = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const [state, setState] = useState<LearnState>("LOADING");
+  const [state, setState] = useState<LearnState>("INIT");
 
   const [videoInfo, setVideoInfo] = useState<Shorts>({
     shortsNo: 0,
@@ -306,7 +306,7 @@ const LearnPage = () => {
 
   // 화면의 준비가 모두 완료했을 때 실행
   useEffect(() => {
-    if (state === "LOADING") {
+    if (state === "INIT") {
       if (videoInfo && sectionList && centerSectionRef) {
         initInterval();
       }
@@ -483,7 +483,7 @@ const LearnPage = () => {
   return (
     <Container>
       <StarEffect numStars={80} />
-      {state === "LOADING" ? (
+      {state === "INIT" ? (
         <LoadingText>Loading...</LoadingText>
       ) : (
         <>
