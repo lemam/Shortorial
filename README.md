@@ -59,9 +59,8 @@
 ![FLASK](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
 <img src="https://a11ybadges.com/badge?logo=nodedotjs" height="25"/>
 
-**Data**
-
-<img src="https://img.shields.io/badge/Anaconda-44A833?style=flat-square&logo=Anaconda&logoColor=white" height="25"/>  
+**Data**  
+<img src="https://img.shields.io/badge/Anaconda-44A833?style=flat-square&logo=Anaconda&logoColor=white" height="25"/>
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white)
 <img src="https://a11ybadges.com/badge?logo=pandas" height="25"/>
 <img src="https://a11ybadges.com/badge?logo=numpy" height="25"/>
@@ -168,7 +167,7 @@
   - 세로 - 카메라
   - 가로 - 원본 영상과 카메라
 
-<img src="README_assets/17_반응형.png" />
+<img src="README_assets/17_반응형.png" width="688"/>
 
 #### FFmpeg
 
