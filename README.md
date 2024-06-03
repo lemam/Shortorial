@@ -2,7 +2,7 @@
 
 # SHORTORIAL | 모션 인식 기반 댄스 학습 서비스
 
-<img src="/uploads/a3e23c258661246bc3789930f2efcc13/logo.png" width="" height="150"></img>
+<img src="README_assets/1_logo.png" width="" height="150"></img>
 
 숏토리얼은 댄스 챌린지를 중심으로 춤을 연습하고, 촬영하고, SNS에 공유할 수 있는 댄스 학습 서비스입니다.
 
@@ -45,7 +45,7 @@
 
 ## Stack
 
-![자율_서비스아키텍처](/uploads/c84d4b3d34096a382757e013f35ebe56/자율_서비스아키텍처.jpg)
+<img src="README_assets/2_서비스아키텍처.jpg" />
 
 **Environment**  
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)
@@ -98,61 +98,61 @@
 
 #### 랜딩 페이지
 
-![랜딩페이지](/uploads/56174d7986671d2201b41b7aa303a1e5/랜딩페이지.gif){: width="688" }
+<img src="README_assets/3_랜딩페이지.gif" width="688"/>
 
 #### 메인 페이지
 
 - 추천 쇼츠 챌린지, 인기 쇼츠 챌린지, 전체 쇼츠 챌린지
 - 쇼츠 상세 정보  
-  ![메인페이지](/uploads/ac155778e68321c6c917a8540cbadbe7/메인페이지.gif){: width="688" }
+  <img src="README_assets/4_메인페이지.gif" width="688"/>
 
 #### 연습 모드
 
 - 연습 모드 화면 구성
 - 영상을 일정 시간마다 나누어 여러 구간으로 표시
 - 구간 반복, 거울 모드(좌우 반전), 배속 변경 기능 사용 가능  
-  ![연습페이지](/uploads/750fb15c197e564ab56da0a27a6f3fb3/연습페이지.png){: width="688" }
+  <img src="README_assets/5_연습페이지.png" width="688"/>
 
 - 모션 인식을 활용한 버튼 클릭  
-  ![연습모드_버튼](/uploads/afafdd4ce87982a8c14000d0ac1c8b47/연습모드_버튼.gif){: width="688" }
+  <img src="README_assets/6_연습모드_버튼.gif" width="688"/>
 
 - 손 제스처로 구간 이동  
-  ![연습모드_제스처](/uploads/ee486e62271755b3e018399152bd0501/연습모드_제스처.gif){: width="688" }
+  <img src="README_assets/7_연습모드_제스처.gif" width="688"/>
 
 - 구간마다 포즈 유사도 점수 표시  
-  ![연습모드](/uploads/d4e0dd66fcd86818fd615a4d3b831a32/연습모드.gif){: width="688" }
+  <img src="README_assets/8_연습모드.gif" width="688"/>
 
 #### 챌린지 모드
 
 - 챌린지 모드 화면 구성
 - 영상 녹화 가능
 - 타이머, 거울 모드(좌우 반전) 기능 사용 가능  
-  ![챌린지페이지](/uploads/a27e8b2ac78aa06e9ab1f755e991212d/챌린지페이지.png){: width="688" }
+  <img src="README_assets/9_챌린지페이지.png" width="688"/>
 
 - 모션 인식을 활용한 버튼 클릭  
-  ![챌린지모드_버튼](/uploads/29ea128059b6d15f2ac45ad6b0492d5e/챌린지모드_버튼.gif){: width="688" }
+  <img src="README_assets/10_챌린지모드_버튼.gif" width="688"/>
 
 - 녹화 후 영상 저장  
-  ![챌린지녹화](/uploads/9a87bdf5bedaabede4ee6dfdcc7c4e4c/챌린지녹화.gif){: width="688" }
+  <img src="README_assets/11_챌린지녹화.gif" width="688"/>
 
 #### 마이 페이지
 
 - 촬영한 영상과 시도한 영상 확인  
-  ![mypage](/uploads/757e7fd8311f4da75c87e7c3f54ad10d/mypage.gif){: width="688" }
+  <img src="README_assets/12_마이페이지.gif" width="688"/>
 
 # 사용 기술
 
 #### BlazePose in mediapipe
 
 - 영상에서 33개의 keypoints를 추출하여 각 관절의 랜드마크 값을 반환 ( x, y, visibility)
-  ![모션인식](/uploads/a861e2b5da7894d45fe27159646a7593/모션인식.gif)
+  <img src="README_assets/13_모션인식.gif" width="688"/>
 
 - 랜드마크의 좌표값 스케일을 정규화  
-  ![image](/uploads/cdf9142e317cc1ac9ce063a454aa7e76/image.png){: width="688"}
+  <img src="README_assets/14_정규화.png" width="688"/>
 
 - 정규화된 값을 바탕으로 코사인 유사도 실행 -> 결과값을 바탕으로 유사도 비교  
-  ![image](/uploads/5bb2e1d55d665b90993ecfd373847491/image.png)
-  ![image](/uploads/9a3c3394352b0c07c56febd64d20076a/image.png)
+  <img src="README_assets/15_코사인유사도.png" />
+  <img src="README_assets/16_유사도비교.png" />
 
 #### 반응형 웹 디자인
 
@@ -164,9 +164,11 @@
   - 세로 - 원본 영상
   - 가로 - 원본 영상과 카메라
 - 챌린지 모드
+
   - 세로 - 카메라
-  - 가로 - 원본 영상과 카메라  
-    ![반응형](/uploads/37e7eeb60f4707ee4a0c30b778e2049d/반응형.png){: width="688" }
+  - 가로 - 원본 영상과 카메라
+
+<img src="README_assets/17_반응형.png" />
 
 #### FFmpeg
 
