@@ -73,15 +73,14 @@ const MainPage = () => {
     <Container>
       <Header />
       <SectionWrapper>
-        {/* NOTE: 아예 없애는 게 아니라 안내 피드백을 주는 식으로 수정해보면 어떨까? */}
-        {recommendedShorts.length > 0 && (
-          <SeriesSection style={{ background: "#fefae0" }}>
-            <SectionHeaderContainer>
-              <SectionTitle>⭐ 이런 챌린지는 어떠세요?</SectionTitle>
-              <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
-            </SectionHeaderContainer>
-            <SectionConents className="nowrap">
-              {recommendedShorts?.map(shorts => (
+        <SeriesSection style={{ background: "#fefae0" }}>
+          <SectionHeaderContainer>
+            <SectionTitle>⭐ 이런 챌린지는 어떠세요?</SectionTitle>
+            <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
+          </SectionHeaderContainer>
+          <SectionConents className="nowrap">
+            {recommendedShorts.length > 0 ? (
+              recommendedShorts?.map(shorts => (
                 <ShortsVideoItem
                   key={shorts.shortsNo}
                   shortsInfo={shorts}
@@ -89,10 +88,12 @@ const MainPage = () => {
                   isSerise
                   onClick={openModal(shorts)}
                 ></ShortsVideoItem>
-              ))}
-            </SectionConents>
-          </SeriesSection>
-        )}
+              ))
+            ) : (
+              <SectionError>{`컨텐츠를 불러오는데 실패했습니다.😥\n잠시 후에 다시 시도해주세요.`}</SectionError>
+            )}
+          </SectionConents>
+        </SeriesSection>
         <SeriesSection style={{ background: "#ffe5ec" }}>
           <SectionHeaderContainer>
             <SectionTitle>🔥 요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
@@ -219,6 +220,14 @@ const SectionHeaderContainer = styled.div`
   @media screen and (max-width: 1024px) {
     margin: calc(var(--grid-item-margin) / 2);
   }
+`;
+
+const SectionError = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  white-space: pre-line;
+  line-height: 1.5;
 `;
 
 const pulse = keyframes`
