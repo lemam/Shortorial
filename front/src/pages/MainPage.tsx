@@ -2,21 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { RecomShorts, Shorts } from "../constants/types";
-import {
-  getRecommendedShorts,
-  getShortsList,
-  getTopRankingShorts,
-  getTryCount,
-} from "../apis/shorts";
+import { getRecommendedShorts, getShortsList, getTopRankingShorts, getTryCount } from "../apis/shorts";
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
-import {
-  CancelPresentation,
-  Copyright,
-  EmojiPeople,
-  MusicNote,
-  TimerOutlined,
-} from "@mui/icons-material";
+import { CancelPresentation, Copyright, EmojiPeople, MusicNote, TimerOutlined } from "@mui/icons-material";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -26,7 +15,7 @@ const MainPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [allShortsList, setAllShortsList] = useState<Shorts[]>();
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>();
-  const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>();
+  const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
 
   const openModal = (shorts: Shorts | RecomShorts) => {
     return () => {
@@ -84,14 +73,15 @@ const MainPage = () => {
     <Container>
       <Header />
       <SectionWrapper>
-        {recommendedShorts && (
+        {/* NOTE: 아예 없애는 게 아니라 안내 피드백을 주는 식으로 수정해보면 어떨까? */}
+        {recommendedShorts.length > 0 && (
           <SeriesSection style={{ background: "#fefae0" }}>
             <SectionHeaderContainer>
               <SectionTitle>⭐ 이런 챌린지는 어떠세요?</SectionTitle>
               <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
             </SectionHeaderContainer>
             <SectionConents className="nowrap">
-              {recommendedShorts?.map((shorts) => (
+              {recommendedShorts?.map(shorts => (
                 <ShortsVideoItem
                   key={shorts.shortsNo}
                   shortsInfo={shorts}
@@ -109,7 +99,7 @@ const MainPage = () => {
             <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
           </SectionHeaderContainer>
           <SectionConents className="nowrap">
-            {popularShortsList?.map((shorts) => (
+            {popularShortsList?.map(shorts => (
               <ShortsVideoItem
                 key={shorts.shortsNo}
                 shortsInfo={shorts}
@@ -123,7 +113,7 @@ const MainPage = () => {
         <Section>
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
-            {allShortsList?.map((shorts) => (
+            {allShortsList?.map(shorts => (
               <ShortsVideoItem
                 key={shorts.shortsNo}
                 shortsInfo={shorts}
@@ -142,37 +132,21 @@ const MainPage = () => {
           <Details>
             <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="23px"></Detail>
             <div>
-              <Detail
-                icon={<MusicNote />}
-                text={`${selectedShorts.musicName}`}
-                fontSize="18px"
-              ></Detail>
+              <Detail icon={<MusicNote />} text={`${selectedShorts.musicName}`} fontSize="18px"></Detail>
 
-              <Detail
-                icon={<TimerOutlined />}
-                text={`${selectedShorts.shortsTime}초`}
-                fontSize="18px"
-              ></Detail>
+              <Detail icon={<TimerOutlined />} text={`${selectedShorts.shortsTime}초`} fontSize="18px"></Detail>
               <Detail
                 icon={<EmojiPeople />}
                 text={`${selectedShorts.shortsChallengers}명의 챌린저`}
                 fontSize="18px"
               ></Detail>
-              <Detail
-                icon={<Copyright />}
-                text={selectedShorts.shortsDirector}
-                fontSize="18px"
-              ></Detail>
+              <Detail icon={<Copyright />} text={selectedShorts.shortsDirector} fontSize="18px"></Detail>
             </div>
           </Details>
 
           <ButtonContainer>
-            <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>
-              연습모드
-            </RouteButton>
-            <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>
-              챌린지모드
-            </RouteButton>
+            <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>연습모드</RouteButton>
+            <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>챌린지모드</RouteButton>
           </ButtonContainer>
         </Modal>
       )}
