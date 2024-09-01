@@ -14,7 +14,7 @@ const MainPage = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [allShortsList, setAllShortsList] = useState<Shorts[]>();
-  const [popularShortsList, setPopularShortsList] = useState<Shorts[]>();
+  const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
   const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
 
   const openModal = (shorts: Shorts | RecomShorts) => {
@@ -39,7 +39,8 @@ const MainPage = () => {
     navigate(`/challenge/${shortsNo}`);
   };
 
-  // 둘러보기 쇼츠 리스트 가져오기
+  // 전체 쇼츠 리스트 가져오기
+  // TODO: 전체를 가져오는 것이 아닌 무한 스크롤으로 구현하기
   const loadAllShortsList = async () => {
     const data = await getShortsList();
     if (data) setAllShortsList(data);
@@ -92,23 +93,25 @@ const MainPage = () => {
             </SectionConents>
           </SeriesSection>
         )}
-        <SeriesSection style={{ background: "#ffe5ec" }}>
-          <SectionHeaderContainer>
-            <SectionTitle>🔥 요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
-            <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
-          </SectionHeaderContainer>
-          <SectionConents className="nowrap">
-            {popularShortsList?.map(shorts => (
-              <ShortsVideoItem
-                key={shorts.shortsNo}
-                shortsInfo={shorts}
-                isLoading={isLoading}
-                isSerise
-                onClick={openModal(shorts)}
-              />
-            ))}
-          </SectionConents>
-        </SeriesSection>
+        {popularShortsList.length > 0 && (
+          <SeriesSection style={{ background: "#ffe5ec" }}>
+            <SectionHeaderContainer>
+              <SectionTitle>🔥 요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
+              <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
+            </SectionHeaderContainer>
+            <SectionConents className="nowrap">
+              {popularShortsList.map(shorts => (
+                <ShortsVideoItem
+                  key={shorts.shortsNo}
+                  shortsInfo={shorts}
+                  isLoading={isLoading}
+                  isSerise
+                  onClick={openModal(shorts)}
+                />
+              ))}
+            </SectionConents>
+          </SeriesSection>
+        )}
         <Section>
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
