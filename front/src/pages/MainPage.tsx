@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
-import { RecomShorts, Shorts } from "../constants/types";
-import { getRecommendedShorts, getShortsList, getTopRankingShorts, getTryCount } from "../apis/shorts";
+import { CancelPresentation, Copyright, EmojiPeople, MusicNote, TimerOutlined } from "@mui/icons-material";
+
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
-import { CancelPresentation, Copyright, EmojiPeople, MusicNote, TimerOutlined } from "@mui/icons-material";
+import { RecomShorts, Shorts } from "../constants/types";
+import { getRecommendedShorts, getShortsList, getTopRankingShorts, getTryCount } from "../apis/shorts";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -81,7 +82,7 @@ const MainPage = () => {
               <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
             </SectionHeaderContainer>
             <SectionConents className="nowrap">
-              {recommendedShorts?.map(shorts => (
+              {recommendedShorts.map(shorts => (
                 <ShortsVideoItem
                   key={shorts.shortsNo}
                   shortsInfo={shorts}
