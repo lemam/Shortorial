@@ -1,22 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
-import { RecomShorts, Shorts } from "../constants/types";
-import {
-  getRecommendedShorts,
-  getShortsList,
-  getTopRankingShorts,
-  getTryCount,
-} from "../apis/shorts";
+import { CancelPresentation, Copyright, EmojiPeople, MusicNote, TimerOutlined } from "@mui/icons-material";
+
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
-import {
-  CancelPresentation,
-  Copyright,
-  EmojiPeople,
-  MusicNote,
-  TimerOutlined,
-} from "@mui/icons-material";
+import { RecomShorts, Shorts } from "../constants/types";
+import { getRecommendedShorts, getShortsList, getTopRankingShorts, getTryCount } from "../apis/shorts";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -25,8 +15,8 @@ const MainPage = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [allShortsList, setAllShortsList] = useState<Shorts[]>();
-  const [popularShortsList, setPopularShortsList] = useState<Shorts[]>();
-  const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>();
+  const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
+  const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
 
   const openModal = (shorts: Shorts | RecomShorts) => {
     return () => {
@@ -50,7 +40,8 @@ const MainPage = () => {
     navigate(`/challenge/${shortsNo}`);
   };
 
-  // 둘러보기 쇼츠 리스트 가져오기
+  // 전체 쇼츠 리스트 가져오기
+  // TODO: 전체를 가져오는 것이 아닌 무한 스크롤으로 구현하기
   const loadAllShortsList = async () => {
     const data = await getShortsList();
     if (data) setAllShortsList(data);
@@ -84,14 +75,14 @@ const MainPage = () => {
     <Container>
       <Header />
       <SectionWrapper>
-        {recommendedShorts && (
+        {recommendedShorts.length > 0 && (
           <SeriesSection style={{ background: "#fefae0" }}>
             <SectionHeaderContainer>
               <SectionTitle>⭐ 이런 챌린지는 어떠세요?</SectionTitle>
               <p>당신이 좋아할 만한 챌린지를 추천해드릴게요.</p>
             </SectionHeaderContainer>
             <SectionConents className="nowrap">
-              {recommendedShorts?.map((shorts) => (
+              {recommendedShorts.map(shorts => (
                 <ShortsVideoItem
                   key={shorts.shortsNo}
                   shortsInfo={shorts}
@@ -103,27 +94,29 @@ const MainPage = () => {
             </SectionConents>
           </SeriesSection>
         )}
-        <SeriesSection style={{ background: "#ffe5ec" }}>
-          <SectionHeaderContainer>
-            <SectionTitle>🔥 요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
-            <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
-          </SectionHeaderContainer>
-          <SectionConents className="nowrap">
-            {popularShortsList?.map((shorts) => (
-              <ShortsVideoItem
-                key={shorts.shortsNo}
-                shortsInfo={shorts}
-                isLoading={isLoading}
-                isSerise
-                onClick={openModal(shorts)}
-              />
-            ))}
-          </SectionConents>
-        </SeriesSection>
+        {popularShortsList.length > 0 && (
+          <SeriesSection style={{ background: "#ffe5ec" }}>
+            <SectionHeaderContainer>
+              <SectionTitle>🔥 요즘 이 챌린지가 가장 인기 있어요</SectionTitle>
+              <p>{`숏토리얼에서 최근 가장 인기가 많은 챌린지들을 소개합니다.\n지금 바로 유행에 동참하세요!`}</p>
+            </SectionHeaderContainer>
+            <SectionConents className="nowrap">
+              {popularShortsList.map(shorts => (
+                <ShortsVideoItem
+                  key={shorts.shortsNo}
+                  shortsInfo={shorts}
+                  isLoading={isLoading}
+                  isSerise
+                  onClick={openModal(shorts)}
+                />
+              ))}
+            </SectionConents>
+          </SeriesSection>
+        )}
         <Section>
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
-            {allShortsList?.map((shorts) => (
+            {allShortsList?.map(shorts => (
               <ShortsVideoItem
                 key={shorts.shortsNo}
                 shortsInfo={shorts}
@@ -142,37 +135,21 @@ const MainPage = () => {
           <Details>
             <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="23px"></Detail>
             <div>
-              <Detail
-                icon={<MusicNote />}
-                text={`${selectedShorts.musicName}`}
-                fontSize="18px"
-              ></Detail>
+              <Detail icon={<MusicNote />} text={`${selectedShorts.musicName}`} fontSize="18px"></Detail>
 
-              <Detail
-                icon={<TimerOutlined />}
-                text={`${selectedShorts.shortsTime}초`}
-                fontSize="18px"
-              ></Detail>
+              <Detail icon={<TimerOutlined />} text={`${selectedShorts.shortsTime}초`} fontSize="18px"></Detail>
               <Detail
                 icon={<EmojiPeople />}
                 text={`${selectedShorts.shortsChallengers}명의 챌린저`}
                 fontSize="18px"
               ></Detail>
-              <Detail
-                icon={<Copyright />}
-                text={selectedShorts.shortsDirector}
-                fontSize="18px"
-              ></Detail>
+              <Detail icon={<Copyright />} text={selectedShorts.shortsDirector} fontSize="18px"></Detail>
             </div>
           </Details>
 
           <ButtonContainer>
-            <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>
-              연습모드
-            </RouteButton>
-            <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>
-              챌린지모드
-            </RouteButton>
+            <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>연습모드</RouteButton>
+            <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>챌린지모드</RouteButton>
           </ButtonContainer>
         </Modal>
       )}
