@@ -6,7 +6,7 @@ import { CancelPresentation, Copyright, EmojiPeople, MusicNote, TimerOutlined } 
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
 import { RecomShorts, Shorts } from "../constants/types";
-import { getRecommendedShorts, getShortsList, getTopRankingShorts, getTryCount } from "../apis/shorts";
+import { getRecommendedShorts, getTopRankingShorts, getTryCount, getShortsList } from "../apis/shorts";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -14,7 +14,9 @@ const MainPage = () => {
   const [selectedShorts, setSelectedShorts] = useState<Shorts | RecomShorts | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [allShortsList, setAllShortsList] = useState<Shorts[]>();
+
+  const [page, setPage] = useState(0);
+  const [shortsList, setShortsList] = useState<Shorts[]>([]);
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
   const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
 
@@ -40,13 +42,6 @@ const MainPage = () => {
     navigate(`/challenge/${shortsNo}`);
   };
 
-  // 전체 쇼츠 리스트 가져오기
-  // TODO: 전체를 가져오는 것이 아닌 무한 스크롤으로 구현하기
-  const loadAllShortsList = async () => {
-    const data = await getShortsList();
-    if (data) setAllShortsList(data);
-  };
-
   // 인기 쇼츠 리스트 가져오기
   const loadPopularShortsList = async () => {
     const data = await getTopRankingShorts();
@@ -59,17 +54,39 @@ const MainPage = () => {
     if (data) setRecommendedShorts(data);
   };
 
+  // TODO: 전체를 가져오는 것이 아닌 무한 스크롤으로 구현하기
+  // page 별 쇼츠 리스트 가져오기
+  const loadShortsList = async (page: number) => {
+    const data = await getShortsList(page);
+    if (data) setShortsList(prev => [...prev, data]);
+  };
+
+  // TODO: 로딩 추가하기
+  const handleObserver = (entries: IntersectionObserverEntry[]) => {
+    if (entries[0].isIntersecting) setPage(prevPage => prevPage + 1);
+  };
+
+  // 무한 스크롤을 위한 IntersectionObserver 인스턴스 생성
   useEffect(() => {
-    loadAllShortsList();
+    const observer = new IntersectionObserver(handleObserver, { threshold: 0 });
+    const target = document.getElementById("observer");
+    if (target) observer.observe(target);
+  }, []);
+
+  useEffect(() => {
     loadPopularShortsList();
     loadRecommendedShortsList();
   }, []);
 
   useEffect(() => {
-    if (popularShortsList && allShortsList) {
+    if (popularShortsList && shortsList) {
       setIsLoading(false);
     }
-  }, [allShortsList, popularShortsList]);
+  }, [shortsList, popularShortsList]);
+
+  useEffect(() => {
+    loadShortsList(page);
+  }, [page]);
 
   return (
     <Container>
@@ -116,7 +133,7 @@ const MainPage = () => {
         <Section>
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
-            {allShortsList?.map(shorts => (
+            {shortsList.map(shorts => (
               <ShortsVideoItem
                 key={shorts.shortsNo}
                 shortsInfo={shorts}
@@ -124,6 +141,7 @@ const MainPage = () => {
                 onClick={openModal(shorts)}
               />
             ))}
+            <div id="observer" style={{ height: "10px" }}></div>
           </SectionConents>
         </Section>
       </SectionWrapper>
@@ -136,7 +154,6 @@ const MainPage = () => {
             <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="23px"></Detail>
             <div>
               <Detail icon={<MusicNote />} text={`${selectedShorts.musicName}`} fontSize="18px"></Detail>
-
               <Detail icon={<TimerOutlined />} text={`${selectedShorts.shortsTime}초`} fontSize="18px"></Detail>
               <Detail
                 icon={<EmojiPeople />}
