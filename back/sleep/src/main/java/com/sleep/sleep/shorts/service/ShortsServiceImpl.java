@@ -4,6 +4,7 @@ import com.sleep.sleep.member.dto.JoinDto;
 import com.sleep.sleep.member.entity.Member;
 import com.sleep.sleep.member.entity.MemberRole;
 import com.sleep.sleep.member.repository.MemberRepository;
+import com.sleep.sleep.shorts.dto.PagenationShortsDto;
 import com.sleep.sleep.shorts.dto.ShortsDto;
 import com.sleep.sleep.shorts.dto.TryShortsDto;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
@@ -63,6 +64,57 @@ public class ShortsServiceImpl implements ShortsService{
         return shortsInfo;
     }
 
+    /**
+     * 페이지별 쇼츠 리스트 조회
+     * @param page 조회하고 싶은 페이지 번호
+     * @param size 한 페이지 안의 콘텐츠 크기
+     * @return 한 페이지 범위의 Shorts 리스트를 담은 PagenationShortsDto
+     */
+    public PagenationShortsDto getShortList(int page, int size) {
+        List<Shorts> shorts = shortsRepository.findShortList();
+
+        PagenationShortsDto result = new PagenationShortsDto();
+        List<ShortsDto> shortsList = new ArrayList<>();
+
+        int start = page * size;            // 조회 시작 범위
+        int end = (page + 1) * size - 1;    // 조회 끝 범위
+        boolean isLastPage = false;
+
+        // 끝 범위가 리스트 범위를 벗어나면 끝 범위를 마지막 인덱스로 설정한다.
+        if (end >= shorts.size()) {
+            end = shorts.size() - 1;
+            isLastPage = true;
+        }
+
+        // 범위에 있는 Shorts 정보들을 shortsList에 저장한다.
+        for(int i = start; i <= end; i++){
+            Shorts value = shorts.get(i);
+            ShortsDto shortsDto = new ShortsDto();
+
+            shortsDto.setShortsNo(value.getShortsNo());
+            shortsDto.setShortsUrl(value.getShortsUrl());
+            shortsDto.setShortsTime(value.getShortsTime());
+            shortsDto.setShortsTitle(value.getShortsTitle());
+            shortsDto.setShortsDirector(value.getShortsDirector());
+            shortsDto.setShortsChallengers(value.getShortsChallengers());
+            shortsDto.setShortsLink(value.getShortsLink());
+            shortsDto.setShortDate(value.getShortsDate());
+
+            int musicNo = value.getMusicNo();
+            Music music = musicRepository.findByMusicNo(musicNo);
+            MusicSinger musicSinger= musicSingerRepository.findByMusicNo(musicNo);
+            Singer singer = singerRepository.findBySingerNo(musicSinger.getSingerNo());
+            shortsDto.setMusicName(music.getMusicName());
+            shortsDto.setSingerName(singer.getSingerName());
+
+            shortsList.add(shortsDto);
+        }
+
+        result.setContents(shortsList);
+        result.setLastPage(isLastPage);
+
+        return result;
+    }
 
     //리스트 조회
     public List<ShortsDto> getShortList() {
