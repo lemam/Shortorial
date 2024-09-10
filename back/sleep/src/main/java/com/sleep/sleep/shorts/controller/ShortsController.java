@@ -1,6 +1,7 @@
 package com.sleep.sleep.shorts.controller;
 
 import com.sleep.sleep.common.JWT.JwtTokenUtil;
+import com.sleep.sleep.shorts.dto.PagenationShortsDto;
 import com.sleep.sleep.shorts.dto.ShortsDto;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
 import com.sleep.sleep.shorts.entity.UploadShorts;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,14 @@ public class ShortsController {
         List<ShortsDto> shortsList = shortsService.getShortList();
 
         return ResponseEntity.ok(shortsList);
+    }
+
+    @Operation(summary = "페이지별 쇼츠 목록 조회")
+    @GetMapping("page/{page}")
+    public ResponseEntity<PagenationShortsDto> selectShortList(@PathVariable int page) {
+        PagenationShortsDto result = shortsService.getShortList(page, 10);
+        if (result.getContents() == null) result.setContents(new ArrayList<>());
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "특정 쇼츠 조회")
