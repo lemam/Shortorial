@@ -13,9 +13,9 @@ const MainPage = () => {
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [selectedShorts, setSelectedShorts] = useState<Shorts | RecomShorts | null>(null);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(-1);
   const [shortsList, setShortsList] = useState<Shorts[]>([]);
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
   const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
@@ -54,16 +54,27 @@ const MainPage = () => {
     if (data) setRecommendedShorts(data);
   };
 
-  // TODO: 전체를 가져오는 것이 아닌 무한 스크롤으로 구현하기
   // page 별 쇼츠 리스트 가져오기
   const loadShortsList = async (page: number) => {
+    setIsLoading(true);
     const data = await getShortsList(page);
-    if (data) setShortsList(prev => [...prev, data]);
+    if (data) setShortsList(prev => prev.concat(data.contents));
+    setIsLoading(false);
   };
 
-  // TODO: 로딩 추가하기
+  // const handleObserver = useCallback(
+  //   (entries: IntersectionObserverEntry[]) => {
+  //     if (!isLoading && entries[0].isIntersecting) {
+  //       setPage(prevPage => prevPage + 1);
+  //     }
+  //   },
+  //   [isLoading]
+  // );
+
   const handleObserver = (entries: IntersectionObserverEntry[]) => {
-    if (entries[0].isIntersecting) setPage(prevPage => prevPage + 1);
+    if (!isLoading && entries[0].isIntersecting) {
+      setPage(prevPage => prevPage + 1);
+    }
   };
 
   // 무한 스크롤을 위한 IntersectionObserver 인스턴스 생성
@@ -78,14 +89,14 @@ const MainPage = () => {
     loadRecommendedShortsList();
   }, []);
 
-  useEffect(() => {
-    if (popularShortsList && shortsList) {
-      setIsLoading(false);
-    }
-  }, [shortsList, popularShortsList]);
+  // useEffect(() => {
+  //   if (popularShortsList && shortsList) {
+  //     setIsLoading(false);
+  //   }
+  // }, [shortsList, popularShortsList]);
 
   useEffect(() => {
-    loadShortsList(page);
+    if (page >= 0) loadShortsList(page);
   }, [page]);
 
   return (
@@ -163,7 +174,6 @@ const MainPage = () => {
               <Detail icon={<Copyright />} text={selectedShorts.shortsDirector} fontSize="18px"></Detail>
             </div>
           </Details>
-
           <ButtonContainer>
             <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>연습모드</RouteButton>
             <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>챌린지모드</RouteButton>

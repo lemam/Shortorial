@@ -26,6 +26,11 @@ export interface Shorts {
   singerName: string;
 }
 
+export interface PagenationShorts {
+  contents: Shorts[];
+  isLastPage: boolean;
+}
+
 export interface RecomShorts {
   musicNo: number;
   shortsChallengers: number;
