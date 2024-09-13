@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { CancelPresentation, Copyright, EmojiPeople, MusicNote, TimerOutlined } from "@mui/icons-material";
+import { useInView } from "react-intersection-observer";
 
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
-import { RecomShorts, Shorts } from "../constants/types";
+import { PagenationShorts, RecomShorts, Shorts } from "../constants/types";
 import { getRecommendedShorts, getTopRankingShorts, getTryCount, getShortsList } from "../apis/shorts";
 
 const MainPage = () => {
@@ -13,12 +14,48 @@ const MainPage = () => {
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [selectedShorts, setSelectedShorts] = useState<Shorts | RecomShorts | null>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
-  const [page, setPage] = useState(-1);
+  const [page, setPage] = useState(0);
   const [shortsList, setShortsList] = useState<Shorts[]>([]);
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
   const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
+
+  const { ref, inView } = useInView();
+  const [isLastPage, setLastPage] = useState(false);
+
+  // page 별 쇼츠 리스트 가져오기
+  const loadShortsList = async (page: number) => {
+    setLoading(true);
+    const data: PagenationShorts = await getShortsList(page);
+    setShortsList(prev => [...prev].concat(data.contents));
+    setLastPage(data.isLastPage);
+    setLoading(false);
+  };
+
+  // 인기 쇼츠 리스트 가져오기
+  const loadPopularShortsList = async () => {
+    const data = await getTopRankingShorts();
+    if (data) setPopularShortsList(data);
+  };
+
+  // 추천 쇼츠 리스트 가져오기
+  const loadRecommendedShortsList = async () => {
+    const data = await getRecommendedShorts();
+    if (data) setRecommendedShorts(data);
+  };
+
+  useEffect(() => {
+    if (inView && !isLoading) {
+      loadShortsList(page);
+      setPage(prev => prev + 1);
+    }
+  }, [inView, isLoading, page]);
+
+  useEffect(() => {
+    loadPopularShortsList();
+    loadRecommendedShortsList();
+  }, []);
 
   const openModal = (shorts: Shorts | RecomShorts) => {
     return () => {
@@ -41,63 +78,6 @@ const MainPage = () => {
     getTryCount(shortsNo);
     navigate(`/challenge/${shortsNo}`);
   };
-
-  // 인기 쇼츠 리스트 가져오기
-  const loadPopularShortsList = async () => {
-    const data = await getTopRankingShorts();
-    if (data) setPopularShortsList(data);
-  };
-
-  // 추천 쇼츠 리스트 가져오기
-  const loadRecommendedShortsList = async () => {
-    const data = await getRecommendedShorts();
-    if (data) setRecommendedShorts(data);
-  };
-
-  // page 별 쇼츠 리스트 가져오기
-  const loadShortsList = async (page: number) => {
-    setIsLoading(true);
-    const data = await getShortsList(page);
-    if (data) setShortsList(prev => prev.concat(data.contents));
-    setIsLoading(false);
-  };
-
-  // const handleObserver = useCallback(
-  //   (entries: IntersectionObserverEntry[]) => {
-  //     if (!isLoading && entries[0].isIntersecting) {
-  //       setPage(prevPage => prevPage + 1);
-  //     }
-  //   },
-  //   [isLoading]
-  // );
-
-  const handleObserver = (entries: IntersectionObserverEntry[]) => {
-    if (!isLoading && entries[0].isIntersecting) {
-      setPage(prevPage => prevPage + 1);
-    }
-  };
-
-  // 무한 스크롤을 위한 IntersectionObserver 인스턴스 생성
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, { threshold: 0 });
-    const target = document.getElementById("observer");
-    if (target) observer.observe(target);
-  }, []);
-
-  useEffect(() => {
-    loadPopularShortsList();
-    loadRecommendedShortsList();
-  }, []);
-
-  // useEffect(() => {
-  //   if (popularShortsList && shortsList) {
-  //     setIsLoading(false);
-  //   }
-  // }, [shortsList, popularShortsList]);
-
-  useEffect(() => {
-    if (page >= 0) loadShortsList(page);
-  }, [page]);
 
   return (
     <Container>
@@ -152,9 +132,9 @@ const MainPage = () => {
                 onClick={openModal(shorts)}
               />
             ))}
-            <div id="observer" style={{ height: "10px" }}></div>
           </SectionConents>
         </Section>
+        {!isLastPage && <div ref={ref} style={{ height: "10px" }}></div>}
       </SectionWrapper>
       {showDetails && selectedShorts && (
         <Modal>
