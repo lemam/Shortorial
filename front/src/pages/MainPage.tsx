@@ -2,21 +2,48 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { CancelPresentation, Copyright, EmojiPeople, MusicNote, TimerOutlined } from "@mui/icons-material";
+import { useInView } from "react-intersection-observer";
 
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
-import { RecomShorts, Shorts } from "../constants/types";
-import { getRecommendedShorts, getShortsList, getTopRankingShorts, getTryCount } from "../apis/shorts";
+import { PaginationShorts, RecomShorts, Shorts } from "../constants/types";
+import { getRecommendedShorts, getTopRankingShorts, getTryCount, getShortsList } from "../apis/shorts";
 
 const MainPage = () => {
-  const navigate = useNavigate();
+  const [shortsList, setShortsList] = useState<Shorts[]>([]);
+  const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
+  const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
+
+  const [ref, inView] = useInView();
+  const [page, setPage] = useState(0);
+  const [isLastPage, setLastPage] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [selectedShorts, setSelectedShorts] = useState<Shorts | RecomShorts | null>(null);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [allShortsList, setAllShortsList] = useState<Shorts[]>();
-  const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
-  const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
+  const navigate = useNavigate();
+
+  // page 별 쇼츠 리스트 가져오기
+  const loadShortsList = async (page: number) => {
+    setLoading(true);
+    const data: PaginationShorts = await getShortsList(page);
+    setShortsList(prev => [...prev].concat(data.contents));
+    setLastPage(data.isLastPage);
+    setLoading(false);
+  };
+
+  // 인기 쇼츠 리스트 가져오기
+  const loadPopularShortsList = async () => {
+    const data = await getTopRankingShorts();
+    if (data) setPopularShortsList(data);
+  };
+
+  // 추천 쇼츠 리스트 가져오기
+  const loadRecommendedShortsList = async () => {
+    const data = await getRecommendedShorts();
+    if (data) setRecommendedShorts(data);
+  };
 
   const openModal = (shorts: Shorts | RecomShorts) => {
     return () => {
@@ -40,36 +67,19 @@ const MainPage = () => {
     navigate(`/challenge/${shortsNo}`);
   };
 
-  // 전체 쇼츠 리스트 가져오기
-  // TODO: 전체를 가져오는 것이 아닌 무한 스크롤으로 구현하기
-  const loadAllShortsList = async () => {
-    const data = await getShortsList();
-    if (data) setAllShortsList(data);
-  };
-
-  // 인기 쇼츠 리스트 가져오기
-  const loadPopularShortsList = async () => {
-    const data = await getTopRankingShorts();
-    if (data) setPopularShortsList(data);
-  };
-
-  // 추천 쇼츠 리스트 가져오기
-  const loadRecommendedShortsList = async () => {
-    const data = await getRecommendedShorts();
-    if (data) setRecommendedShorts(data);
-  };
-
+  // 인기, 추천 쇼츠 리스트 조회
   useEffect(() => {
-    loadAllShortsList();
     loadPopularShortsList();
     loadRecommendedShortsList();
   }, []);
 
+  // '둘러보기' 섹션에서 무한 스크롤 실행
   useEffect(() => {
-    if (popularShortsList && allShortsList) {
-      setIsLoading(false);
+    if (inView && !isLoading) {
+      loadShortsList(page);
+      setPage(prev => prev + 1);
     }
-  }, [allShortsList, popularShortsList]);
+  }, [inView, isLoading, page]);
 
   return (
     <Container>
@@ -116,7 +126,7 @@ const MainPage = () => {
         <Section>
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
-            {allShortsList?.map(shorts => (
+            {shortsList.map(shorts => (
               <ShortsVideoItem
                 key={shorts.shortsNo}
                 shortsInfo={shorts}
@@ -126,6 +136,7 @@ const MainPage = () => {
             ))}
           </SectionConents>
         </Section>
+        {!isLastPage && <div ref={ref} style={{ height: "10px" }}></div>}
       </SectionWrapper>
       {showDetails && selectedShorts && (
         <Modal>
@@ -136,7 +147,6 @@ const MainPage = () => {
             <Detail text={selectedShorts.shortsTitle} fontWeight="bold" fontSize="23px"></Detail>
             <div>
               <Detail icon={<MusicNote />} text={`${selectedShorts.musicName}`} fontSize="18px"></Detail>
-
               <Detail icon={<TimerOutlined />} text={`${selectedShorts.shortsTime}초`} fontSize="18px"></Detail>
               <Detail
                 icon={<EmojiPeople />}
@@ -146,7 +156,6 @@ const MainPage = () => {
               <Detail icon={<Copyright />} text={selectedShorts.shortsDirector} fontSize="18px"></Detail>
             </div>
           </Details>
-
           <ButtonContainer>
             <RouteButton onClick={() => goToLearnMode(selectedShorts.shortsNo)}>연습모드</RouteButton>
             <RouteButton onClick={() => goToChallengeMode(selectedShorts.shortsNo)}>챌린지모드</RouteButton>
