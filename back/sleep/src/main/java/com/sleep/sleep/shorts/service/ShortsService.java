@@ -1,8 +1,7 @@
 package com.sleep.sleep.shorts.service;
 
-import com.sleep.sleep.shorts.dto.PagenationShortsDto;
+import com.sleep.sleep.shorts.dto.PaginationShortsDto;
 import com.sleep.sleep.shorts.dto.ShortsDto;
-import com.sleep.sleep.shorts.dto.TryShortsDto;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
 import java.util.List;
 public interface ShortsService {
@@ -15,7 +14,7 @@ public interface ShortsService {
     public List<ShortsDto> getShortRankingList();
 
     // 페이지별 쇼츠 리스트 조회
-    public PagenationShortsDto getShortList(int page, int size);
+    public PaginationShortsDto getShortList(int page, int size);
 
     //사용자의 업로드한 쇼츠 리스트
     public List<UploadShortsDto> getUploadShortsList(String memberId);

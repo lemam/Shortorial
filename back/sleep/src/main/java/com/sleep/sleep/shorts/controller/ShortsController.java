@@ -1,10 +1,8 @@
 package com.sleep.sleep.shorts.controller;
 
 import com.sleep.sleep.common.JWT.JwtTokenUtil;
-import com.sleep.sleep.shorts.dto.PagenationShortsDto;
+import com.sleep.sleep.shorts.dto.PaginationShortsDto;
 import com.sleep.sleep.shorts.dto.ShortsDto;
-import com.sleep.sleep.shorts.dto.UploadShortsDto;
-import com.sleep.sleep.shorts.entity.UploadShorts;
 import com.sleep.sleep.shorts.repository.UploadShortsRepository;
 import com.sleep.sleep.shorts.service.ShortsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +37,8 @@ public class ShortsController {
 
     @Operation(summary = "페이지별 쇼츠 목록 조회")
     @GetMapping("page/{page}")
-    public ResponseEntity<PagenationShortsDto> selectShortList(@PathVariable int page) {
-        PagenationShortsDto result = shortsService.getShortList(page, 10);
+    public ResponseEntity<PaginationShortsDto> selectShortList(@PathVariable int page) {
+        PaginationShortsDto result = shortsService.getShortList(page, 10);
         if (result.getContents() == null) result.setContents(new ArrayList<>());
         return ResponseEntity.ok(result);
     }

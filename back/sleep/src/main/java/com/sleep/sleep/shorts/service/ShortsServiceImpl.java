@@ -1,17 +1,12 @@
 package com.sleep.sleep.shorts.service;
 
-import com.sleep.sleep.member.dto.JoinDto;
 import com.sleep.sleep.member.entity.Member;
-import com.sleep.sleep.member.entity.MemberRole;
 import com.sleep.sleep.member.repository.MemberRepository;
-import com.sleep.sleep.shorts.dto.PagenationShortsDto;
+import com.sleep.sleep.shorts.dto.PaginationShortsDto;
 import com.sleep.sleep.shorts.dto.ShortsDto;
-import com.sleep.sleep.shorts.dto.TryShortsDto;
 import com.sleep.sleep.shorts.dto.UploadShortsDto;
 import com.sleep.sleep.shorts.entity.*;
 import com.sleep.sleep.shorts.repository.*;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -70,10 +65,10 @@ public class ShortsServiceImpl implements ShortsService{
      * @param size 한 페이지 안의 콘텐츠 크기
      * @return 한 페이지 범위의 Shorts 리스트를 담은 PagenationShortsDto
      */
-    public PagenationShortsDto getShortList(int page, int size) {
+    public PaginationShortsDto getShortList(int page, int size) {
         List<Shorts> shorts = shortsRepository.findShortList();
 
-        PagenationShortsDto result = new PagenationShortsDto();
+        PaginationShortsDto result = new PaginationShortsDto();
         List<ShortsDto> shortsList = new ArrayList<>();
 
         int start = page * size;            // 조회 시작 범위

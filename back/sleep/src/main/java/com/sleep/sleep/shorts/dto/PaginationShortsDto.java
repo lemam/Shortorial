@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PagenationShortsDto {
+public class PaginationShortsDto {
     private List<ShortsDto> contents;
     private boolean isLastPage;
 }
