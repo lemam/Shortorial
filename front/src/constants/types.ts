@@ -26,7 +26,7 @@ export interface Shorts {
   singerName: string;
 }
 
-export interface PagenationShorts {
+export interface PaginationShorts {
   contents: Shorts[];
   isLastPage: boolean;
 }

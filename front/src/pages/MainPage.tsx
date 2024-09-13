@@ -6,7 +6,7 @@ import { useInView } from "react-intersection-observer";
 
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
-import { PagenationShorts, RecomShorts, Shorts } from "../constants/types";
+import { PaginationShorts, RecomShorts, Shorts } from "../constants/types";
 import { getRecommendedShorts, getTopRankingShorts, getTryCount, getShortsList } from "../apis/shorts";
 
 const MainPage = () => {
@@ -27,7 +27,7 @@ const MainPage = () => {
   // page 별 쇼츠 리스트 가져오기
   const loadShortsList = async (page: number) => {
     setLoading(true);
-    const data: PagenationShorts = await getShortsList(page);
+    const data: PaginationShorts = await getShortsList(page);
     setShortsList(prev => [...prev].concat(data.contents));
     setLastPage(data.isLastPage);
     setLoading(false);
