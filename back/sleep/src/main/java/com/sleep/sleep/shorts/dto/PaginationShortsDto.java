@@ -12,4 +12,8 @@ import java.util.List;
 public class PaginationShortsDto {
     private List<ShortsDto> contents;
     private boolean isLastPage;
+
+    public boolean getIsLastPage() {
+        return isLastPage;
+    }
 }
