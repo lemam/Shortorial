@@ -10,19 +10,19 @@ import { PaginationShorts, RecomShorts, Shorts } from "../constants/types";
 import { getRecommendedShorts, getTopRankingShorts, getTryCount, getShortsList } from "../apis/shorts";
 
 const MainPage = () => {
-  const navigate = useNavigate();
-  const [showDetails, setShowDetails] = useState<boolean>(false);
-  const [selectedShorts, setSelectedShorts] = useState<Shorts | RecomShorts | null>(null);
-
-  const [isLoading, setLoading] = useState(false);
-
-  const [page, setPage] = useState(0);
   const [shortsList, setShortsList] = useState<Shorts[]>([]);
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
   const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
 
-  const { ref, inView } = useInView();
+  const [ref, inView] = useInView();
+  const [page, setPage] = useState(0);
   const [isLastPage, setLastPage] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+
+  const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [selectedShorts, setSelectedShorts] = useState<Shorts | RecomShorts | null>(null);
+
+  const navigate = useNavigate();
 
   // page 별 쇼츠 리스트 가져오기
   const loadShortsList = async (page: number) => {
@@ -45,18 +45,6 @@ const MainPage = () => {
     if (data) setRecommendedShorts(data);
   };
 
-  useEffect(() => {
-    if (inView && !isLoading) {
-      loadShortsList(page);
-      setPage(prev => prev + 1);
-    }
-  }, [inView, isLoading, page]);
-
-  useEffect(() => {
-    loadPopularShortsList();
-    loadRecommendedShortsList();
-  }, []);
-
   const openModal = (shorts: Shorts | RecomShorts) => {
     return () => {
       setSelectedShorts(shorts);
@@ -78,6 +66,20 @@ const MainPage = () => {
     getTryCount(shortsNo);
     navigate(`/challenge/${shortsNo}`);
   };
+
+  // 인기, 추천 쇼츠 리스트 조회
+  useEffect(() => {
+    loadPopularShortsList();
+    loadRecommendedShortsList();
+  }, []);
+
+  // '둘러보기' 섹션에서 무한 스크롤 실행
+  useEffect(() => {
+    if (inView && !isLoading) {
+      loadShortsList(page);
+      setPage(prev => prev + 1);
+    }
+  }, [inView, isLoading, page]);
 
   return (
     <Container>
