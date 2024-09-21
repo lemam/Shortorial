@@ -26,3 +26,24 @@ export const CardSubTitle = styled.div`
   font-size: 14px;
   color: #606060;
 `;
+
+export const CardVideoSkeleton = styled.div`
+  border-radius: 12px;
+  background-color: #e2e2e6;
+  aspect-ratio: 9 / 16;
+`;
+
+export const CardTitleSkeleton = styled.div`
+  height: 32px;
+  margin: 6px 0;
+  border-radius: 4px;
+  background-color: #e2e2e6;
+`;
+
+export const CardSubTitleSkeleton = styled.div`
+  width: 50%;
+  height: 16px;
+  margin: 6px 0;
+  border-radius: 4px;
+  background-color: #e2e2e6;
+`;

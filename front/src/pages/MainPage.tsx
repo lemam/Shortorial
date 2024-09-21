@@ -6,15 +6,17 @@ import { useInView } from "react-intersection-observer";
 
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
+import ShortsCard from "../components/shorts/ShortsCard";
 import { PaginationShorts, RecomShorts, Shorts } from "../constants/types";
 import { getRecommendedShorts, getTopRankingShorts, getTryCount, getShortsList } from "../apis/shorts";
+import { Card, CardSubTitleSkeleton, CardTitleSkeleton, CardVideoSkeleton } from "../components/shorts/style";
 
 const MainPage = () => {
   const [shortsList, setShortsList] = useState<Shorts[]>([]);
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
   const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
 
-  const [ref, inView] = useInView();
+  const [ref, inView] = useInView({ threshold: 0.5 });
   const [page, setPage] = useState(0);
   const [isLastPage, setLastPage] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -127,16 +129,30 @@ const MainPage = () => {
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
             {shortsList.map(shorts => (
-              <ShortsVideoItem
-                key={shorts.shortsNo}
-                shortsInfo={shorts}
-                isLoading={isLoading}
-                onClick={openModal(shorts)}
-              />
+              <ShortsCard key={shorts.shortsNo} shortsInfo={shorts} />
             ))}
+            {!isLastPage &&
+              [...new Array(5)].map((_, idx) => (
+                <Card key={idx}>
+                  <CardVideoSkeleton />
+                  <CardTitleSkeleton />
+                  <CardSubTitleSkeleton />
+                </Card>
+              ))}
+            {!isLastPage && !isLoading && (
+              <div
+                ref={ref}
+                style={{
+                  position: "absolute",
+                  bottom: "30px",
+                  height: "400px",
+                  width: "100%",
+                  backgroundColor: "rgba(255, 0, 0, 0.3)",
+                }}
+              />
+            )}
           </SectionConents>
         </Section>
-        {!isLastPage && <div ref={ref} style={{ height: "10px" }}></div>}
       </SectionWrapper>
       {showDetails && selectedShorts && (
         <Modal>
@@ -193,6 +209,7 @@ const SectionTitle = styled.h3`
 `;
 
 const SectionConents = styled.div`
+  position: relative;
   display: flex;
   flex-wrap: wrap;
 

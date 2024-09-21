@@ -19,7 +19,7 @@ export interface Shorts {
   shortsTitle: string;
   shortsDirector: string;
   shortsTime: number;
-  shortsChallengers: number;
+  shortsChallengers: number | undefined;
   shortsLink: string;
   shortsDate: string;
   musicName: string;
