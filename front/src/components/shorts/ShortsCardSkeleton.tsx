@@ -1,5 +1,4 @@
-import { Card } from "react-bootstrap";
-import { CardSubTitleSkeleton, CardTitleSkeleton, CardVideoSkeleton } from "./style";
+import { Card, CardSubTitleSkeleton, CardTitleSkeleton, CardVideoSkeleton } from "./style";
 
 const ShortsCardSkeleton = () => {
   return (
