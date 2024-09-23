@@ -257,10 +257,10 @@ const pulse = keyframes`
 `;
 
 const InViewRef = styled.div`
-  position: "absolute";
-  bottom: "30px";
-  height: "400px";
-  width: "100%";
+  position: absolute;
+  bottom: 30px;
+  height: 400px;
+  width: 100%;
 `;
 
 const Modal = styled.div`
