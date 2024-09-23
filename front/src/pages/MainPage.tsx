@@ -144,18 +144,7 @@ const MainPage = () => {
                   <CardSubTitleSkeleton />
                 </Card>
               ))}
-            {!isLastPage && !isLoading && (
-              <div
-                ref={ref}
-                style={{
-                  position: "absolute",
-                  bottom: "30px",
-                  height: "400px",
-                  width: "100%",
-                  backgroundColor: "rgba(255, 0, 0, 0.3)",
-                }}
-              />
-            )}
+            {!isLastPage && !isLoading && <InViewRef ref={ref} />}
           </SectionConents>
         </Section>
       </SectionWrapper>
@@ -265,6 +254,13 @@ const pulse = keyframes`
   100% { 
     transform: translate(-50%, -50%) scale(1); 
   }
+`;
+
+const InViewRef = styled.div`
+  position: "absolute";
+  bottom: "30px";
+  height: "400px";
+  width: "100%";
 `;
 
 const Modal = styled.div`
