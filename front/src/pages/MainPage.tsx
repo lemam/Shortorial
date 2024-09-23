@@ -7,9 +7,9 @@ import { useInView } from "react-intersection-observer";
 import Header from "../components/header/Header";
 import ShortsVideoItem from "../components/shorts/ShortsVideoItem";
 import ShortsCard from "../components/shorts/ShortsCard";
+import ShortsCardSkeleton from "../components/shorts/ShortsCardSkeleton";
 import { PaginationShorts, RecomShorts, Shorts } from "../constants/types";
 import { getRecommendedShorts, getTopRankingShorts, getTryCount, getShortsList } from "../apis/shorts";
-import { Card, CardSubTitleSkeleton, CardTitleSkeleton, CardVideoSkeleton } from "../components/shorts/style";
 
 const MainPage = () => {
   const [shortsList, setShortsList] = useState<Shorts[]>([]);
@@ -136,14 +136,7 @@ const MainPage = () => {
             {shortsList.map(shorts => (
               <ShortsCard key={shorts.shortsNo} shortsInfo={shorts} />
             ))}
-            {!isLastPage &&
-              [...new Array(5)].map((_, idx) => (
-                <Card key={idx}>
-                  <CardVideoSkeleton />
-                  <CardTitleSkeleton />
-                  <CardSubTitleSkeleton />
-                </Card>
-              ))}
+            {!isLastPage && [...new Array(5)].map((_, idx) => <ShortsCardSkeleton key={idx} />)}
             {!isLastPage && !isLoading && <InViewRef ref={ref} />}
           </SectionConents>
         </Section>
