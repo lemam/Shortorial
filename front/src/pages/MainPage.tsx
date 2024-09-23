@@ -18,8 +18,8 @@ const MainPage = () => {
 
   const [ref, inView] = useInView({ threshold: 0.5 });
   const [page, setPage] = useState(0);
-  const [isLastPage, setLastPage] = useState(false);
-  const [isLoading, setLoading] = useState(false);
+  const [isLastPage, setIsLastPage] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [selectedShorts, setSelectedShorts] = useState<Shorts | RecomShorts | null>(null);
@@ -28,11 +28,11 @@ const MainPage = () => {
 
   // page 별 쇼츠 리스트 가져오기
   const loadShortsList = async (page: number) => {
-    setLoading(true);
+    setIsLoading(true);
     const data: PaginationShorts = await getShortsList(page);
     setShortsList(prev => [...prev].concat(data.contents));
-    setLastPage(data.isLastPage);
-    setLoading(false);
+    setIsLastPage(data.isLastPage);
+    setIsLoading(false);
   };
 
   // 인기 쇼츠 리스트 가져오기
@@ -82,6 +82,11 @@ const MainPage = () => {
       setPage(prev => prev + 1);
     }
   }, [inView, isLoading, page]);
+
+  /*
+  FIXME: 작은 화면에서는 무한스크롤 ref가 너무 내려가 스켈레톤이 100% 보이는 구간도 있음
+  (https://www.notion.so/20240921-UI-108a5c5b6556809ebbe6c7b1509b356f#108a5c5b655680da907be3314688b8d5)
+  */
 
   return (
     <Container>
