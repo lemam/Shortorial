@@ -15,8 +15,6 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
     alert("모달이 열립니다.");
   };
 
-  const [context, setContext] = useState<AudioContext | null>(null);
-
   // 영상에 마우스 올리면 재생되도록 하는 거 만드는 중
   // 근데 사용자 인터렉션 없이 재생하는 거 안 됨
   // mute하면 해결할 수 있다.
