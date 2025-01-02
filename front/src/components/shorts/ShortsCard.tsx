@@ -12,6 +12,7 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleClick = () => {
+    pauseVideo();
     alert("모달이 열립니다.");
   };
 
@@ -22,11 +23,12 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
   // 미리보기는 전체는 아니고 5초 후에 멈추는 걸로 하자.
   const hanldeMouseEnter = () => {
     videoRef.current?.play();
-    console.log(shortsInfo.shortsTitle);
   };
 
   // 마우스를 떼면 0초로 돌아가는 기능 추가
-  const handleMouseLeave = () => {
+  const handleMouseLeave = () => pauseVideo();
+
+  const pauseVideo = () => {
     const video = videoRef.current;
     if (video) {
       video.pause();
