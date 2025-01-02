@@ -10,6 +10,11 @@ export const Card = styled.div`
 export const CardVideo = styled.video`
   width: 100%;
   border-radius: 12px;
+  transition: border-radius 0.2s;
+
+  &:hover {
+    border-radius: 0;
+  }
 `;
 
 export const CardTitle = styled.div`
