@@ -19,15 +19,23 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
   // 근데 사용자 인터렉션 없이 재생하는 거 안 됨
   // mute하면 해결할 수 있다.
   // 이후 mute를 store에서 통합 관리해서 다른 곳에서 음소거를 해제하면 계속 유지되도록 하자.
-  // 마우스를 떼면 0초로 돌아가는 기능도 필요
   // 미리보기는 전체는 아니고 5초 후에 멈추는 걸로 하자.
   const hanldeMouseEnter = () => {
     videoRef.current?.play();
     console.log(shortsInfo.shortsTitle);
   };
 
+  // 마우스를 떼면 0초로 돌아가는 기능 추가
+  const handleMouseLeave = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+  };
+
   return (
-    <Card onClick={handleClick} onMouseEnter={hanldeMouseEnter}>
+    <Card onClick={handleClick} onMouseEnter={hanldeMouseEnter} onMouseLeave={handleMouseLeave}>
       {isLoading && <CardVideoSkeleton />}
       <CardVideo
         muted
