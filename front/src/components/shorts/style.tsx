@@ -7,9 +7,44 @@ export const Card = styled.div`
   cursor: pointer;
 `;
 
+export const CardVideoContainer = styled.div`
+  position: relative;
+
+  .hover-opacity {
+    opacity: 0;
+  }
+
+  &:hover {
+    .hover-opacity {
+      opacity: 1;
+    }
+  }
+`;
+
 export const CardVideo = styled.video`
   width: 100%;
   border-radius: 12px;
+`;
+
+export const Gradient = styled.div`
+  position: absolute;
+  bottom: 5px;
+  width: 100%;
+  height: 100px;
+  background: rgb(0, 0, 0);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.25));
+  border-radius: 0 0 12px 12px;
+`;
+
+export const SoundButton = styled.button`
+  position: absolute;
+  right: 12px;
+  bottom: 16px;
+  color: #fff;
+
+  svg {
+    font-size: 28px;
+  }
 `;
 
 export const CardTitle = styled.div`
@@ -22,7 +57,7 @@ export const CardTitle = styled.div`
   overflow: hidden;
 `;
 
-export const CardSubTitle = styled.div`
+export const CardDesc = styled.div`
   font-size: 14px;
   color: #606060;
 `;
