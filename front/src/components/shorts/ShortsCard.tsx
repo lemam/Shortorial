@@ -1,6 +1,17 @@
 import { useRef, useState } from "react";
+import { VolumeUpRounded, VolumeOffRounded } from "@mui/icons-material";
 
-import { Card, CardVideo, CardTitle, CardSubTitle, CardVideoSkeleton } from "./style";
+import useShortsVideoStore from "../../store/useShortsVideoStore";
+import {
+  Card,
+  CardVideo,
+  CardTitle,
+  CardSubTitle,
+  CardVideoSkeleton,
+  CardVideoContainer,
+  SoundButton,
+  Gradient,
+} from "./style";
 import { Shorts } from "../../constants/types";
 
 interface ShortsCardProps {
@@ -8,6 +19,8 @@ interface ShortsCardProps {
 }
 
 const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
+  // mute를 store에서 통합 관리해서 다른 곳에서 음소거를 해제하면 계속 유지
+  const { isMuted, toggleMute } = useShortsVideoStore();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -16,18 +29,12 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
     alert("모달이 열립니다.");
   };
 
-  // 영상에 마우스 올리면 재생되도록 하는 거 만드는 중
-  // 근데 사용자 인터렉션 없이 재생하는 거 안 됨
-  // mute하면 해결할 수 있다.
-  // 이후 mute를 store에서 통합 관리해서 다른 곳에서 음소거를 해제하면 계속 유지되도록 하자.
-  // 미리보기는 전체는 아니고 5초 후에 멈추는 걸로 하자.
+  // 영상에 마우스 올리면 재생
   const hanldeMouseEnter = () => {
     videoRef.current?.play();
   };
 
   // 마우스를 떼면 0초로 돌아가는 기능 추가
-  const handleMouseLeave = () => pauseVideo();
-
   const pauseVideo = () => {
     const video = videoRef.current;
     if (video) {
@@ -37,18 +44,28 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
   };
 
   return (
-    <Card onClick={handleClick} onMouseEnter={hanldeMouseEnter} onMouseLeave={handleMouseLeave}>
+    <Card onMouseEnter={hanldeMouseEnter} onMouseLeave={pauseVideo}>
       {isLoading && <CardVideoSkeleton />}
-      <CardVideo
-        muted
-        src={shortsInfo.shortsLink}
-        crossOrigin="anonymous"
-        onLoadedData={() => setIsLoading(false)}
-        style={{ display: `${isLoading ? "none" : "inline"}` }}
-        ref={videoRef}
-      ></CardVideo>
-      <CardTitle>{shortsInfo.shortsTitle}</CardTitle>
-      <CardSubTitle>챌린저 {shortsInfo.shortsChallengers}명</CardSubTitle>
+      <CardVideoContainer>
+        <div onClick={handleClick}>
+          <CardVideo
+            muted={isMuted}
+            src={shortsInfo.shortsLink}
+            crossOrigin="anonymous"
+            onLoadedData={() => setIsLoading(false)}
+            style={{ display: `${isLoading ? "none" : "inline"}` }}
+            ref={videoRef}
+          ></CardVideo>
+        </div>
+        <Gradient />
+        <SoundButton className="hover-opacity" onClick={toggleMute}>
+          {isMuted ? <VolumeOffRounded /> : <VolumeUpRounded />}
+        </SoundButton>
+      </CardVideoContainer>
+      <div onClick={handleClick}>
+        <CardTitle>{shortsInfo.shortsTitle}</CardTitle>
+        <CardSubTitle>챌린저 {shortsInfo.shortsChallengers}명</CardSubTitle>
+      </div>
     </Card>
   );
 };
