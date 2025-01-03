@@ -45,14 +45,13 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
   return (
     <Card onMouseEnter={playVideo} onMouseLeave={pauseVideo}>
       {isLoading && <CardVideoSkeleton />}
-      <CardVideoContainer>
+      <CardVideoContainer style={{ display: `${isLoading ? "none" : "inline"}` }}>
         <div onClick={openModal}>
           <CardVideo
             muted={isMuted}
             src={shortsInfo.shortsLink}
             crossOrigin="anonymous"
             onLoadedData={() => setIsLoading(false)}
-            style={{ display: `${isLoading ? "none" : "inline"}` }}
             ref={videoRef}
           ></CardVideo>
         </div>
