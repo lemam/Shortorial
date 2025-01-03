@@ -6,7 +6,7 @@ import {
   Card,
   CardVideo,
   CardTitle,
-  CardSubTitle,
+  CardDesc,
   CardVideoSkeleton,
   CardVideoContainer,
   SoundButton,
@@ -62,7 +62,7 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
       </CardVideoContainer>
       <div onClick={openModal}>
         <CardTitle>{shortsInfo.shortsTitle}</CardTitle>
-        <CardSubTitle>챌린저 {shortsInfo.shortsChallengers}명</CardSubTitle>
+        <CardDesc>챌린저 {shortsInfo.shortsChallengers}명</CardDesc>
       </div>
     </Card>
   );

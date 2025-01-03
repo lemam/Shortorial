@@ -57,7 +57,7 @@ export const CardTitle = styled.div`
   overflow: hidden;
 `;
 
-export const CardSubTitle = styled.div`
+export const CardDesc = styled.div`
   font-size: 14px;
   color: #606060;
 `;
