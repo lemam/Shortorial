@@ -19,22 +19,21 @@ interface ShortsCardProps {
 }
 
 const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
-  // mute를 store에서 통합 관리해서 다른 곳에서 음소거를 해제하면 계속 유지
   const { isMuted, toggleMute } = useShortsVideoStore();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const handleClick = () => {
+  const openModal = () => {
     pauseVideo();
     alert("모달이 열립니다.");
   };
 
-  // 영상에 마우스 올리면 재생
-  const hanldeMouseEnter = () => {
+  // 영상에 마우스가 들어오면 영상 재생을 시작한다.
+  const playVideo = () => {
     videoRef.current?.play();
   };
 
-  // 마우스를 떼면 0초로 돌아가는 기능 추가
+  // 영상에서 마우스를 떼면 재생된 영상을 초기화한다.
   const pauseVideo = () => {
     const video = videoRef.current;
     if (video) {
@@ -44,10 +43,10 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
   };
 
   return (
-    <Card onMouseEnter={hanldeMouseEnter} onMouseLeave={pauseVideo}>
+    <Card onMouseEnter={playVideo} onMouseLeave={pauseVideo}>
       {isLoading && <CardVideoSkeleton />}
       <CardVideoContainer>
-        <div onClick={handleClick}>
+        <div onClick={openModal}>
           <CardVideo
             muted={isMuted}
             src={shortsInfo.shortsLink}
@@ -62,7 +61,7 @@ const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
           {isMuted ? <VolumeOffRounded /> : <VolumeUpRounded />}
         </SoundButton>
       </CardVideoContainer>
-      <div onClick={handleClick}>
+      <div onClick={openModal}>
         <CardTitle>{shortsInfo.shortsTitle}</CardTitle>
         <CardSubTitle>챌린저 {shortsInfo.shortsChallengers}명</CardSubTitle>
       </div>
