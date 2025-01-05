@@ -16,7 +16,7 @@ const MainPage = () => {
   const [popularShortsList, setPopularShortsList] = useState<Shorts[]>([]);
   const [recommendedShorts, setRecommendedShorts] = useState<RecomShorts[]>([]);
 
-  const [ref, inView] = useInView({ threshold: 0.5 });
+  const [ref, inView] = useInView();
   const [page, setPage] = useState(0);
   const [isLastPage, setIsLastPage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -82,11 +82,6 @@ const MainPage = () => {
       setPage(prev => prev + 1);
     }
   }, [inView, isLoading, page]);
-
-  /*
-  FIXME: 작은 화면에서는 무한스크롤 ref가 너무 내려가 스켈레톤이 100% 보이는 구간도 있음
-  (https://www.notion.so/20240921-UI-108a5c5b6556809ebbe6c7b1509b356f#108a5c5b655680da907be3314688b8d5)
-  */
 
   return (
     <Container>
@@ -251,8 +246,8 @@ const pulse = keyframes`
 
 const InViewRef = styled.div`
   position: absolute;
-  bottom: 30px;
-  height: 400px;
+  bottom: 900px;
+  height: 10px;
   width: 100%;
 `;
 
