@@ -88,7 +88,7 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
             alt=""
             style={{
               position: "absolute",
-              zIndex: "10",
+              zIndex: "1",
               width: "100%",
               borderRadius: "12px",
               opacity: `${showThumbnail ? "1" : "0"}`,

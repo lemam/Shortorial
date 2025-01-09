@@ -255,7 +255,7 @@ const Modal = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgba(255, 255, 255, 0.8);
-  z-index: 1;
+  z-index: 10;
   padding: 20px;
   width: 50%;
   animation: ${pulse} 0.5s ease-in-out;
