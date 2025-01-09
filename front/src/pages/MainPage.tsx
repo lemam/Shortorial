@@ -48,10 +48,8 @@ const MainPage = () => {
   };
 
   const openModal = (shorts: Shorts | RecomShorts) => {
-    return () => {
-      setSelectedShorts(shorts);
-      setShowDetails(true);
-    };
+    setSelectedShorts(shorts);
+    setShowDetails(true);
   };
 
   const closeModal = () => {
@@ -100,7 +98,7 @@ const MainPage = () => {
                   shortsInfo={shorts}
                   isLoading={isLoading}
                   isSerise
-                  onClick={openModal(shorts)}
+                  onClick={() => openModal(shorts)}
                 ></ShortsVideoItem>
               ))}
             </SectionConents>
@@ -119,7 +117,7 @@ const MainPage = () => {
                   shortsInfo={shorts}
                   isLoading={isLoading}
                   isSerise
-                  onClick={openModal(shorts)}
+                  onClick={() => openModal(shorts)}
                 />
               ))}
             </SectionConents>
@@ -129,7 +127,7 @@ const MainPage = () => {
           <SectionTitle>둘러보기</SectionTitle>
           <SectionConents>
             {shortsList.map(shorts => (
-              <ShortsCard key={shorts.shortsNo} shortsInfo={shorts} />
+              <ShortsCard key={shorts.shortsNo} shortsInfo={shorts} handleOpenModal={() => openModal(shorts)} />
             ))}
             {!isLastPage && [...new Array(5)].map((_, idx) => <ShortsCardSkeleton key={idx} />)}
             {!isLastPage && !isLoading && <InViewRef ref={ref} />}

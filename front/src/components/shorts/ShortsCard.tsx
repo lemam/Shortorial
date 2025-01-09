@@ -16,16 +16,19 @@ import { Shorts } from "../../constants/types";
 
 interface ShortsCardProps {
   shortsInfo: Shorts;
+  handleOpenModal: () => void;
 }
 
-const ShortsCard = ({ shortsInfo }: ShortsCardProps) => {
+const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
   const { isMuted, toggleMute } = useShortsVideoStore();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // 클릭했을 때 모달을 띄우기 위한 메소드
+  // 모달을 띄울 때 영상을 멈추게 한다.
   const openModal = () => {
+    handleOpenModal();
     pauseVideo();
-    alert("모달이 열립니다.");
   };
 
   // 영상에 마우스가 들어오면 영상 재생을 시작한다.
