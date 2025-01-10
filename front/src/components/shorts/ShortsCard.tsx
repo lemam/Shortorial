@@ -21,6 +21,7 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
     return arr[arr.length - 1];
   }, [shortsInfo.shortsUrl]);
 
+  // 영상에 마우스가 들어오면 영상 재생을 시작한다.
   const handleMouseOver = () => {
     if (!isLoading) {
       setShowThumbnail(false);
@@ -28,6 +29,7 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
     }
   };
 
+  // 영상에서 마우스를 떼면 재생된 영상을 초기화한다.
   const handleMouseOut = () => {
     if (!isLoading) {
       setShowThumbnail(true);
@@ -44,12 +46,10 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
     }
   };
 
-  // 영상에 마우스가 들어오면 영상 재생을 시작한다.
   const playVideo = () => {
     videoRef.current?.play();
   };
 
-  // 영상에서 마우스를 떼면 재생된 영상을 초기화한다.
   const pauseVideo = () => {
     const video = videoRef.current;
     if (video) {
@@ -65,7 +65,7 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
         <S.CardVideoBox onClick={openModal}>
           <S.Thumbnail
             src={`https://img.youtube.com/vi/${videoId}/frame0.jpg`}
-            alt=""
+            alt={`${shortsInfo.shortsTitle} 섬네일`}
             opacity={`${showThumbnail ? 1 : 0}`}
           />
           <S.CardVideo
