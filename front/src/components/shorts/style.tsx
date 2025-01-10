@@ -82,3 +82,16 @@ export const CardSubTitleSkeleton = styled.div`
   border-radius: 4px;
   background-color: #e2e2e6;
 `;
+
+export const CardVideoBox = styled.div`
+  width: 100%;
+  aspect-ratio: "9 / 16";
+`;
+
+export const Thumbnail = styled.img<{ opacity: string }>`
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  border-radius: 12px;
+  opacity: ${props => props.opacity};
+`;

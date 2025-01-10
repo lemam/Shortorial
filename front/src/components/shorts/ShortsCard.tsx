@@ -2,16 +2,7 @@ import { useRef, useState } from "react";
 import { VolumeUpRounded, VolumeOffRounded } from "@mui/icons-material";
 
 import useShortsVideoStore from "../../store/useShortsVideoStore";
-import {
-  Card,
-  CardVideo,
-  CardTitle,
-  CardDesc,
-  CardVideoSkeleton,
-  CardVideoContainer,
-  SoundButton,
-  Gradient,
-} from "./style";
+import * as S from "./style";
 import { Shorts } from "../../constants/types";
 
 interface ShortsCardProps {
@@ -78,40 +69,33 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
   };
 
   return (
-    <Card onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
-      {isLoading && <CardVideoSkeleton />}
-      <CardVideoContainer style={{ display: `${isLoading ? "none" : "inline"}` }}>
-        <div onClick={openModal} style={{ width: "100%", aspectRatio: "9 / 16" }}>
-          {/* 썸네일 */}
-          <img
+    <S.Card onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+      {isLoading && <S.CardVideoSkeleton />}
+      <S.CardVideoContainer style={{ display: `${isLoading ? "none" : "inline"}` }}>
+        <S.CardVideoBox onClick={openModal}>
+          <S.Thumbnail
             src="https://img.youtube.com/vi/-jkcLE1Ticw/frame0.jpg"
             alt=""
-            style={{
-              position: "absolute",
-              zIndex: "1",
-              width: "100%",
-              borderRadius: "12px",
-              opacity: `${showThumbnail ? "1" : "0"}`,
-            }}
+            opacity={`${showThumbnail ? 1 : 0}`}
           />
-          <CardVideo
+          <S.CardVideo
             muted={isMuted}
             src={shortsInfo.shortsLink}
             crossOrigin="anonymous"
             onLoadedData={() => setIsLoading(false)}
             ref={videoRef}
-          ></CardVideo>
-        </div>
-        <Gradient />
-        <SoundButton className="hover-opacity" onClick={toggleMute}>
+          ></S.CardVideo>
+        </S.CardVideoBox>
+        <S.Gradient />
+        <S.SoundButton className="hover-opacity" onClick={toggleMute}>
           {isMuted ? <VolumeOffRounded /> : <VolumeUpRounded />}
-        </SoundButton>
-      </CardVideoContainer>
+        </S.SoundButton>
+      </S.CardVideoContainer>
       <div onClick={openModal}>
-        <CardTitle>{shortsInfo.shortsTitle}</CardTitle>
-        <CardDesc>챌린저 {shortsInfo.shortsChallengers}명</CardDesc>
+        <S.CardTitle>{shortsInfo.shortsTitle}</S.CardTitle>
+        <S.CardDesc>챌린저 {shortsInfo.shortsChallengers}명</S.CardDesc>
       </div>
-    </Card>
+    </S.Card>
   );
 };
 
