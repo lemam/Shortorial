@@ -9,6 +9,9 @@ export const Card = styled.div`
 
 export const CardVideoContainer = styled.div`
   position: relative;
+  width: 100%;
+  margin-bottom: 4px;
+  aspect-ratio: 9 / 16;
 
   .hover-opacity {
     opacity: 0;
@@ -28,7 +31,7 @@ export const CardVideo = styled.video`
 
 export const Gradient = styled.div`
   position: absolute;
-  bottom: 5px;
+  bottom: 0;
   width: 100%;
   height: 100px;
   background: rgb(0, 0, 0);
@@ -41,7 +44,7 @@ export const SoundButton = styled.button`
   right: 12px;
   bottom: 16px;
   color: #fff;
-  z-index: 2;
+  z-index: 1;
 
   svg {
     font-size: 28px;
@@ -86,14 +89,14 @@ export const CardSubTitleSkeleton = styled.div`
 
 export const CardVideoBox = styled.div`
   width: 100%;
-  aspect-ratio: "9 / 16";
+  height: 100%;
 `;
 
 export const Thumbnail = styled.img<{ opacity: string }>`
   position: absolute;
-  z-index: 1;
   width: 100%;
   border-radius: 12px;
+  z-index: 1;
   opacity: ${props => props.opacity};
   transition: opacity 0.2s;
 `;

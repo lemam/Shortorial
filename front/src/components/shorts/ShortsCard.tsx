@@ -22,7 +22,7 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
   }, [shortsInfo.shortsUrl]);
 
   // 영상에 마우스가 들어오면 영상 재생을 시작한다.
-  const handleMouseOver = () => {
+  const handleMouseEnter = () => {
     if (!isLoading) {
       setShowThumbnail(false);
       playVideo();
@@ -30,7 +30,7 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
   };
 
   // 영상에서 마우스를 떼면 재생된 영상을 초기화한다.
-  const handleMouseOut = () => {
+  const handleMouseLeave = () => {
     if (!isLoading) {
       setShowThumbnail(true);
       pauseVideo();
@@ -59,9 +59,9 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
   };
 
   return (
-    <S.Card onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+    <S.Card onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       {isLoading && <S.CardVideoSkeleton />}
-      <S.CardVideoContainer style={{ display: `${isLoading ? "none" : "inline"}` }}>
+      <S.CardVideoContainer style={{ display: `${isLoading ? "none" : "block"}` }}>
         <S.CardVideoBox onClick={openModal}>
           <S.Thumbnail
             src={`https://img.youtube.com/vi/${videoId}/frame0.jpg`}
