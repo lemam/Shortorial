@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { VolumeUpRounded, VolumeOffRounded } from "@mui/icons-material";
 
 import useShortsVideoStore from "../../store/useShortsVideoStore";
@@ -15,6 +15,11 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showThumbnail, setShowThumbnail] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const videoId = useMemo(() => {
+    const arr = shortsInfo.shortsUrl.split("/");
+    return arr[arr.length - 1];
+  }, [shortsInfo.shortsUrl]);
 
   const handleMouseOver = () => {
     if (!isLoading) {
@@ -59,7 +64,7 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
       <S.CardVideoContainer style={{ display: `${isLoading ? "none" : "inline"}` }}>
         <S.CardVideoBox onClick={openModal}>
           <S.Thumbnail
-            src="https://img.youtube.com/vi/-jkcLE1Ticw/frame0.jpg"
+            src={`https://img.youtube.com/vi/${videoId}/frame0.jpg`}
             alt=""
             opacity={`${showThumbnail ? 1 : 0}`}
           />
