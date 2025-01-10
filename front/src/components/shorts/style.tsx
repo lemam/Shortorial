@@ -41,6 +41,7 @@ export const SoundButton = styled.button`
   right: 12px;
   bottom: 16px;
   color: #fff;
+  z-index: 2;
 
   svg {
     font-size: 28px;
