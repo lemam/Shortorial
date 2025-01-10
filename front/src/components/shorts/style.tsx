@@ -94,4 +94,5 @@ export const Thumbnail = styled.img<{ opacity: string }>`
   width: 100%;
   border-radius: 12px;
   opacity: ${props => props.opacity};
+  transition: opacity 0.2s;
 `;
