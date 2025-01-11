@@ -36,9 +36,9 @@ public class ShortsController {
     }
 
     @Operation(summary = "페이지별 쇼츠 목록 조회")
-    @GetMapping("page/{page}")
-    public ResponseEntity<PaginationShortsDto> selectShortList(@PathVariable int page) {
-        PaginationShortsDto result = shortsService.getShortList(page, 10);
+    @GetMapping("page/{page}/{size}")
+    public ResponseEntity<PaginationShortsDto> selectShortList(@PathVariable int page, @PathVariable int size) {
+        PaginationShortsDto result = shortsService.getShortList(page, size);
         if (result.getContents() == null) result.setContents(new ArrayList<>());
         return ResponseEntity.ok(result);
     }
