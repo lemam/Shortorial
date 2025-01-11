@@ -29,7 +29,8 @@ const MainPage = () => {
   // page 별 쇼츠 리스트 가져오기
   const loadShortsList = async (page: number) => {
     setIsLoading(true);
-    const data: PaginationShorts = await getShortsList(page);
+    const size = window.innerWidth >= 1024 ? 8 : 6;
+    const data: PaginationShorts = await getShortsList(page, size);
     setShortsList(prev => [...prev].concat(data.contents));
     setIsLastPage(data.isLastPage);
     setIsLoading(false);

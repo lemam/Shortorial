@@ -56,9 +56,9 @@ export async function postUploadShorts(blob: Blob, fileName: string) {
 }
 
 // page의 쇼츠 리스트 조회
-export const getShortsList = async (page: number) => {
+export const getShortsList = async (page: number, size: number = 6) => {
   try {
-    const response = await axios.get(`${REST_SHORTS_LIST_URL}/page/${page}`);
+    const response = await axios.get(`${REST_SHORTS_LIST_URL}/page/${page}/${size}`);
     return response.data;
   } catch (error) {
     console.error(error);
