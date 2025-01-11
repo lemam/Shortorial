@@ -1,35 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import {
-  Flip,
-  Pause,
-  PlayArrow,
-  Repeat,
-  Videocam,
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
-import noRepeat from "/src/assets/icon/repeat-off.svg";
 import { useNavigate, useParams } from "react-router-dom";
-import { VideoSection, Shorts } from "../constants/types";
-import { predictVideo, setBtnInfo } from "../modules/Motion";
-import { getShortsInfo } from "../apis/shorts";
-import useLearnStore from "../store/useLearnStore";
-import { useActionStore, useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
+import styled from "styled-components";
+import { Flip, Pause, PlayArrow, Repeat, Videocam, Visibility, VisibilityOff } from "@mui/icons-material";
+
 import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
 import VideoMotionButton from "../components/button/VideoMotionButton";
-import { Acc } from "../modules/Acc";
-import {
-  useMotionLandmarkStore,
-  useVideoLandmarkStore,
-  useValueStore,
-  useCountStore,
-} from "../store/useAccStore";
+import StarEffect from "../components/style/StarEffect";
 
+import useLearnStore from "../store/useLearnStore";
+import { useActionStore, useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
+import { useMotionLandmarkStore, useVideoLandmarkStore, useValueStore, useCountStore } from "../store/useAccStore";
+import { VideoSection, Shorts } from "../constants/types";
+import { predictVideo, setBtnInfo } from "../modules/Motion";
+import { Acc } from "../modules/Acc";
+import { getShortsInfo } from "../apis/shorts";
+import noRepeat from "/src/assets/icon/repeat-off.svg";
 import greatImage from "../assets/score/great.png";
 import goodImage from "../assets/score/good.png";
-import StarEffect from "../components/style/StarEffect";
 
 const LearnPage = () => {
   type LearnState = "INIT" | "PAUSE" | "READY" | "PLAY";
@@ -69,47 +57,42 @@ const LearnPage = () => {
 
   const [sectionList, setSectionList] = useState<VideoSection[]>([]);
 
-  const [currentTime, setCurrentTime] = useLearnStore((state) => [
-    state.currentTime,
-    state.setCurrentTime,
-  ]);
+  const [currentTime, setCurrentTime] = useLearnStore(state => [state.currentTime, state.setCurrentTime]);
 
-  const [timer, resetTimer, countdownTimer] = useLearnStore((state) => [
+  const [timer, resetTimer, countdownTimer] = useLearnStore(state => [
     state.timer,
     state.resetTimer,
     state.countdownTimer,
   ]);
 
-  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore((state) => [
+  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore(state => [
     state.isLooping,
     state.loopSection,
     state.setIsLooping,
     state.setLoopSection,
   ]);
 
-  const [isFlipped, setIsFlipped] = useLearnStore((state) => [state.isFlipped, state.setIsFlipped]);
+  const [isFlipped, setIsFlipped] = useLearnStore(state => [state.isFlipped, state.setIsFlipped]);
 
-  const [playSpeed, changePlaySpeed] = useLearnStore((state) => [
-    state.playSpeed,
-    state.changePlaySpeed,
-  ]);
+  const [playSpeed, changePlaySpeed] = useLearnStore(state => [state.playSpeed, state.changePlaySpeed]);
 
-  const currentSection = useLearnStore((state) => state.currentSection);
+  const currentSection = useLearnStore(state => state.currentSection);
   // const setCurrentSection = useLearnStore((state) => state.setCurrentSection);
 
-  const btn = useBtnStore((state) => state.btn);
-  const action = useActionStore((state) => state.action);
+  const btn = useBtnStore(state => state.btn);
+  const action = useActionStore(state => state.action);
   const [canAction, setCanAction] = useState(true);
 
-  const [playCount, challengeCount, repeatCount, flipCount, speedCount, canvasCount] =
-    useMotionDetectionStore((state) => [
+  const [playCount, challengeCount, repeatCount, flipCount, speedCount, canvasCount] = useMotionDetectionStore(
+    state => [
       state.playCount,
       state.challengeCount,
       state.repeatCount,
       state.flipCount,
       state.speedCount,
       state.canvasCount,
-    ]);
+    ]
+  );
 
   // 영상 정보 가져오기
   const loadVideo = useCallback(async () => {
@@ -402,8 +385,8 @@ const LearnPage = () => {
   const videoLandmark = useVideoLandmarkStore.getState().videoLandmark;
   const motionLandmark = useMotionLandmarkStore.getState().motionLandmark;
   const [acc, setAcc] = useState(0);
-  const [accValue, setAccValue] = useValueStore((state) => [state.accValue, state.setAccValue]);
-  const [count, setCount] = useCountStore((state) => [state.count, state.setCount]);
+  const [accValue, setAccValue] = useValueStore(state => [state.accValue, state.setAccValue]);
+  const [count, setCount] = useCountStore(state => [state.count, state.setCount]);
 
   const [scoreImage, setScoreImage] = useState("");
   // 정확도 계산하기
@@ -412,10 +395,7 @@ const LearnPage = () => {
       const sectionListTmp = sectionList;
 
       if (currentSection.id > 0) {
-        sectionListTmp[currentSection.id - 1].maxAcc = Math.max(
-          acc / count,
-          sectionListTmp[currentSection.id - 1].acc
-        );
+        sectionListTmp[currentSection.id - 1].maxAcc = Math.max(acc / count, sectionListTmp[currentSection.id - 1].acc);
         sectionListTmp[currentSection.id - 1].acc = acc / count;
       } else {
         sectionListTmp[sectionListTmp.length - 1].maxAcc = Math.max(
@@ -434,10 +414,7 @@ const LearnPage = () => {
   useEffect(() => {
     if (sectionList.length > 0 && flag) {
       const sectionListTmp = sectionList;
-      sectionListTmp[currentSection.id].maxAcc = Math.max(
-        acc / count,
-        sectionListTmp[currentSection.id].acc
-      );
+      sectionListTmp[currentSection.id].maxAcc = Math.max(acc / count, sectionListTmp[currentSection.id].acc);
       sectionListTmp[currentSection.id].acc = acc / count;
       console.log(sectionListTmp);
       setSectionList(sectionListTmp);
@@ -493,7 +470,7 @@ const LearnPage = () => {
               parentWidth={getLeftSectionWidth()}
               currentTime={currentTime}
               isLooping={isLooping}
-              clickHandler={(section) => moveVideoTime(section.start)}
+              clickHandler={section => moveVideoTime(section.start)}
             />
           </LeftSection>
           <CenterSection ref={centerSectionRef}>
@@ -610,12 +587,7 @@ const Container = styled.div`
     flex-direction: column-reverse;
   }
 
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(48, 13, 45, 1) 80%,
-    rgba(112, 0, 102, 1) 100%
-  );
+  background: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(48, 13, 45, 1) 80%, rgba(112, 0, 102, 1) 100%);
 `;
 
 const Section = styled.section`
@@ -730,7 +702,7 @@ const LoadingText = styled.div`
 const Image = styled.img<{ $visible: boolean }>`
   position: absolute;
   width: 50%;
-  display: ${(props) => (props.$visible ? "flex" : "none")};
+  display: ${props => (props.$visible ? "flex" : "none")};
   z-index: 2;
 `;
 export default LearnPage;
