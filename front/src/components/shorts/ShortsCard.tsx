@@ -14,7 +14,7 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
   const { isMuted, toggleMute } = useShortsVideoStore();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showThumbnail, setShowThumbnail] = useState<boolean>(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const videoId = useMemo(() => {
     const arr = shortsInfo.shortsUrl.split("/");
