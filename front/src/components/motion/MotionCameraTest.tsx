@@ -1,10 +1,12 @@
 import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
 import { useCallback, useEffect, useRef, useState } from "react";
+import useCameraStore from "./useCameraStore";
+import styled from "styled-components";
 
 function MotionCameraTest() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [userPermission, setUserPermission] = useState<boolean>(true);
+  const { setUserPermission } = useCameraStore();
   const [poseLandmarker, setPoseLandmarker] = useState<PoseLandmarker | null>(null);
 
   // 포즈 랜드마크 초기화
@@ -40,7 +42,7 @@ function MotionCameraTest() {
       console.log("카메라 접근 실패:", error);
       setUserPermission(false);
     }
-  }, []);
+  }, [setUserPermission]);
 
   // 카메라, 포즈 랜드마크 초기화
   useEffect(() => {
@@ -78,7 +80,7 @@ function MotionCameraTest() {
       // 캔버스에 렌더링
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         if (results.landmarks) {
           results.landmarks.forEach(landmark => {
@@ -104,14 +106,35 @@ function MotionCameraTest() {
   }, [poseLandmarker]);
 
   return (
-    <div>
-      {!userPermission && (
-        <div>카메라 접근이 차단되었습니다. 상단 아이콘을 클릭하여 접근을 허용 후 새로고침해주세요.</div>
-      )}
-      <video ref={videoRef} autoPlay playsInline></video>
-      <canvas ref={canvasRef}></canvas>
-    </div>
+    <CameraContainer>
+      <VideoBox>
+        <Camera ref={videoRef} autoPlay playsInline></Camera>
+        <Canvas ref={canvasRef}></Canvas>
+      </VideoBox>
+    </CameraContainer>
   );
 }
+
+const CameraContainer = styled.div`
+  height: 100%;
+  overflow: hidden;
+`;
+
+const VideoBox = styled.div`
+  position: relative;
+  height: 100%;
+  aspect-ratio: 9/16;
+`;
+
+const Camera = styled.video`
+  width: 100%;
+`;
+
+const Canvas = styled.canvas`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+`;
 
 export default MotionCameraTest;
