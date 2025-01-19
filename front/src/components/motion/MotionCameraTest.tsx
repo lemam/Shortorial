@@ -106,25 +106,12 @@ function MotionCameraTest() {
   }, [poseLandmarker]);
 
   return (
-    <CameraContainer>
-      <VideoBox>
-        <Camera ref={videoRef} autoPlay playsInline></Camera>
-        <Canvas ref={canvasRef}></Canvas>
-      </VideoBox>
-    </CameraContainer>
+    <div>
+      <Camera ref={videoRef} autoPlay playsInline></Camera>
+      <Canvas ref={canvasRef}></Canvas>
+    </div>
   );
 }
-
-const CameraContainer = styled.div`
-  height: 100%;
-  overflow: hidden;
-`;
-
-const VideoBox = styled.div`
-  position: relative;
-  height: 100%;
-  aspect-ratio: 9/16;
-`;
 
 const Camera = styled.video`
   width: 100%;
