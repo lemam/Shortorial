@@ -5,6 +5,7 @@ import { Shorts } from "../../constants/types";
 import { useParams } from "react-router-dom";
 import { getShortsInfo } from "../../apis/shorts";
 import styled from "styled-components";
+import { Videocam } from "@mui/icons-material";
 
 interface Size {
   width: number;
@@ -30,6 +31,10 @@ function LearnPageTest() {
   // 비디오 요소 크기 계산
   // TimestampSection 크기를 제외한 컨테이너 넓이에 적절한 비디오 너비/높이를 계산하여 videoSize에 저장한다.
   const calcVideoSize = useCallback(() => {
+    // NOTE: 가로와 세로 길이 중에 어느 쪽이 긴지 체크한다.
+    // 가로가 길면 아래와 같이
+    // 세로가 길면 다른 계산을 해준다.
+
     const section = timestampSectionRef.current;
 
     if (section && videoInfo) {
@@ -58,7 +63,13 @@ function LearnPageTest() {
   return (
     <Layer>
       {!userPermission && (
-        <div>카메라 접근이 차단되었습니다. 상단 아이콘을 클릭하여 접근을 허용 후 새로고침해주세요.</div>
+        <CameraAlert>
+          <CameraAlertBox>
+            <div>
+              카메라 접근이 차단되었습니다. 상단 아이콘 <Videocam />을 클릭하여 접근을 허용 후 새로고침해주세요.
+            </div>
+          </CameraAlertBox>
+        </CameraAlert>
       )}
       <Container>
         <TimestampSection ref={timestampSectionRef}>
@@ -75,7 +86,6 @@ function LearnPageTest() {
               </VideoBox>
             </VideoContainer>
           )}
-          {/* TODO: 비디오가 켜질 때까지 기다리기... 화면에 표시해주기 */}
           <VideoContainer>
             <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
               <MotionCameraTest />
@@ -87,10 +97,40 @@ function LearnPageTest() {
   );
 }
 
+const CameraAlert = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 40%);
+  z-index: 100;
+`;
+
+const CameraAlertBox = styled.div`
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 160px;
+  padding: 16px;
+  font-size: 32px;
+  color: white;
+  text-align: center;
+  word-break: keep-all;
+  background: #232323;
+  border-radius: 8px;
+  z-index: 100;
+`;
+
 const Layer = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+  background-color: #000;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(48, 13, 45, 1) 80%, rgba(112, 0, 102, 1) 100%);
 `;
 
 const Container = styled(Layer)`
@@ -98,8 +138,8 @@ const Container = styled(Layer)`
   flex-direction: row;
   justify-content: center;
 
-  /* @media screen and (min-width: 800px) {
-    flex-direction: row;
+  /* @media screen and (max-width: 1024px) {
+    flex-direction: column;
   } */
 `;
 
@@ -137,6 +177,7 @@ const VideoBox = styled.div`
   position: relative;
   height: 100%;
   aspect-ratio: 9/16;
+  background-color: #000;
 `;
 
 const Video = styled.video`
