@@ -40,7 +40,7 @@ function LearnPageTest() {
    * 다시 말해, 컨테이너는 현재 사용할 수 있는 최대 넓이를 뜻합니다.
    *
    * 먼저 컨테이너의 가로, 세로 길이를 구합니다. (srcWidth, scrHeight)
-   * 그리고 위에서 구한 가로, 세로 길이 각각을 기준으로 하는 9:16 비율의 길이를 구합니다.(ratioWidth, ratioHeight)
+   * 그리고 위에서 구한 가로, 세로 길이 각각을 기준으로 하는 9:16 비율의 길이를 구합니다. (ratioWidth, ratioHeight)
    *
    * 마지막으로 컨테이너가 비율에 맞춰 계산한 값을 수용 가능한지 확인합니다.
    * 컨테이너의 크기가 비율에 맞춰 계산한 값보다 큰 경우 비율에 맞춰 계산한 값을 적용할 수 있습니다.
@@ -50,39 +50,27 @@ function LearnPageTest() {
     const section = timestampSectionRef.current;
 
     if (section && videoInfo) {
-      let width = 0;
-      let height = 0;
+      let srcWidth = 0;
+      let srcHeight = 0;
 
-      // large
+      // 컨테이너 크기 계산
       if (window.innerWidth > mediaSize.medium) {
-        const srcWidth = (window.innerWidth - section.offsetWidth) / 2;
-        const srcHeight = section.offsetHeight;
-        const ratioWidth = (srcHeight * 9) / 16;
-        const ratioHeight = (srcWidth * 16) / 9;
+        srcWidth = (window.innerWidth - section.offsetWidth) / 2;
+        srcHeight = section.offsetHeight;
+      } else {
+        srcWidth = section.offsetWidth;
+        srcHeight = window.innerHeight - section.offsetHeight;
 
-        width = srcWidth >= ratioWidth ? ratioWidth : srcWidth;
-        height = srcWidth >= ratioWidth ? srcHeight : ratioHeight;
+        if (window.innerWidth > mediaSize.small) srcWidth /= 2; // 미디어 사이즈가 medium인 경우
       }
-      // medium
-      else if (window.innerWidth > mediaSize.small) {
-        const srcHeight = window.innerHeight - section.offsetHeight;
-        const srcWidth = section.offsetWidth / 2;
-        const ratioHeight = (srcWidth * 16) / 9;
-        const ratioWidth = (srcHeight * 9) / 16;
 
-        width = srcHeight >= ratioHeight ? srcWidth : ratioWidth;
-        height = srcHeight >= ratioHeight ? ratioHeight : srcHeight;
-      }
-      // small
-      else {
-        const srcHeight = window.innerHeight - section.offsetHeight;
-        const srcWidth = section.offsetWidth;
-        const ratioHeight = (srcWidth * 16) / 9;
-        const ratioWidth = (srcHeight * 9) / 16;
+      // 9:16 비율의 화면 크기 계산
+      const ratioWidth = (srcHeight * 9) / 16;
+      const ratioHeight = (srcWidth * 16) / 9;
 
-        width = srcHeight >= ratioHeight ? srcWidth : ratioWidth;
-        height = srcHeight >= ratioHeight ? ratioHeight : srcHeight;
-      }
+      // 컨테이너에 맞춰 크기 조정
+      const width = srcWidth >= ratioWidth ? ratioWidth : srcWidth;
+      const height = srcWidth >= ratioWidth ? srcHeight : ratioHeight;
 
       setVideoSize({ width, height });
     }
