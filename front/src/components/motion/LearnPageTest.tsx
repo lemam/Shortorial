@@ -12,6 +12,11 @@ interface Size {
   height: number;
 }
 
+const mediaSize = {
+  medium: 1024,
+  small: 640,
+};
+
 function LearnPageTest() {
   const [videoInfo, setVideoInfo] = useState<Shorts | null>(null);
   const { userPermission } = useCameraStore();
@@ -34,7 +39,7 @@ function LearnPageTest() {
     const section = timestampSectionRef.current;
 
     if (section && videoInfo) {
-      if (window.innerWidth > 1024) {
+      if (window.innerWidth > mediaSize.medium) {
         const totalWidth = window.innerWidth - section.offsetWidth; // 사용 가능한 VideoSection 너비
         const width = totalWidth / 2;
         const height = section.offsetHeight;
@@ -43,10 +48,18 @@ function LearnPageTest() {
         // 사용 가능한 너비가 비율에 맞춰 계산한 너비보다 넓은 경우 화면에 꽉차게 출력한다.
         if (width >= ratioWidth) setVideoSize({ width: ratioWidth, height });
         else setVideoSize({ width, height: (width * 16) / 9 });
-      } else {
+      } else if (window.innerWidth > mediaSize.small) {
         const totalHeight = window.innerHeight - section.offsetHeight;
         const height = totalHeight;
         const width = section.offsetWidth / 2;
+        const ratioHeight = (width * 16) / 9;
+
+        if (height >= ratioHeight) setVideoSize({ width, height: ratioHeight });
+        else setVideoSize({ width: (height * 9) / 16, height });
+      } else {
+        const totalHeight = window.innerHeight - section.offsetHeight;
+        const height = totalHeight;
+        const width = section.offsetWidth;
         const ratioHeight = (width * 16) / 9;
 
         if (height >= ratioHeight) setVideoSize({ width, height: ratioHeight });
@@ -92,7 +105,7 @@ function LearnPageTest() {
               </VideoBox>
             </VideoContainer>
           )}
-          <VideoContainer>
+          <VideoContainer className="camera">
             <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
               <MotionCameraTest />
             </VideoBox>
@@ -107,7 +120,7 @@ const CameraAlert = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 40%);
+  background-color: rgba(0, 0, 0, 0.4);
   z-index: 100;
 `;
 
@@ -144,7 +157,7 @@ const Container = styled(Layer)`
   flex-direction: row;
   justify-content: center;
 
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: ${mediaSize.medium}px) {
     flex-direction: column-reverse;
   }
 `;
@@ -158,7 +171,7 @@ const TimestampSection = styled.section`
   flex-shrink: 0;
   padding: 0 24px;
 
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: ${mediaSize.medium}px) {
     flex-direction: row;
     flex-basis: 100px;
   }
@@ -173,6 +186,7 @@ const Button = styled.button`
 `;
 
 const VideoSection = styled.section`
+  position: relative;
   display: flex;
   justify-content: center;
 `;
@@ -182,6 +196,16 @@ const VideoContainer = styled.div`
   align-items: center;
   height: 100%;
   overflow: hidden;
+
+  @media screen and (max-width: ${mediaSize.small}px) {
+    &.camera {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      visibility: hidden;
+    }
+  }
 `;
 
 const VideoBox = styled.div`
