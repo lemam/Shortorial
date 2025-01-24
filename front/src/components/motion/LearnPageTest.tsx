@@ -33,38 +33,58 @@ function LearnPageTest() {
     }
   }, [params.shortsNo]);
 
-  // 비디오 요소 크기 계산
-  // TimestampSection 크기를 제외한 컨테이너 넓이에 적절한 비디오 너비/높이를 계산하여 videoSize에 저장한다.
+  /**
+   * 화면 크기에 맞춰 비디오 요소의 크기를 계산합니다.
+   *
+   * 브라우저 전체 크기에서 TimestampSection 크기를 뺀 나머지 공간을 컨테이너라고 하겠습니다.
+   * 다시 말해, 컨테이너는 현재 사용할 수 있는 최대 넓이를 뜻합니다.
+   *
+   * 먼저 컨테이너의 가로, 세로 길이를 구합니다. (srcWidth, scrHeight)
+   * 그리고 위에서 구한 가로, 세로 길이 각각을 기준으로 하는 9:16 비율의 길이를 구합니다.(ratioWidth, ratioHeight)
+   *
+   * 마지막으로 컨테이너가 비율에 맞춰 계산한 값을 수용 가능한지 확인합니다.
+   * 컨테이너의 크기가 비율에 맞춰 계산한 값보다 큰 경우 비율에 맞춰 계산한 값을 적용할 수 있습니다.
+   * 그렇지 않은 경우, 스크린 밖으로 나가지 않도록 가로세로의 값을 조정합니다.
+   */
   const calcVideoSize = useCallback(() => {
     const section = timestampSectionRef.current;
 
     if (section && videoInfo) {
+      let width = 0;
+      let height = 0;
+
+      // large
       if (window.innerWidth > mediaSize.medium) {
-        const totalWidth = window.innerWidth - section.offsetWidth; // 사용 가능한 VideoSection 너비
-        const width = totalWidth / 2;
-        const height = section.offsetHeight;
-        const ratioWidth = (height * 9) / 16;
+        const srcWidth = (window.innerWidth - section.offsetWidth) / 2;
+        const srcHeight = section.offsetHeight;
+        const ratioWidth = (srcHeight * 9) / 16;
+        const ratioHeight = (srcWidth * 16) / 9;
 
-        // 사용 가능한 너비가 비율에 맞춰 계산한 너비보다 넓은 경우 화면에 꽉차게 출력한다.
-        if (width >= ratioWidth) setVideoSize({ width: ratioWidth, height });
-        else setVideoSize({ width, height: (width * 16) / 9 });
-      } else if (window.innerWidth > mediaSize.small) {
-        const totalHeight = window.innerHeight - section.offsetHeight;
-        const height = totalHeight;
-        const width = section.offsetWidth / 2;
-        const ratioHeight = (width * 16) / 9;
-
-        if (height >= ratioHeight) setVideoSize({ width, height: ratioHeight });
-        else setVideoSize({ width: (height * 9) / 16, height });
-      } else {
-        const totalHeight = window.innerHeight - section.offsetHeight;
-        const height = totalHeight;
-        const width = section.offsetWidth;
-        const ratioHeight = (width * 16) / 9;
-
-        if (height >= ratioHeight) setVideoSize({ width, height: ratioHeight });
-        else setVideoSize({ width: (height * 9) / 16, height });
+        width = srcWidth >= ratioWidth ? ratioWidth : srcWidth;
+        height = srcWidth >= ratioWidth ? srcHeight : ratioHeight;
       }
+      // medium
+      else if (window.innerWidth > mediaSize.small) {
+        const srcHeight = window.innerHeight - section.offsetHeight;
+        const srcWidth = section.offsetWidth / 2;
+        const ratioHeight = (srcWidth * 16) / 9;
+        const ratioWidth = (srcHeight * 9) / 16;
+
+        width = srcHeight >= ratioHeight ? srcWidth : ratioWidth;
+        height = srcHeight >= ratioHeight ? ratioHeight : srcHeight;
+      }
+      // small
+      else {
+        const srcHeight = window.innerHeight - section.offsetHeight;
+        const srcWidth = section.offsetWidth;
+        const ratioHeight = (srcWidth * 16) / 9;
+        const ratioWidth = (srcHeight * 9) / 16;
+
+        width = srcHeight >= ratioHeight ? srcWidth : ratioWidth;
+        height = srcHeight >= ratioHeight ? ratioHeight : srcHeight;
+      }
+
+      setVideoSize({ width, height });
     }
   }, [videoInfo]);
 
