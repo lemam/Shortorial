@@ -31,21 +31,27 @@ function LearnPageTest() {
   // 비디오 요소 크기 계산
   // TimestampSection 크기를 제외한 컨테이너 넓이에 적절한 비디오 너비/높이를 계산하여 videoSize에 저장한다.
   const calcVideoSize = useCallback(() => {
-    // NOTE: 가로와 세로 길이 중에 어느 쪽이 긴지 체크한다.
-    // 가로가 길면 아래와 같이
-    // 세로가 길면 다른 계산을 해준다.
-
     const section = timestampSectionRef.current;
 
     if (section && videoInfo) {
-      const totalWidth = window.innerWidth - section.offsetWidth; // 사용 가능한 VideoSection 너비
-      const width = totalWidth / 2;
-      const height = section.offsetHeight;
-      const ratioWidth = (height * 9) / 16;
+      if (window.innerWidth > 1024) {
+        const totalWidth = window.innerWidth - section.offsetWidth; // 사용 가능한 VideoSection 너비
+        const width = totalWidth / 2;
+        const height = section.offsetHeight;
+        const ratioWidth = (height * 9) / 16;
 
-      // 사용 가능한 너비가 비율에 맞춰 계산한 너비보다 넓은 경우 화면에 꽉차게 출력한다.
-      if (width >= ratioWidth) setVideoSize({ width: ratioWidth, height });
-      else setVideoSize({ width, height: (width * 16) / 9 });
+        // 사용 가능한 너비가 비율에 맞춰 계산한 너비보다 넓은 경우 화면에 꽉차게 출력한다.
+        if (width >= ratioWidth) setVideoSize({ width: ratioWidth, height });
+        else setVideoSize({ width, height: (width * 16) / 9 });
+      } else {
+        const totalHeight = window.innerHeight - section.offsetHeight;
+        const height = totalHeight;
+        const width = section.offsetWidth / 2;
+        const ratioHeight = (width * 16) / 9;
+
+        if (height >= ratioHeight) setVideoSize({ width, height: ratioHeight });
+        else setVideoSize({ width: (height * 9) / 16, height });
+      }
     }
   }, [videoInfo]);
 
@@ -138,9 +144,9 @@ const Container = styled(Layer)`
   flex-direction: row;
   justify-content: center;
 
-  /* @media screen and (max-width: 1024px) {
-    flex-direction: column;
-  } */
+  @media screen and (max-width: 1024px) {
+    flex-direction: column-reverse;
+  }
 `;
 
 const TimestampSection = styled.section`
@@ -151,6 +157,11 @@ const TimestampSection = styled.section`
   flex-basis: 160px;
   flex-shrink: 0;
   padding: 0 24px;
+
+  @media screen and (max-width: 1024px) {
+    flex-direction: row;
+    flex-basis: 100px;
+  }
 `;
 
 const Button = styled.button`
