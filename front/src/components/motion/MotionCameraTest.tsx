@@ -115,6 +115,7 @@ function MotionCameraTest() {
 
 const Camera = styled.video`
   width: 100%;
+  transform: scaleX(-1);
 `;
 
 const Canvas = styled.canvas`
