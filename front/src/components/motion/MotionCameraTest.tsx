@@ -1,4 +1,4 @@
-import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
+import { DrawingUtils, FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useCameraStore from "./useCameraStore";
 import styled from "styled-components";
@@ -80,16 +80,20 @@ function MotionCameraTest() {
       // 캔버스에 렌더링
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         if (results.landmarks) {
+          const drawingUtils = new DrawingUtils(ctx);
+
+          // 카메라 좌우반전에 따른 랜드마크 위치 재계산
           results.landmarks.forEach(landmark => {
-            landmark.forEach(point => {
-              ctx.beginPath();
-              ctx.arc(point.x * canvas.width, point.y * canvas.height, 5, 0, 2 * Math.PI);
-              ctx.fillStyle = "red";
-              ctx.fill();
+            const flipLandmark = landmark.map(point => {
+              const temp = { ...point };
+              temp.x = 1 - temp.x;
+              return temp;
             });
+
+            drawingUtils.drawLandmarks(flipLandmark, { radius: 5 });
+            drawingUtils.drawConnectors(flipLandmark, PoseLandmarker.POSE_CONNECTIONS);
           });
         }
       }
