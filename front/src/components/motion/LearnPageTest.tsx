@@ -5,7 +5,7 @@ import { Shorts } from "../../constants/types";
 import { useParams } from "react-router-dom";
 import { getShortsInfo } from "../../apis/shorts";
 import styled from "styled-components";
-import { Videocam } from "@mui/icons-material";
+import { PlayArrow, Videocam } from "@mui/icons-material";
 
 interface Size {
   width: number;
@@ -113,9 +113,14 @@ function LearnPageTest() {
               </VideoBox>
             </VideoContainer>
           )}
-          <VideoContainer className="camera">
+          <VideoContainer className={`camera ${window.innerWidth < mediaSize.small ? "hidden" : ""}`}>
             <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
               <MotionCameraTest />
+              <Controller>
+                <ControlButton>
+                  <PlayArrow />
+                </ControlButton>
+              </Controller>
             </VideoBox>
           </VideoContainer>
         </VideoSection>
@@ -200,10 +205,14 @@ const VideoSection = styled.section`
 `;
 
 const VideoContainer = styled.div`
-  display: flex;
+  position: relative;
   align-items: center;
   height: 100%;
   overflow: hidden;
+
+  &.hidden {
+    visibility: hidden;
+  }
 
   @media screen and (max-width: ${mediaSize.small}px) {
     &.camera {
@@ -211,9 +220,29 @@ const VideoContainer = styled.div`
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      visibility: hidden;
     }
   }
+`;
+
+const Controller = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+`;
+
+const ControlButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 24px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
 `;
 
 const VideoBox = styled.div`
