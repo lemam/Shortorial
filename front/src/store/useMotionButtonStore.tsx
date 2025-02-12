@@ -1,12 +1,5 @@
 import { create } from "zustand";
-
-interface MotionButton {
-  minX: number;
-  maxX: number;
-  minY: number;
-  maxY: number;
-  click: () => void;
-}
+import { MotionButton } from "../constants/types";
 
 interface MotionButtonState {
   button: MotionButton | null;

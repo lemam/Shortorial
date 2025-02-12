@@ -44,3 +44,11 @@ export interface RecomShorts {
   singerName: string;
   musicName: string;
 }
+
+export interface MotionButton {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  click: () => void;
+}

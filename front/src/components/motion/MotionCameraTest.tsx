@@ -3,12 +3,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import useCameraStore from "./useCameraStore";
 import styled from "styled-components";
 import useMotionButtonStore from "../../store/useMotionButtonStore";
+import { MotionButton } from "../../constants/types";
 
 function MotionCameraTest() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { setUserPermission } = useCameraStore();
+
   const [poseLandmarker, setPoseLandmarker] = useState<PoseLandmarker | null>(null);
+  const [hoveredButton, setHoveredButton] = useState<MotionButton | null>(null);
+  const [hoverStartTime, setHoverStartTime] = useState<number>(0);
+
+  const { setUserPermission } = useCameraStore();
   const { getButton } = useMotionButtonStore();
 
   // 포즈 랜드마크 초기화
@@ -104,7 +109,23 @@ function MotionCameraTest() {
               // 손 위치가 버튼 안에 들어오면 활성화
               if (button) {
                 if (handX >= button.minX && handX <= button.maxX && handY >= button.minY && handY <= button.maxY) {
-                  button.click();
+                  console.log(hoverStartTime);
+
+                  // 들어온 버튼이란 걸 저장한다
+                  if (hoveredButton !== button) {
+                    setHoveredButton(button);
+                    setHoverStartTime(Date.now());
+                  }
+                  // 3초 이상 지속
+                  else if (hoverStartTime && Date.now() - hoverStartTime >= 3000) {
+                    button.click();
+                    setHoverStartTime(0);
+                  }
+                }
+                // 아예 밖으로 나온 경우 초기화
+                else {
+                  setHoveredButton(null);
+                  setHoverStartTime(0);
                 }
               }
 
