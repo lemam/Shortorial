@@ -95,10 +95,12 @@ function LearnPageTest() {
     }
   }, [setButton]);
 
+  // 쇼츠 영상 가져오기
   useEffect(() => {
     loadVideo();
   }, [loadVideo]);
 
+  // 비디오 크기 계산하기
   useEffect(() => {
     calcVideoSize();
     window.addEventListener("resize", calcVideoSize);
@@ -106,6 +108,7 @@ function LearnPageTest() {
     return () => window.addEventListener("resize", calcVideoSize);
   }, [calcVideoSize]);
 
+  // 모션인식 버튼 초기화
   useEffect(() => {
     window.addEventListener("load", initMotionButton);
 
