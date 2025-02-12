@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { getShortsInfo } from "../../apis/shorts";
 import styled from "styled-components";
 import { PlayArrow, Videocam } from "@mui/icons-material";
+import useMotionButtonStore from "../../store/useMotionButtonStore";
 
 interface Size {
   width: number;
@@ -24,6 +25,9 @@ function LearnPageTest() {
 
   const timestampSectionRef = useRef<HTMLDivElement>(null);
   const [videoSize, setVideoSize] = useState<Size>({ width: 0, height: 0 });
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const { setButton } = useMotionButtonStore();
 
   // 쇼츠 영상 데이터 가져오기
   const loadVideo = useCallback(async () => {
@@ -76,6 +80,21 @@ function LearnPageTest() {
     }
   }, [videoInfo]);
 
+  // 재생 모션 버튼 정보를 store에 저장한다.
+  const initMotionButton = useCallback(() => {
+    const button = buttonRef.current;
+
+    if (button) {
+      setButton({
+        minX: button.offsetLeft,
+        maxX: button.offsetLeft + button.offsetWidth,
+        minY: button.offsetTop,
+        maxY: button.offsetTop + button.offsetHeight,
+        click: () => alert("재생하기"),
+      });
+    }
+  }, [setButton]);
+
   useEffect(() => {
     loadVideo();
   }, [loadVideo]);
@@ -86,6 +105,12 @@ function LearnPageTest() {
 
     return () => window.addEventListener("resize", calcVideoSize);
   }, [calcVideoSize]);
+
+  useEffect(() => {
+    window.addEventListener("load", initMotionButton);
+
+    return () => window.removeEventListener("load", initMotionButton);
+  }, [initMotionButton]);
 
   return (
     <Layer>
@@ -117,7 +142,7 @@ function LearnPageTest() {
             <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
               <MotionCameraTest />
               <Controller>
-                <ControlButton>
+                <ControlButton ref={buttonRef}>
                   <PlayArrow />
                 </ControlButton>
               </Controller>
@@ -230,7 +255,9 @@ const Controller = styled.div`
   left: 0;
   display: flex;
   justify-content: flex-end;
+  align-items: center; //
   width: 100%;
+  height: 100%; //
 `;
 
 const ControlButton = styled.button`
@@ -239,7 +266,7 @@ const ControlButton = styled.button`
   align-items: center;
   width: 24px;
   height: 24px;
-  padding: 24px;
+  padding: 48px;
   color: white;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 50%;

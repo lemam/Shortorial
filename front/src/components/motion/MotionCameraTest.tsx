@@ -2,12 +2,14 @@ import { DrawingUtils, FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-
 import { useCallback, useEffect, useRef, useState } from "react";
 import useCameraStore from "./useCameraStore";
 import styled from "styled-components";
+import useMotionButtonStore from "../../store/useMotionButtonStore";
 
 function MotionCameraTest() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { setUserPermission } = useCameraStore();
   const [poseLandmarker, setPoseLandmarker] = useState<PoseLandmarker | null>(null);
+  const { getButton } = useMotionButtonStore();
 
   // 포즈 랜드마크 초기화
   const createPoseLandmarker = async () => {
@@ -84,13 +86,32 @@ function MotionCameraTest() {
         if (results.landmarks) {
           const drawingUtils = new DrawingUtils(ctx);
 
-          // 카메라 좌우반전에 따른 랜드마크 위치 재계산
           results.landmarks.forEach(landmark => {
+            // 카메라 좌우반전에 따른 랜드마크 위치 재계산
             const flipLandmark = landmark.map(point => {
               const temp = { ...point };
               temp.x = 1 - temp.x;
               return temp;
             });
+
+            // 오른쪽 새끼손가락 랜드마크를 기준으로 70% 이상 화면에 보이면
+            if (flipLandmark[18].visibility >= 0.7) {
+              // 랜드마크를 픽셀 단위 좌표로 변환
+              const handX = flipLandmark[18].x * canvas.offsetWidth;
+              const handY = flipLandmark[18].y * canvas.offsetHeight;
+              const button = getButton();
+
+              // 손 위치가 버튼 안에 들어오면 활성화
+              if (button) {
+                if (handX >= button.minX && handX <= button.maxX && handY >= button.minY && handY <= button.maxY) {
+                  button.click();
+                }
+              }
+
+              // 버튼이 여러 개인 경우
+              // https://chatgpt.com/c/67a2fd48-4fe8-8004-8d40-fb3ac147caa0
+              // const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+            }
 
             drawingUtils.drawLandmarks(flipLandmark, { radius: 5 });
             drawingUtils.drawConnectors(flipLandmark, PoseLandmarker.POSE_CONNECTIONS);
@@ -110,10 +131,10 @@ function MotionCameraTest() {
   }, [poseLandmarker]);
 
   return (
-    <div>
+    <>
       <Camera ref={videoRef} autoPlay playsInline></Camera>
       <Canvas ref={canvasRef}></Canvas>
-    </div>
+    </>
   );
 }
 
