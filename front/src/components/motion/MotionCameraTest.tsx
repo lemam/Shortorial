@@ -10,8 +10,14 @@ function MotionCameraTest() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [poseLandmarker, setPoseLandmarker] = useState<PoseLandmarker | null>(null);
+
+  // 모션 버튼의 감지 관련 변수들
   const hoverStartTime = useRef(0);
   const hoveredButton = useRef<MotionButton | null>(null);
+
+  // 모션 캡쳐의 부드러운 움직임을 위한 설정 값
+  const lastPosition = useRef({ x: 0, y: 0 });
+  const SMOOTHING_FACTOR = 0.8;
 
   const { setUserPermission } = useCameraStore();
   const { getButton } = useMotionButtonStore();
@@ -101,9 +107,16 @@ function MotionCameraTest() {
 
             // 오른쪽 새끼손가락 랜드마크를 기준으로 70% 이상 화면에 보이면
             if (flipLandmark[18].visibility >= 0.7) {
-              // 랜드마크를 픽셀 단위 좌표로 변환
-              const handX = flipLandmark[18].x * canvas.offsetWidth;
-              const handY = flipLandmark[18].y * canvas.offsetHeight;
+              // 손 랜드마크를 픽셀 단위 좌표로 변환
+              const handX =
+                SMOOTHING_FACTOR * lastPosition.current.x +
+                (1 - SMOOTHING_FACTOR) * flipLandmark[18].x * canvas.offsetWidth;
+              const handY =
+                SMOOTHING_FACTOR * lastPosition.current.y +
+                (1 - SMOOTHING_FACTOR) * flipLandmark[18].y * canvas.offsetHeight;
+
+              lastPosition.current = { x: handX, y: handY };
+
               const button = getButton();
 
               // 손 위치가 버튼 안에 들어오면 활성화
