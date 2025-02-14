@@ -85,13 +85,15 @@ function LearnPageTest() {
     const button = buttonRef.current;
 
     if (button) {
-      setButton({
+      const btn = {
         minX: button.offsetLeft,
         maxX: button.offsetLeft + button.offsetWidth,
         minY: button.offsetTop,
         maxY: button.offsetTop + button.offsetHeight,
         click: () => alert("재생하기"),
-      });
+      };
+
+      setButton(btn);
     }
   }, [setButton]);
 
@@ -146,6 +148,18 @@ function LearnPageTest() {
               <MotionCameraTest />
               <Controller>
                 <ControlButton ref={buttonRef}>
+                  <PlayArrow />
+                </ControlButton>
+                <ControlButton>
+                  <PlayArrow />
+                </ControlButton>
+                <ControlButton>
+                  <PlayArrow />
+                </ControlButton>
+                <ControlButton>
+                  <PlayArrow />
+                </ControlButton>
+                <ControlButton>
                   <PlayArrow />
                 </ControlButton>
               </Controller>
@@ -258,9 +272,10 @@ const Controller = styled.div`
   left: 0;
   display: flex;
   justify-content: flex-end;
-  align-items: center; //
+  flex-direction: column;
+  align-items: flex-end;
   width: 100%;
-  height: 100%; //
+  /* height: 100%; // */
 `;
 
 const ControlButton = styled.button`
@@ -270,6 +285,7 @@ const ControlButton = styled.button`
   width: 24px;
   height: 24px;
   padding: 48px;
+  margin-bottom: 16px;
   color: white;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 50%;
