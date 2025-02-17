@@ -50,7 +50,7 @@ function LearnPageTest() {
   const [videoSize, setVideoSize] = useState<Size>({ width: 0, height: 0 });
 
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const { setButton } = useMotionButtonStore();
+  const { setButtons } = useMotionButtonStore();
 
   // 쇼츠 영상 데이터 가져오기
   const loadVideo = useCallback(async () => {
@@ -108,21 +108,23 @@ function LearnPageTest() {
     const buttons = buttonRefs.current;
 
     if (buttons) {
-      const buttonList = buttons.map((button, idx) => {
-        if (!button) return;
+      const buttonList = buttons
+        .map((button, idx) => {
+          if (!button) return null;
 
-        return {
-          minX: button.offsetLeft,
-          maxX: button.offsetLeft + button.offsetWidth,
-          minY: button.offsetTop,
-          maxY: button.offsetTop + button.offsetHeight,
-          click: motionButtons[idx].click,
-        };
-      });
+          return {
+            minX: button.offsetLeft,
+            maxX: button.offsetLeft + button.offsetWidth,
+            minY: button.offsetTop,
+            maxY: button.offsetTop + button.offsetHeight,
+            click: motionButtons[idx].click,
+          };
+        })
+        .filter(el => el != null);
 
-      setButton(buttonList);
+      setButtons(buttonList);
     }
-  }, [setButton]);
+  }, [setButtons]);
 
   // 쇼츠 영상 가져오기
   useEffect(() => {

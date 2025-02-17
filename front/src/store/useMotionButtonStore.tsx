@@ -2,15 +2,15 @@ import { create } from "zustand";
 import { MotionButton } from "../constants/types";
 
 interface MotionButtonState {
-  button: MotionButton | null;
-  setButton: (rect: MotionButton) => void;
-  getButton: () => MotionButton | null;
+  buttons: MotionButton[];
+  setButtons: (buttons: MotionButton[]) => void;
+  getButtons: () => MotionButton[];
 }
 
 const useMotionButtonStore = create<MotionButtonState>((set, get) => ({
-  button: null,
-  setButton: rect => set({ button: rect }),
-  getButton: () => get().button,
+  buttons: [],
+  setButtons: buttons => set({ buttons }),
+  getButtons: () => get().buttons,
 }));
 
 export default useMotionButtonStore;
