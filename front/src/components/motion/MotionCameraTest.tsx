@@ -15,7 +15,7 @@ function MotionCameraTest() {
   const hoverStartTime = useRef(0);
   const hoveredButton = useRef<MotionButton | null>(null);
 
-  // 모션 캡쳐의 부드러운 움직임을 위한 설정 값
+  // 모션 캡처의 부드러운 움직임을 위한 설정 값
   const lastPosition = useRef({ x: 0, y: 0 });
   const SMOOTHING_FACTOR = 0.8;
 
@@ -108,6 +108,7 @@ function MotionCameraTest() {
             // 오른쪽 새끼손가락 랜드마크를 기준으로 70% 이상 화면에 보이면
             if (flipLandmark[18].visibility >= 0.7) {
               // 손 랜드마크를 픽셀 단위 좌표로 변환
+              // 노이즈를 줄이기 위한 이전 값을 이용한 평균 값
               const handX =
                 SMOOTHING_FACTOR * lastPosition.current.x +
                 (1 - SMOOTHING_FACTOR) * flipLandmark[18].x * canvas.offsetWidth;

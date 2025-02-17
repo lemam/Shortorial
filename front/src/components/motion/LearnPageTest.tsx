@@ -5,7 +5,7 @@ import { Shorts } from "../../constants/types";
 import { useParams } from "react-router-dom";
 import { getShortsInfo } from "../../apis/shorts";
 import styled from "styled-components";
-import { PlayArrow, Videocam } from "@mui/icons-material";
+import { Flip, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
 import useMotionButtonStore from "../../store/useMotionButtonStore";
 
 interface Size {
@@ -18,6 +18,29 @@ const mediaSize = {
   small: 640,
 };
 
+const motionButtons = [
+  {
+    icon: <PlayArrow />,
+    click: () => alert("재생"),
+  },
+  {
+    icon: <Repeat />,
+    click: () => alert("구간 반복"),
+  },
+  {
+    icon: <Flip />,
+    click: () => alert("거울 모드"),
+  },
+  {
+    icon: `${1}x`,
+    click: () => alert("배속 모드"),
+  },
+  {
+    icon: <Videocam />,
+    click: () => alert("챌린지로 이동"),
+  },
+];
+
 function LearnPageTest() {
   const [videoInfo, setVideoInfo] = useState<Shorts | null>(null);
   const { userPermission } = useCameraStore();
@@ -26,7 +49,7 @@ function LearnPageTest() {
   const timestampSectionRef = useRef<HTMLDivElement>(null);
   const [videoSize, setVideoSize] = useState<Size>({ width: 0, height: 0 });
 
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const { setButton } = useMotionButtonStore();
 
   // 쇼츠 영상 데이터 가져오기
@@ -82,18 +105,22 @@ function LearnPageTest() {
 
   // 재생 모션 버튼 정보를 store에 저장한다.
   const initMotionButton = useCallback(() => {
-    const button = buttonRef.current;
+    const buttons = buttonRefs.current;
 
-    if (button) {
-      const btn = {
-        minX: button.offsetLeft,
-        maxX: button.offsetLeft + button.offsetWidth,
-        minY: button.offsetTop,
-        maxY: button.offsetTop + button.offsetHeight,
-        click: () => alert("재생하기"),
-      };
+    if (buttons) {
+      const buttonList = buttons.map((button, idx) => {
+        if (!button) return;
 
-      setButton(btn);
+        return {
+          minX: button.offsetLeft,
+          maxX: button.offsetLeft + button.offsetWidth,
+          minY: button.offsetTop,
+          maxY: button.offsetTop + button.offsetHeight,
+          click: motionButtons[idx].click,
+        };
+      });
+
+      setButton(buttonList);
     }
   }, [setButton]);
 
@@ -147,21 +174,11 @@ function LearnPageTest() {
             <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
               <MotionCameraTest />
               <Controller>
-                <ControlButton ref={buttonRef}>
-                  <PlayArrow />
-                </ControlButton>
-                <ControlButton>
-                  <PlayArrow />
-                </ControlButton>
-                <ControlButton>
-                  <PlayArrow />
-                </ControlButton>
-                <ControlButton>
-                  <PlayArrow />
-                </ControlButton>
-                <ControlButton>
-                  <PlayArrow />
-                </ControlButton>
+                {motionButtons.map((el, idx) => (
+                  <ControlButton key={idx} ref={el => (buttonRefs.current[idx] = el)} onClick={el.click}>
+                    {el.icon}
+                  </ControlButton>
+                ))}
               </Controller>
             </VideoBox>
           </VideoContainer>
