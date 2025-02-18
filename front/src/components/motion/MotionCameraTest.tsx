@@ -20,7 +20,7 @@ function MotionCameraTest() {
   const SMOOTHING_FACTOR = 0.8;
 
   const { setUserPermission } = useCameraStore();
-  const { getButton } = useMotionButtonStore();
+  const { getButtons } = useMotionButtonStore();
 
   // 포즈 랜드마크 초기화
   const createPoseLandmarker = async () => {
@@ -118,12 +118,12 @@ function MotionCameraTest() {
 
               lastPosition.current = { x: handX, y: handY };
 
-              const button = getButton();
+              const buttons = getButtons();
 
               // 손 위치가 버튼 안에 들어오면 활성화
-              if (button) {
+              for (const button of buttons) {
                 if (handX >= button.minX && handX <= button.maxX && handY >= button.minY && handY <= button.maxY) {
-                  // 들어온 버튼이란 걸 저장한다
+                  // 들어온 버튼을 저장
                   if (hoveredButton.current !== button) {
                     hoveredButton.current = button;
                     hoverStartTime.current = Date.now();
@@ -161,7 +161,7 @@ function MotionCameraTest() {
     return () => {
       video.removeEventListener("loadeddata", detectPose);
     };
-  }, [getButton, poseLandmarker]);
+  }, [getButtons, poseLandmarker]);
 
   return (
     <>
