@@ -136,14 +136,14 @@ function MotionCameraTest() {
                 }
                 // 아예 밖으로 나온 경우 초기화
                 else {
-                  hoveredButton.current = null;
-                  hoverStartTime.current = 0;
+                  if (hoveredButton.current && button === hoveredButton.current) {
+                    console.log("나감");
+
+                    hoveredButton.current = null;
+                    hoverStartTime.current = 0;
+                  }
                 }
               }
-
-              // 버튼이 여러 개인 경우
-              // https://chatgpt.com/c/67a2fd48-4fe8-8004-8d40-fb3ac147caa0
-              // const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
             }
 
             drawingUtils.drawLandmarks(flipLandmark, { radius: 5 });
