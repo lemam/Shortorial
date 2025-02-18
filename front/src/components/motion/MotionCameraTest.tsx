@@ -118,7 +118,7 @@ function MotionCameraTest() {
 
               lastPosition.current = { x: handX, y: handY };
 
-              const buttons = getButtons();
+              const buttons = getButtons(); // 모션 버튼 리스트
 
               // 손 위치가 버튼 안에 들어오면 활성화
               for (const button of buttons) {
@@ -137,8 +137,6 @@ function MotionCameraTest() {
                 // 아예 밖으로 나온 경우 초기화
                 else {
                   if (hoveredButton.current && button === hoveredButton.current) {
-                    console.log("나감");
-
                     hoveredButton.current = null;
                     hoverStartTime.current = 0;
                   }
@@ -146,6 +144,7 @@ function MotionCameraTest() {
               }
             }
 
+            // 랜드마크 그리기
             drawingUtils.drawLandmarks(flipLandmark, { radius: 5 });
             drawingUtils.drawConnectors(flipLandmark, PoseLandmarker.POSE_CONNECTIONS);
           });
