@@ -1,5 +1,5 @@
 import { DrawingUtils, FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useCameraStore from "./useCameraStore";
 import styled from "styled-components";
 import useMotionButtonStore from "../../store/useMotionButtonStore";
@@ -20,7 +20,9 @@ function MotionCameraTest() {
   const SMOOTHING_FACTOR = 0.8;
 
   const { setUserPermission } = useCameraStore();
-  const { getButtons } = useMotionButtonStore();
+  const { getButtons, setProgress, getProgress } = useMotionButtonStore();
+
+  const HOVER_DURATION_MS = 3000; // 모션 버튼 접촉 지속 시간(ms)
 
   // 포즈 랜드마크 초기화
   const createPoseLandmarker = async () => {
@@ -120,22 +122,38 @@ function MotionCameraTest() {
 
               const buttons = getButtons(); // 모션 버튼 리스트
 
-              // 손 위치가 버튼 안에 들어오면 활성화
+              // 모션 버튼 접촉 여부 확인
               for (const button of buttons) {
+                // 1. 손에 버튼이 접촉한 경우
                 if (handX >= button.minX && handX <= button.maxX && handY >= button.minY && handY <= button.maxY) {
-                  // 들어온 버튼을 저장
+                  // 이전에 저장한 버튼과 계속 접촉하고 있는 경우
+                  if (hoveredButton.current && button === hoveredButton.current) {
+                    // 진행도 저장
+                    const progress = Math.min(((Date.now() - hoverStartTime.current) / HOVER_DURATION_MS) * 100, 100);
+                    setProgress(progress);
+
+                    // 진행이 완료되면 버튼을 활성화한다.
+                    if (hoverStartTime && getProgress() >= 100) {
+                      // TODO: 버튼이 무한정 클릭된다. 밖으로 나가기 전까지 한 번만 실행되었으면 좋겠다.
+                      // 이를 해결하기 위해 boolean으로 상태 플래그를 세우는 방법이 있다.
+                      // 그리고 진행도 변수와 처리도 스토어에 전부 저장할지 고민해봐야겠다.
+
+                      button.click();
+                      hoverStartTime.current = 0;
+                    }
+                  }
+
+                  // 저장하지 않은 새로운 버튼과 접촉한 경우
                   if (hoveredButton.current !== button) {
+                    // 새로운 hover button을 저장한다.
                     hoveredButton.current = button;
                     hoverStartTime.current = Date.now();
-                  }
-                  // 3초 이상 지속
-                  else if (hoverStartTime && Date.now() - hoverStartTime.current >= 3000) {
-                    button.click();
-                    hoverStartTime.current = 0;
+                    setProgress(0);
                   }
                 }
-                // 아예 밖으로 나온 경우 초기화
+                // 2. 손에 접촉한 버튼이 없는 경우
                 else {
+                  // 이전에 저장한 버튼과 접촉이 이어지지 않았다면 hover button을 초기화한다.
                   if (hoveredButton.current && button === hoveredButton.current) {
                     hoveredButton.current = null;
                     hoverStartTime.current = 0;
