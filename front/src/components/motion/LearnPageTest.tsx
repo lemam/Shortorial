@@ -177,14 +177,14 @@ function LearnPageTest() {
               <MotionCameraTest />
               <Controller>
                 {motionButtons.map((el, idx) => (
-                  <ControlButtonContaienr ref={el => (buttonRefs.current[idx] = el)}>
+                  <ControlButtonContainer ref={el => (buttonRefs.current[idx] = el)}>
                     <ControlButton key={idx} onClick={el.click}>
                       {el.icon}
                     </ControlButton>
                     <CircleWrapper viewBox="0 0 60 60">
                       <CircleProgress cx={30} cy={30} r={28} progress={getProgress()} />
                     </CircleWrapper>
-                  </ControlButtonContaienr>
+                  </ControlButtonContainer>
                 ))}
               </Controller>
             </VideoBox>
@@ -304,7 +304,7 @@ const Controller = styled.div`
   padding: 0 8px;
 `;
 
-const ControlButtonContaienr = styled.div`
+const ControlButtonContainer = styled.div`
   position: relative;
   cursor: pointer;
 

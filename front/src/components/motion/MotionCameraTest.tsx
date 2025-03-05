@@ -179,7 +179,7 @@ function MotionCameraTest() {
     return () => {
       video.removeEventListener("loadeddata", detectPose);
     };
-  }, [getButtons, poseLandmarker]);
+  }, [getButtons, getProgress, poseLandmarker, setProgress]);
 
   return (
     <>
