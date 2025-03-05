@@ -1,5 +1,5 @@
 import { DrawingUtils, FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useCameraStore from "./useCameraStore";
 import styled from "styled-components";
 import useMotionButtonStore from "../../store/useMotionButtonStore";
@@ -131,6 +131,7 @@ function MotionCameraTest() {
                     // 진행도 저장
                     const progress = Math.min(((Date.now() - hoverStartTime.current) / HOVER_DURATION_MS) * 100, 100);
                     setProgress(progress);
+                    console.log(getProgress());
 
                     // 진행이 완료되면 버튼을 활성화한다.
                     if (hoverStartTime && getProgress() >= 100) {

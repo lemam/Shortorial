@@ -49,8 +49,8 @@ function LearnPageTest() {
   const timestampSectionRef = useRef<HTMLDivElement>(null);
   const [videoSize, setVideoSize] = useState<Size>({ width: 0, height: 0 });
 
-  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const { setButtons } = useMotionButtonStore();
+  const buttonRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { setButtons, getProgress } = useMotionButtonStore();
 
   // 쇼츠 영상 데이터 가져오기
   const loadVideo = useCallback(async () => {
@@ -177,9 +177,14 @@ function LearnPageTest() {
               <MotionCameraTest />
               <Controller>
                 {motionButtons.map((el, idx) => (
-                  <ControlButton key={idx} ref={el => (buttonRefs.current[idx] = el)} onClick={el.click}>
-                    {el.icon}
-                  </ControlButton>
+                  <ControlButtonContaienr ref={el => (buttonRefs.current[idx] = el)}>
+                    <ControlButton key={idx} onClick={el.click}>
+                      {el.icon}
+                    </ControlButton>
+                    <CircleWrapper viewBox="0 0 60 60">
+                      <CircleProgress cx={30} cy={30} r={28} progress={getProgress()} />
+                    </CircleWrapper>
+                  </ControlButtonContaienr>
                 ))}
               </Controller>
             </VideoBox>
@@ -290,24 +295,60 @@ const Controller = styled.div`
   top: 0;
   left: 0;
   display: flex;
-  justify-content: flex-end;
   flex-direction: column;
+  justify-content: space-between;
   align-items: flex-end;
   width: 100%;
-  /* height: 100%; // */
+  height: 50%;
+  margin: 16px 0;
+  padding: 0 8px;
+`;
+
+const ControlButtonContaienr = styled.div`
+  position: relative;
+  cursor: pointer;
+
+  &:hover button,
+  &:active button {
+    border: 3px solid #fb2576;
+  }
 `;
 
 const ControlButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 24px;
-  height: 24px;
-  padding: 48px;
+  width: 60px;
+  height: 60px;
   margin-bottom: 16px;
   color: white;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 50%;
+  box-sizing: border-box;
+
+  &:hover,
+  &:active {
+    border: 3px solid #fb2576;
+  }
+`;
+
+const CircleWrapper = styled.svg`
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotate(-90deg);
+  width: 60px;
+  height: 60px;
+`;
+
+const CircleProgress = styled.circle<{ r: number; progress: number }>`
+  fill: none;
+  stroke: #fb2576;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: ${({ r }) => r * Math.PI * 2};
+  stroke-dashoffset: ${({ r, progress }) => r * Math.PI * 2 * (1 - progress / 100)};
+  transition: stroke-dashoffset 0.5s ease;
 `;
 
 const VideoBox = styled.div`
