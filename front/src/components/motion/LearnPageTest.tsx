@@ -50,7 +50,7 @@ function LearnPageTest() {
   const [videoSize, setVideoSize] = useState<Size>({ width: 0, height: 0 });
 
   const buttonRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const { setButtons, getProgress } = useMotionButtonStore();
+  const { setButtons, getProgress, getActiveButtonId } = useMotionButtonStore();
 
   // 쇼츠 영상 데이터 가져오기
   const loadVideo = useCallback(async () => {
@@ -177,12 +177,15 @@ function LearnPageTest() {
               <MotionCameraTest />
               <Controller>
                 {motionButtons.map((el, idx) => (
-                  <ControlButtonContainer ref={el => (buttonRefs.current[idx] = el)}>
-                    <ControlButton key={idx} onClick={el.click}>
-                      {el.icon}
-                    </ControlButton>
+                  <ControlButtonContainer ref={el => (buttonRefs.current[idx] = el)} onClick={el.click}>
+                    <ControlButton key={idx}>{el.icon}</ControlButton>
                     <CircleWrapper viewBox="0 0 60 60">
-                      <CircleProgress cx={30} cy={30} r={28} progress={getProgress()} />
+                      <CircleProgress
+                        cx={30}
+                        cy={30}
+                        r={28}
+                        progress={idx === getActiveButtonId() ? getProgress() : 0}
+                      />
                     </CircleWrapper>
                   </ControlButtonContainer>
                 ))}

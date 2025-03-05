@@ -20,7 +20,7 @@ function MotionCameraTest() {
   const SMOOTHING_FACTOR = 0.8;
 
   const { setUserPermission } = useCameraStore();
-  const { getButtons, setProgress, getProgress } = useMotionButtonStore();
+  const { getButtons, setProgress, getProgress, setActiveButtonId } = useMotionButtonStore();
 
   const HOVER_DURATION_MS = 3000; // 모션 버튼 접촉 지속 시간(ms)
 
@@ -123,7 +123,7 @@ function MotionCameraTest() {
               const buttons = getButtons(); // 모션 버튼 리스트
 
               // 모션 버튼 접촉 여부 확인
-              for (const button of buttons) {
+              for (const [index, button] of buttons.entries()) {
                 // 1. 손에 버튼이 접촉한 경우
                 if (handX >= button.minX && handX <= button.maxX && handY >= button.minY && handY <= button.maxY) {
                   // 이전에 저장한 버튼과 계속 접촉하고 있는 경우
@@ -131,7 +131,6 @@ function MotionCameraTest() {
                     // 진행도 저장
                     const progress = Math.min(((Date.now() - hoverStartTime.current) / HOVER_DURATION_MS) * 100, 100);
                     setProgress(progress);
-                    console.log(getProgress());
 
                     // 진행이 완료되면 버튼을 활성화한다.
                     if (hoverStartTime && getProgress() >= 100) {
@@ -150,6 +149,7 @@ function MotionCameraTest() {
                     hoveredButton.current = button;
                     hoverStartTime.current = Date.now();
                     setProgress(0);
+                    setActiveButtonId(index);
                   }
                 }
                 // 2. 손에 접촉한 버튼이 없는 경우
@@ -158,6 +158,8 @@ function MotionCameraTest() {
                   if (hoveredButton.current && button === hoveredButton.current) {
                     hoveredButton.current = null;
                     hoverStartTime.current = 0;
+                    setProgress(0);
+                    setActiveButtonId(-1);
                   }
                 }
               }
@@ -179,7 +181,7 @@ function MotionCameraTest() {
     return () => {
       video.removeEventListener("loadeddata", detectPose);
     };
-  }, [getButtons, getProgress, poseLandmarker, setProgress]);
+  }, [getButtons, getProgress, poseLandmarker, setActiveButtonId, setProgress]);
 
   return (
     <>
