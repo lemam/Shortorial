@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import MotionCameraTest from "./MotionCameraTest";
-import useCameraStore from "./useCameraStore";
-import { Shorts } from "../../constants/types";
 import { useParams } from "react-router-dom";
-import { getShortsInfo } from "../../apis/shorts";
 import styled from "styled-components";
 import { Videocam } from "@mui/icons-material";
-import useMotionButtonStore from "../../store/useMotionButtonStore";
+
+import MotionCameraTest from "./MotionCameraTest";
+import { Shorts } from "../../constants/types";
 import { motionButtons } from "../../constants/motionButtons";
+import { getShortsInfo } from "../../apis/shorts";
+import useCameraStore from "./useCameraStore";
+import useMotionButtonStore from "../../store/useMotionButtonStore";
 
 interface Size {
   width: number;
