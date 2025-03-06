@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import MotionCameraTest from "./MotionCameraTest";
 import useCameraStore from "./useCameraStore";
 import { Shorts } from "../../constants/types";
 import { useParams } from "react-router-dom";
 import { getShortsInfo } from "../../apis/shorts";
 import styled from "styled-components";
-import { Flip, PlayArrow, Repeat, Videocam } from "@mui/icons-material";
+import { Videocam } from "@mui/icons-material";
 import useMotionButtonStore from "../../store/useMotionButtonStore";
+import { motionButtons } from "../../constants/motionButtons";
 
 interface Size {
   width: number;
@@ -18,29 +19,6 @@ const mediaSize = {
   small: 640,
 };
 
-const motionButtons = [
-  {
-    icon: <PlayArrow />,
-    click: () => alert("재생"),
-  },
-  {
-    icon: <Repeat />,
-    click: () => alert("구간 반복"),
-  },
-  {
-    icon: <Flip />,
-    click: () => alert("거울 모드"),
-  },
-  {
-    icon: `${1}x`,
-    click: () => alert("배속 모드"),
-  },
-  {
-    icon: <Videocam />,
-    click: () => alert("챌린지로 이동"),
-  },
-];
-
 function LearnPageTest() {
   const [videoInfo, setVideoInfo] = useState<Shorts | null>(null);
   const { userPermission } = useCameraStore();
@@ -51,6 +29,8 @@ function LearnPageTest() {
 
   const buttonRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { setButtons, getProgress, getActiveButtonId } = useMotionButtonStore();
+
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // 쇼츠 영상 데이터 가져오기
   const loadVideo = useCallback(async () => {
@@ -103,6 +83,37 @@ function LearnPageTest() {
     }
   }, [videoInfo]);
 
+  const handlePlay = () => {
+    console.log("영상 재생!");
+  };
+
+  const handleRepeat = () => {
+    console.log("구간 반복 활성화!");
+  };
+
+  const handleMirrorMode = () => {
+    console.log("거울 모드 변경!");
+  };
+
+  const handleSpeedChange = () => {
+    console.log("배속 변경!");
+  };
+
+  const handleChallenge = () => {
+    console.log("챌린지 페이지로 이동!");
+  };
+
+  // 버튼 action에 따른 클릭 핸들러 매핑
+  const buttonClickActions: { [key: string]: () => void } = useMemo(() => {
+    return {
+      play: handlePlay,
+      repeat: handleRepeat,
+      mirror: handleMirrorMode,
+      speed: handleSpeedChange,
+      challenge: handleChallenge,
+    };
+  }, []);
+
   // 재생 모션 버튼 정보를 store에 저장한다.
   const initMotionButton = useCallback(() => {
     const buttons = buttonRefs.current;
@@ -117,14 +128,14 @@ function LearnPageTest() {
             maxX: button.offsetLeft + button.offsetWidth,
             minY: button.offsetTop,
             maxY: button.offsetTop + button.offsetHeight,
-            click: motionButtons[idx].click,
+            click: buttonClickActions[motionButtons[idx].action],
           };
         })
         .filter(el => el != null);
 
       setButtons(buttonList);
     }
-  }, [setButtons]);
+  }, [buttonClickActions, setButtons]);
 
   // 쇼츠 영상 가져오기
   useEffect(() => {
@@ -168,7 +179,7 @@ function LearnPageTest() {
           {videoInfo && (
             <VideoContainer>
               <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
-                <Video src={videoInfo.shortsLink} crossOrigin="anonymous"></Video>
+                <Video src={videoInfo.shortsLink} crossOrigin="anonymous" ref={videoRef}></Video>
               </VideoBox>
             </VideoContainer>
           )}
@@ -176,9 +187,12 @@ function LearnPageTest() {
             <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
               <MotionCameraTest />
               <Controller>
-                {motionButtons.map((el, idx) => (
-                  <ControlButtonContainer ref={el => (buttonRefs.current[idx] = el)} onClick={el.click}>
-                    <ControlButton key={idx}>{el.icon}</ControlButton>
+                {motionButtons.map((button, idx) => (
+                  <ControlButtonContainer
+                    ref={button => (buttonRefs.current[idx] = button)}
+                    onClick={buttonClickActions[button.action]}
+                  >
+                    <ControlButton key={idx}>{button.icon}</ControlButton>
                     <CircleWrapper viewBox="0 0 60 60">
                       <CircleProgress
                         cx={30}
