@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { Videocam } from "@mui/icons-material";
+import { Flip, Pause, PlayArrow, Videocam } from "@mui/icons-material";
+import { TbRepeat, TbRepeatOff } from "react-icons/tb";
 
 import MotionCameraTest from "./MotionCameraTest";
 import { Shorts } from "../../constants/types";
@@ -20,10 +21,13 @@ const mediaSize = {
   small: 640,
 };
 
+const PLAYBACK_SPEED = [1, 0.75, 0.5];
+
 function LearnPageTest() {
   const [videoInfo, setVideoInfo] = useState<Shorts | null>(null);
   const { userPermission } = useCameraStore();
   const params = useParams();
+  const navigate = useNavigate();
 
   const timestampSectionRef = useRef<HTMLDivElement>(null);
   const [videoSize, setVideoSize] = useState<Size>({ width: 0, height: 0 });
@@ -32,6 +36,10 @@ function LearnPageTest() {
   const { setButtons, getProgress, getActiveButtonId } = useMotionButtonStore();
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isRepeating, setIsRepeating] = useState<boolean>(false);
+  const [playbackSpeedIdx, setPlaybackSpeedIdx] = useState<number>(0);
+  const playbackSpeed = PLAYBACK_SPEED[playbackSpeedIdx];
 
   // 쇼츠 영상 데이터 가져오기
   const loadVideo = useCallback(async () => {
@@ -84,34 +92,35 @@ function LearnPageTest() {
     }
   }, [videoInfo]);
 
-  const handlePlay = () => {
-    console.log("영상 재생!");
+  const handleClickPlayButton = () => {
+    setIsPlaying(prev => !prev);
   };
 
-  const handleRepeat = () => {
-    console.log("구간 반복 활성화!");
+  const handleClickRepeatButton = () => {
+    setIsRepeating(prev => !prev);
   };
 
-  const handleMirrorMode = () => {
+  const handleClickFlipButton = () => {
+    // 비디오의 css를 건드려야 한다.
     console.log("거울 모드 변경!");
   };
 
-  const handleSpeedChange = () => {
-    console.log("배속 변경!");
+  const handleClickSpeedButton = () => {
+    setPlaybackSpeedIdx(idx => ++idx % PLAYBACK_SPEED.length);
   };
 
-  const handleChallenge = () => {
-    console.log("챌린지 페이지로 이동!");
+  const handleClickChallengeButton = () => {
+    navigate(`/challenge/${params.shortsNo}`);
   };
 
   // 버튼 action에 따른 클릭 핸들러 매핑
   const buttonClickActions: { [key: string]: () => void } = useMemo(() => {
     return {
-      play: handlePlay,
-      repeat: handleRepeat,
-      mirror: handleMirrorMode,
-      speed: handleSpeedChange,
-      challenge: handleChallenge,
+      play: handleClickPlayButton,
+      repeat: handleClickRepeatButton,
+      mirror: handleClickFlipButton,
+      speed: handleClickSpeedButton,
+      challenge: handleClickChallengeButton,
     };
   }, []);
 
@@ -158,6 +167,16 @@ function LearnPageTest() {
     return () => window.removeEventListener("load", initMotionButton);
   }, [initMotionButton]);
 
+  // 영상 재생 / 일시정지
+  useEffect(() => {
+    const video = videoRef.current;
+
+    if (video) {
+      if (isPlaying) video.play();
+      else video.pause();
+    }
+  }, [isPlaying]);
+
   return (
     <Layer>
       {!userPermission && (
@@ -188,6 +207,53 @@ function LearnPageTest() {
             <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
               <MotionCameraTest />
               <Controller>
+                <ControlButtonContainer
+                  ref={button => (buttonRefs.current[0] = button)}
+                  onClick={handleClickPlayButton}
+                >
+                  <ControlButton>{isPlaying ? <Pause /> : <PlayArrow />}</ControlButton>
+                  <CircleWrapper viewBox="0 0 60 60">
+                    <CircleProgress cx={30} cy={30} r={28} progress={0 === getActiveButtonId() ? getProgress() : 0} />
+                  </CircleWrapper>
+                </ControlButtonContainer>
+                <ControlButtonContainer
+                  ref={button => (buttonRefs.current[1] = button)}
+                  onClick={handleClickRepeatButton}
+                >
+                  <ControlButton>{isRepeating ? <TbRepeat /> : <TbRepeatOff />}</ControlButton>
+                  <CircleWrapper viewBox="0 0 60 60">
+                    <CircleProgress cx={30} cy={30} r={28} progress={1 === getActiveButtonId() ? getProgress() : 0} />
+                  </CircleWrapper>
+                </ControlButtonContainer>
+                <ControlButtonContainer
+                  ref={button => (buttonRefs.current[2] = button)}
+                  onClick={handleClickFlipButton}
+                >
+                  <ControlButton>{<Flip />}</ControlButton>
+                  <CircleWrapper viewBox="0 0 60 60">
+                    <CircleProgress cx={30} cy={30} r={28} progress={2 === getActiveButtonId() ? getProgress() : 0} />
+                  </CircleWrapper>
+                </ControlButtonContainer>
+                <ControlButtonContainer
+                  ref={button => (buttonRefs.current[3] = button)}
+                  onClick={handleClickSpeedButton}
+                >
+                  <ControlButton>{`${playbackSpeed}x`}</ControlButton>
+                  <CircleWrapper viewBox="0 0 60 60">
+                    <CircleProgress cx={30} cy={30} r={28} progress={3 === getActiveButtonId() ? getProgress() : 0} />
+                  </CircleWrapper>
+                </ControlButtonContainer>
+                <ControlButtonContainer
+                  ref={button => (buttonRefs.current[4] = button)}
+                  onClick={handleClickChallengeButton}
+                >
+                  <ControlButton>{<Videocam />}</ControlButton>
+                  <CircleWrapper viewBox="0 0 60 60">
+                    <CircleProgress cx={30} cy={30} r={28} progress={4 === getActiveButtonId() ? getProgress() : 0} />
+                  </CircleWrapper>
+                </ControlButtonContainer>
+              </Controller>
+              {/* <Controller>
                 {motionButtons.map((button, idx) => (
                   <ControlButtonContainer
                     ref={button => (buttonRefs.current[idx] = button)}
@@ -204,7 +270,7 @@ function LearnPageTest() {
                     </CircleWrapper>
                   </ControlButtonContainer>
                 ))}
-              </Controller>
+              </Controller> */}
             </VideoBox>
           </VideoContainer>
         </VideoSection>
