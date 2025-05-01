@@ -209,10 +209,12 @@ const LearnPage2 = () => {
       )}
       <Main>
         <TimestampSection ref={timestampSectionRef}>
-          <Timestamp>0:00</Timestamp>
-          <Timestamp>0:10</Timestamp>
-          <Timestamp>0:20</Timestamp>
-          <Timestamp>0:30</Timestamp>
+          <TimestampList>
+            <Timestamp $active>0:00</Timestamp>
+            <Timestamp $active={false}>0:10</Timestamp>
+            <Timestamp $active={false}>0:20</Timestamp>
+            <Timestamp $active={false}>0:30</Timestamp>
+          </TimestampList>
         </TimestampSection>
         <VideoSection>
           {videoInfo && (
@@ -299,27 +301,33 @@ const Main = styled(Container)`
   }
 `;
 
-const TimestampSection = styled.section`
+const TimestampSection = styled.div`
+  position: relative;
+  padding: 0 24px;
+`;
+
+const TimestampList = styled.li`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-basis: 160px;
-  flex-shrink: 0;
-  padding: 0 24px;
+  width: 160px;
+  height: 100%;
+  list-style: none;
 
   @media screen and (max-width: ${mediaSize.medium}px) {
     flex-direction: row;
-    flex-basis: 100px;
+    width: 100%;
   }
 `;
 
-const Timestamp = styled.button`
-  width: 160px;
+const Timestamp = styled.button<{ $active: boolean }>`
+  width: 100%;
   height: 40px;
   margin: 8px 0;
   border-radius: 4px;
-  border: 1px solid red;
+  background-color: ${props => (props.$active ? "#FF95BD50" : "#353535")};
+  border: 1px solid ${props => (props.$active ? "#FB2576" : "#808080")};
 `;
 
 const VideoSection = styled.section`
