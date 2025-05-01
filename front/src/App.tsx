@@ -13,6 +13,7 @@ import VideoTrimPage from "./pages/VideoTrimPage";
 import VideoMarkerPage from "./pages/VIdeoMarkerPage";
 import MyPage from "./pages/MyPage";
 import FeedPage from "./pages/FeedPage";
+import LearnPage2 from "./pages/LearnPage2";
 
 function App() {
   return (
@@ -21,24 +22,12 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route
-            path="/main"
-            element={<PrivateRoute component={<MainPage />} />}
-          />
+          <Route path="/main" element={<PrivateRoute component={<MainPage />} />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/sign-up" element={<SignUp />} />
-          <Route
-            path="/learn/:shortsNo"
-            element={<PrivateRoute component={<LearnPage />} />}
-          />
-          <Route
-            path="/challenge/:shortsNo"
-            element={<PrivateRoute component={<ChallengePage />} />}
-          />
-          <Route
-            path="/challenge/result"
-            element={<PrivateRoute component={<ChallengeResultPage />} />}
-          />
+          <Route path="/learn/:shortsNo" element={<PrivateRoute component={<LearnPage2 />} />} />
+          <Route path="/challenge/:shortsNo" element={<PrivateRoute component={<ChallengePage />} />} />
+          <Route path="/challenge/result" element={<PrivateRoute component={<ChallengeResultPage />} />} />
           <Route path="/video-trim" element={<VideoTrimPage />} />
           <Route path="/video-marker" element={<VideoMarkerPage />} />
           {/* <Route path="/video-resize" element={<VideoResizePage />} /> */}

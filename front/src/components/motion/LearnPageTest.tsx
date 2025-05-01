@@ -8,7 +8,7 @@ import MotionCameraTest from "./MotionCameraTest";
 import { Shorts } from "../../constants/types";
 import { motionButtons } from "../../constants/motionButtons";
 import { getShortsInfo } from "../../apis/shorts";
-import useCameraStore from "./useCameraStore";
+import useCameraStore from "../../store/useCameraStore";
 import useMotionButtonStore from "../../store/useMotionButtonStore";
 
 interface Size {

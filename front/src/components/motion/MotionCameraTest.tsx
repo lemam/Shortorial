@@ -1,6 +1,6 @@
 import { DrawingUtils, FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
 import { useCallback, useEffect, useRef, useState } from "react";
-import useCameraStore from "./useCameraStore";
+import useCameraStore from "../../store/useCameraStore";
 import styled from "styled-components";
 import useMotionButtonStore from "../../store/useMotionButtonStore";
 import { MotionButton } from "../../constants/types";
