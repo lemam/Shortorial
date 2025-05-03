@@ -121,6 +121,13 @@ const LearnPage2 = () => {
     navigate(`/challenge/${params.shortsNo}`);
   };
 
+  // 타임스탬프 버튼 클릭 이벤트 핸들러
+  function handleClickTimestamp(event: React.MouseEvent<HTMLButtonElement>): void {
+    if (videoRef.current) {
+      videoRef.current.currentTime = Number(event.currentTarget.value); // 클릭한 시간으로 영상 이동
+    }
+  }
+
   /**
    * 컴포넌트가 마운트 되고 난 후, 영상의 데이터를 가져와 저장합니다.
    */
@@ -210,10 +217,18 @@ const LearnPage2 = () => {
       <Main>
         <TimestampSection ref={timestampSectionRef}>
           <TimestampList>
-            <Timestamp $active>0:00</Timestamp>
-            <Timestamp $active={false}>0:10</Timestamp>
-            <Timestamp $active={false}>0:20</Timestamp>
-            <Timestamp $active={false}>0:30</Timestamp>
+            <Timestamp $active onClick={handleClickTimestamp} value={0}>
+              0:00
+            </Timestamp>
+            <Timestamp $active={false} onClick={handleClickTimestamp} value={5}>
+              0:05
+            </Timestamp>
+            <Timestamp $active={false} onClick={handleClickTimestamp} value={10}>
+              0:10
+            </Timestamp>
+            <Timestamp $active={false} onClick={handleClickTimestamp} value={15}>
+              0:15
+            </Timestamp>
           </TimestampList>
         </TimestampSection>
         <VideoSection>
