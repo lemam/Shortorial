@@ -155,6 +155,17 @@ const LearnPage2 = () => {
     console.log(timeArr);
   }, [videoInfo]);
 
+  // 숫자(초)를 0:00 형식으로 바꾼 문자열을 반환합니다.
+  const formatTime = (time: number) => {
+    if (!time) return "0:00";
+
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    const formatedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+    return `${minutes}:${formatedSeconds}`;
+  };
+
   /**
    * 컴포넌트가 마운트 되고 난 후, 영상의 데이터를 가져와 저장합니다.
    */
@@ -258,12 +269,11 @@ const LearnPage2 = () => {
       <Main>
         <TimestampSection ref={timestampSectionRef}>
           <TimestampList>
-            {/* TODO: 0:00 형태로 innerText 수정 */}
             {timestampList.map(
               (time, idx) =>
                 videoRef.current && (
                   <Timestamp key={idx} $active={idx === currTimestampIdx} onClick={handleClickTimestamp} value={time}>
-                    {time}
+                    {formatTime(time)}
                   </Timestamp>
                 )
             )}
