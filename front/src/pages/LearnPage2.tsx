@@ -23,6 +23,8 @@ const mediaSize = {
   small: 640,
 };
 
+const TIMESTAMP_INTERVAL = 3; // 타임스탬프 구간 당 시간(초)
+
 const LearnPage2 = () => {
   const params = useParams();
   const navigate = useNavigate();
@@ -39,6 +41,9 @@ const LearnPage2 = () => {
   const [isRepeating, setIsRepeating] = useState<boolean>(false);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
   const [playSpeed, setPlaySpeed] = useState<number>(1);
+
+  const [timestampList, setTimestampList] = useState<number[]>([]);
+  const [currTimestampIdx, setCurrTimestampIdx] = useState<number>(0); // 현재 타임스탬프 인덱스
 
   const TIMER = 3;
   const [currentTimer, setCurrentTimer] = useState<number>(TIMER);
@@ -128,6 +133,28 @@ const LearnPage2 = () => {
     }
   }
 
+  // Video TimeUpdate 이벤트 핸들러
+  const handleTimeUpdate = useCallback(() => {
+    if (videoRef.current) {
+      console.log(videoRef.current.currentTime);
+
+      // 현재 재생 시간에 해당하는 타임 스탬프 인덱스 계산
+      const idx = Math.floor(videoRef.current.currentTime / TIMESTAMP_INTERVAL);
+      if (currTimestampIdx !== idx) setCurrTimestampIdx(idx);
+    }
+  }, [currTimestampIdx]);
+
+  // 현재 로딩된 영상의 타임스탬프 리스트를 생성하여 저장합니다.
+  const calcTimeStampList = useCallback(() => {
+    if (!videoInfo) return;
+
+    const size = videoInfo.shortsTime / TIMESTAMP_INTERVAL;
+    const timeArr = Array.from({ length: size }, (_, idx) => idx * TIMESTAMP_INTERVAL);
+    setTimestampList(timeArr);
+
+    console.log(timeArr);
+  }, [videoInfo]);
+
   /**
    * 컴포넌트가 마운트 되고 난 후, 영상의 데이터를 가져와 저장합니다.
    */
@@ -136,15 +163,28 @@ const LearnPage2 = () => {
   }, [params.shortsNo]);
 
   /**
-   * videoRef 설정 및 이벤트 등록을 위한 useEffect입니다.
-   * videoInfo가 존재해야 video 요소가 렌더링된 상태라고 판단하고 이벤트를 등록합니다.
+   * videoInfo와 videoRef가 로딩이 완료된 후 실행되는 이펙트입니다.
+   * 준비 완료 상태인 PAUSE 상태로 변환하고, 영상의 타임스탬프 리스트를 저장합니다.
    */
   useEffect(() => {
     const video = videoRef.current;
     if (videoInfo && video) {
       setState("PAUSE");
+      calcTimeStampList(); // 타임스탬프 저장
     }
-  }, [videoInfo]);
+  }, [calcTimeStampList, videoInfo]);
+
+  /**
+   * videoRef에 이벤트를 등록합니다.
+   */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (videoInfo && video) video.addEventListener("timeupdate", handleTimeUpdate);
+
+    return () => {
+      if (video) video.addEventListener("timeupdate", handleTimeUpdate);
+    };
+  }, [handleTimeUpdate, videoInfo]);
 
   /**
    * 화면 크기에 맞춰 video 크기를 계산합니다.
@@ -165,6 +205,7 @@ const LearnPage2 = () => {
   }, [state]);
 
   // READY 상태 업데이트
+  // 카운트다운 시작 및 종료 시점을 감지합니다.
   useEffect(() => {
     let timer = timerRef.current;
 
@@ -217,18 +258,15 @@ const LearnPage2 = () => {
       <Main>
         <TimestampSection ref={timestampSectionRef}>
           <TimestampList>
-            <Timestamp $active onClick={handleClickTimestamp} value={0}>
-              0:00
-            </Timestamp>
-            <Timestamp $active={false} onClick={handleClickTimestamp} value={5}>
-              0:05
-            </Timestamp>
-            <Timestamp $active={false} onClick={handleClickTimestamp} value={10}>
-              0:10
-            </Timestamp>
-            <Timestamp $active={false} onClick={handleClickTimestamp} value={15}>
-              0:15
-            </Timestamp>
+            {/* TODO: 0:00 형태로 innerText 수정 */}
+            {timestampList.map(
+              (time, idx) =>
+                videoRef.current && (
+                  <Timestamp key={idx} $active={idx === currTimestampIdx} onClick={handleClickTimestamp} value={time}>
+                    {time}
+                  </Timestamp>
+                )
+            )}
           </TimestampList>
         </TimestampSection>
         <VideoSection>
