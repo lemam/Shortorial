@@ -151,8 +151,6 @@ const LearnPage2 = () => {
     const size = videoInfo.shortsTime / TIMESTAMP_INTERVAL;
     const timeArr = Array.from({ length: size }, (_, idx) => idx * TIMESTAMP_INTERVAL);
     setTimestampList(timeArr);
-
-    console.log(timeArr);
   }, [videoInfo]);
 
   // 숫자(초)를 0:00 형식으로 바꾼 문자열을 반환합니다.
@@ -210,10 +208,13 @@ const LearnPage2 = () => {
 
   // PUASE 상태 업데이트
   useEffect(() => {
-    if (state === "PAUSE") {
-      videoRef.current?.pause();
+    const video = videoRef.current;
+
+    if (state === "PAUSE" && video) {
+      video.pause();
+      video.currentTime = timestampList[currTimestampIdx];
     }
-  }, [state]);
+  }, [currTimestampIdx, state, timestampList]);
 
   // READY 상태 업데이트
   // 카운트다운 시작 및 종료 시점을 감지합니다.
