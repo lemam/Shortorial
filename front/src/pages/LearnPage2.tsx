@@ -367,6 +367,10 @@ const Main = styled(Container)`
 const TimestampSection = styled.div`
   position: relative;
   padding: 0 24px;
+
+  @media screen and (max-width: ${mediaSize.medium}px) {
+    padding: 16px 24px;
+  }
 `;
 
 const TimestampList = styled.li`
@@ -386,11 +390,15 @@ const TimestampList = styled.li`
 
 const Timestamp = styled.button<{ $active: boolean }>`
   width: 100%;
-  height: 40px;
+  height: 50px;
   margin: 8px 0;
   border-radius: 4px;
   background-color: ${props => (props.$active ? "#FF95BD50" : "#353535")};
   border: 1px solid ${props => (props.$active ? "#FB2576" : "#808080")};
+
+  @media screen and (max-width: ${mediaSize.medium}px) {
+    margin: 0 4px;
+  }
 `;
 
 const VideoSection = styled.section`
@@ -436,15 +444,7 @@ const MotionButtonList = styled.div`
   position: absolute;
   top: 0;
   right: 0;
-  padding: 0 8px;
-  /* display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
-  width: 100%;
-  height: 50%;
-  margin: 16px 0;
-   */
+  padding: 24px 8px 0;
 `;
 
 const Timer = styled.div`
