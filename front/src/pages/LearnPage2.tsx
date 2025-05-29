@@ -44,6 +44,8 @@ const LearnPage2 = () => {
 
   const [timestampList, setTimestampList] = useState<number[]>([]);
   const [currTimestampIdx, setCurrTimestampIdx] = useState<number>(0); // 현재 타임스탬프 인덱스
+  const [repeatTimestampIdx, setRepeatTimestampIdx] = useState<number>(0); // 구간 반복할 타임스탬프 인덱스
+  const [canRepeat, setCanRepeat] = useState<boolean>(false);
 
   const TIMER = 3;
   const [currentTimer, setCurrentTimer] = useState<number>(TIMER);
@@ -100,8 +102,10 @@ const LearnPage2 = () => {
 
   // 재생 버튼 클릭 이벤트 핸들러
   const handleClickPlayButton = () => {
-    if (state === "PAUSE") setState("READY");
-    else setState("PAUSE");
+    if (state === "PAUSE") {
+      if (isRepeating) setRepeatTimestampIdx(currTimestampIdx); // 반복할 구간 저장
+      setState("READY");
+    } else setState("PAUSE");
   };
 
   // 반복 버튼 클릭 이벤트 핸들러
@@ -128,7 +132,8 @@ const LearnPage2 = () => {
 
   // 타임스탬프 버튼 클릭 이벤트 핸들러
   function handleClickTimestamp(event: React.MouseEvent<HTMLButtonElement>): void {
-    if (videoRef.current) {
+    // PAUSE 상태일 때만 클릭할 수 있습니다.
+    if (state === "PAUSE" && videoRef.current) {
       videoRef.current.currentTime = Number(event.currentTarget.value); // 클릭한 시간으로 영상 이동
     }
   }
@@ -136,19 +141,32 @@ const LearnPage2 = () => {
   // Video TimeUpdate 이벤트 핸들러
   const handleTimeUpdate = useCallback(() => {
     if (videoRef.current) {
-      console.log(videoRef.current.currentTime);
-
       // 현재 재생 시간에 해당하는 타임 스탬프 인덱스 계산
       const idx = Math.floor(videoRef.current.currentTime / TIMESTAMP_INTERVAL);
-      if (currTimestampIdx !== idx) setCurrTimestampIdx(idx);
+      setCurrTimestampIdx(prev => (prev !== idx ? idx : prev));
     }
-  }, [currTimestampIdx]);
+  }, []);
+
+  // Video Ended 이벤트 핸들러
+  const handleEnded = useCallback(() => {
+    const video = videoRef.current;
+
+    if (state === "PLAY" && video) {
+      // 구간 반복인 경우 마지막 구간 반복
+      if (isRepeating) {
+        video.currentTime = timestampList[repeatTimestampIdx];
+        video.play();
+      } else {
+        setState("PAUSE");
+      }
+    }
+  }, [isRepeating, repeatTimestampIdx, state, timestampList]);
 
   // 현재 로딩된 영상의 타임스탬프 리스트를 생성하여 저장합니다.
   const calcTimeStampList = useCallback(() => {
     if (!videoInfo) return;
 
-    const size = videoInfo.shortsTime / TIMESTAMP_INTERVAL;
+    const size = Math.ceil(videoInfo.shortsTime / TIMESTAMP_INTERVAL);
     const timeArr = Array.from({ length: size }, (_, idx) => idx * TIMESTAMP_INTERVAL);
     setTimestampList(timeArr);
   }, [videoInfo]);
@@ -177,6 +195,7 @@ const LearnPage2 = () => {
    */
   useEffect(() => {
     const video = videoRef.current;
+
     if (videoInfo && video) {
       setState("PAUSE");
       calcTimeStampList(); // 타임스탬프 저장
@@ -188,12 +207,19 @@ const LearnPage2 = () => {
    */
   useEffect(() => {
     const video = videoRef.current;
-    if (videoInfo && video) video.addEventListener("timeupdate", handleTimeUpdate);
+
+    if (videoInfo && video) {
+      video.addEventListener("timeupdate", handleTimeUpdate);
+      video.addEventListener("ended", handleEnded);
+    }
 
     return () => {
-      if (video) video.addEventListener("timeupdate", handleTimeUpdate);
+      if (video) {
+        video.removeEventListener("timeupdate", handleTimeUpdate);
+        video.removeEventListener("ended", handleEnded);
+      }
     };
-  }, [handleTimeUpdate, videoInfo]);
+  }, [handleEnded, handleTimeUpdate, videoInfo]);
 
   /**
    * 화면 크기에 맞춰 video 크기를 계산합니다.
@@ -212,7 +238,6 @@ const LearnPage2 = () => {
 
     if (state === "PAUSE" && video) {
       video.pause();
-      video.currentTime = timestampList[currTimestampIdx];
     }
   }, [currTimestampIdx, state, timestampList]);
 
@@ -255,6 +280,25 @@ const LearnPage2 = () => {
       }
     }
   }, [playSpeed, state]);
+
+  /**
+   * 구간 반복 기능을 위해 현재 시간이 설정해둔 반복 구간을 넘어가는지 상태를 체크합니다.
+   * 넘어갔다면 repeatFlag를 true로 설정합니다.
+   */
+  useEffect(() => {
+    if (state === "PLAY" && isRepeating) {
+      if (currTimestampIdx > repeatTimestampIdx) {
+        setCanRepeat(true);
+      }
+    }
+  }, [currTimestampIdx, isRepeating, repeatTimestampIdx, state]);
+
+  // 구간 반복
+  useEffect(() => {
+    if (!canRepeat || !videoRef.current) return;
+    videoRef.current.currentTime = timestampList[repeatTimestampIdx];
+    setCanRepeat(false);
+  }, [canRepeat, repeatTimestampIdx, timestampList]);
 
   return (
     <Container>
@@ -299,7 +343,7 @@ const LearnPage2 = () => {
                 {state === "PAUSE" && (
                   <>
                     <VideoMotionButton2
-                      icon={isRepeating ? <TbRepeatOff size={24} /> : <TbRepeat size={24} />}
+                      icon={isRepeating ? <TbRepeat size={24} /> : <TbRepeatOff size={24} />}
                       onClick={handleClickRepeatButton}
                     />
                     <VideoMotionButton2 icon={<Flip />} onClick={handleClickFlipButton} />
