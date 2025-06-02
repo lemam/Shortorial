@@ -9,6 +9,7 @@ import VideoMotionButton2 from "../components/button/VideoMotionButton2";
 
 import { getShortsInfo } from "../apis/shorts";
 import useCameraStore from "../store/useCameraStore";
+import useMotionButtonStore from "../store/useMotionButtonStore";
 import { Shorts } from "../constants/types";
 
 type LearnState = "INIT" | "PAUSE" | "READY" | "PLAY";
@@ -46,6 +47,9 @@ const LearnPage2 = () => {
   const [currTimestampIdx, setCurrTimestampIdx] = useState<number>(0); // 현재 타임스탬프 인덱스
   const [repeatTimestampIdx, setRepeatTimestampIdx] = useState<number>(0); // 구간 반복할 타임스탬프 인덱스
   const [canRepeat, setCanRepeat] = useState<boolean>(false);
+
+  const buttonRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { setButtons } = useMotionButtonStore();
 
   const TIMER = 3;
   const [currentTimer, setCurrentTimer] = useState<number>(TIMER);
@@ -182,6 +186,31 @@ const LearnPage2 = () => {
     return `${minutes}:${formatedSeconds}`;
   };
 
+  // 모션 캡처 버튼의 정보를 store에 저장합니다.
+  const initMotionButtons = useCallback(() => {
+    const buttons = buttonRefs.current;
+
+    if (buttons) {
+      const buttonList = buttons
+        .map((button, idx) => {
+          if (!button) return null;
+
+          return {
+            // TODO: 상대값으로 저장됨 컨테이너 안에서의 위치로 조정하기
+            minX: videoSize.width - button.offsetLeft - button.offsetWidth,
+            maxX: videoSize.width - button.offsetLeft,
+            minY: button.offsetTop,
+            maxY: button.offsetTop + button.offsetHeight,
+            click: () => console.log(idx),
+            // click: buttonClickActions[motionButtons[idx].action],
+          };
+        })
+        .filter(el => el != null);
+
+      setButtons(buttonList);
+    }
+  }, [setButtons, videoSize]);
+
   /**
    * 컴포넌트가 마운트 되고 난 후, 영상의 데이터를 가져와 저장합니다.
    */
@@ -201,6 +230,15 @@ const LearnPage2 = () => {
       calcTimeStampList(); // 타임스탬프 저장
     }
   }, [calcTimeStampList, videoInfo]);
+
+  /**
+   * load 이벤트를 등록합니다.
+   */
+  useEffect(() => {
+    window.addEventListener("load", initMotionButtons);
+
+    return () => window.removeEventListener("load", initMotionButtons);
+  }, [initMotionButtons]);
 
   /**
    * videoRef에 이벤트를 등록합니다.
@@ -337,18 +375,37 @@ const LearnPage2 = () => {
               <MotionCameraTest />
               <MotionButtonList>
                 <VideoMotionButton2
+                  idx={0}
+                  ref={el => (buttonRefs.current[0] = el)}
                   icon={state === "PAUSE" ? <PlayArrow /> : <Pause />}
                   onClick={handleClickPlayButton}
                 />
                 {state === "PAUSE" && (
                   <>
                     <VideoMotionButton2
+                      idx={1}
+                      ref={el => (buttonRefs.current[1] = el)}
                       icon={isRepeating ? <TbRepeat size={24} /> : <TbRepeatOff size={24} />}
                       onClick={handleClickRepeatButton}
                     />
-                    <VideoMotionButton2 icon={<Flip />} onClick={handleClickFlipButton} />
-                    <VideoMotionButton2 icon={`${playSpeed}x`} onClick={handleClickSpeedButton} />
-                    <VideoMotionButton2 icon={<Videocam />} onClick={handleClickChallengeButton} />
+                    <VideoMotionButton2
+                      idx={2}
+                      ref={el => (buttonRefs.current[2] = el)}
+                      icon={<Flip />}
+                      onClick={handleClickFlipButton}
+                    />
+                    <VideoMotionButton2
+                      idx={3}
+                      ref={el => (buttonRefs.current[3] = el)}
+                      icon={`${playSpeed}x`}
+                      onClick={handleClickSpeedButton}
+                    />
+                    <VideoMotionButton2
+                      idx={4}
+                      ref={el => (buttonRefs.current[4] = el)}
+                      icon={<Videocam />}
+                      onClick={handleClickChallengeButton}
+                    />
                   </>
                 )}
               </MotionButtonList>

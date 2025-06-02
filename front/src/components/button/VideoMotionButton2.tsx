@@ -1,29 +1,26 @@
+import React from "react";
 import styled from "styled-components";
+import useMotionButtonStore from "../../store/useMotionButtonStore";
 
 interface MotionButtonProps {
+  idx: number;
+  ref?: React.LegacyRef<HTMLDivElement>;
   icon: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
-const VideoMotionButton2 = ({ icon, onClick }: MotionButtonProps) => {
+const VideoMotionButton2 = React.forwardRef<HTMLDivElement, MotionButtonProps>(({ idx, icon, onClick }, ref) => {
+  const { getProgress, getActiveButtonId } = useMotionButtonStore();
+
   return (
-    <ControlButtonContainer
-      // ref={button => (buttonRefs.current[0] = button)}
-      onClick={onClick}
-    >
+    <ControlButtonContainer ref={ref} onClick={onClick}>
       <ControlButton>{icon}</ControlButton>
       <CircleWrapper viewBox="0 0 60 60">
-        <CircleProgress
-          cx={30}
-          cy={30}
-          r={28}
-          // progress={0 === getActiveButtonId() ? getProgress() : 0}
-          progress={30}
-        />
+        <CircleProgress cx={30} cy={30} r={28} progress={idx === getActiveButtonId() ? getProgress() : 0} />
       </CircleWrapper>
     </ControlButtonContainer>
   );
-};
+});
 
 export default VideoMotionButton2;
 
