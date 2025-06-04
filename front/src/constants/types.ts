@@ -50,5 +50,4 @@ export interface MotionButton {
   maxX: number;
   minY: number;
   maxY: number;
-  click: () => void;
 }

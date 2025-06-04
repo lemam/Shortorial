@@ -49,7 +49,9 @@ const LearnPage2 = () => {
   const [canRepeat, setCanRepeat] = useState<boolean>(false);
 
   const buttonRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const { setButtons } = useMotionButtonStore();
+  const { setButtons, getClickButtonId, getIsClicked, setIsClicked } = useMotionButtonStore();
+  const clickButtonId = getClickButtonId(); // 클릭할 버튼 id
+  const isClicked = getIsClicked(); // 버튼 클릭 여부
 
   const TIMER = 3;
   const [currentTimer, setCurrentTimer] = useState<number>(TIMER);
@@ -105,12 +107,12 @@ const LearnPage2 = () => {
   }, [videoInfo]);
 
   // 재생 버튼 클릭 이벤트 핸들러
-  const handleClickPlayButton = () => {
+  const handleClickPlayButton = useCallback(() => {
     if (state === "PAUSE") {
       if (isRepeating) setRepeatTimestampIdx(currTimestampIdx); // 반복할 구간 저장
       setState("READY");
     } else setState("PAUSE");
-  };
+  }, [currTimestampIdx, isRepeating, state]);
 
   // 반복 버튼 클릭 이벤트 핸들러
   const handleClickRepeatButton = () => {
@@ -123,16 +125,16 @@ const LearnPage2 = () => {
   };
 
   // 속도 버튼 클릭 이벤트 핸들러
-  const handleClickSpeedButton = () => {
+  const handleClickSpeedButton = useCallback(() => {
     const speeds = [1, 0.75, 0.5];
     const idx = speeds.findIndex(el => el === playSpeed);
     setPlaySpeed(speeds[(idx + 1) % speeds.length]);
-  };
+  }, [playSpeed]);
 
   // 챌린지 이동 버튼 클릭 이벤트 핸들러
-  const handleClickChallengeButton = () => {
+  const handleClickChallengeButton = useCallback(() => {
     navigate(`/challenge/${params.shortsNo}`);
-  };
+  }, [navigate, params.shortsNo]);
 
   // 타임스탬프 버튼 클릭 이벤트 핸들러
   function handleClickTimestamp(event: React.MouseEvent<HTMLButtonElement>): void {
@@ -186,23 +188,53 @@ const LearnPage2 = () => {
     return `${minutes}:${formatedSeconds}`;
   };
 
+  // 모션 버튼들의 클릭 감지 후 실행
+  useEffect(() => {
+    if (clickButtonId >= 0 && !isClicked) {
+      switch (clickButtonId) {
+        case 0:
+          handleClickPlayButton();
+          break;
+        case 1:
+          handleClickRepeatButton();
+          break;
+        case 2:
+          handleClickFlipButton();
+          break;
+        case 3:
+          handleClickSpeedButton();
+          break;
+        case 4:
+          handleClickChallengeButton();
+          break;
+      }
+
+      setIsClicked(true); // 무한 클릭 방지
+    }
+  }, [
+    clickButtonId,
+    isClicked,
+    getClickButtonId,
+    setIsClicked,
+    handleClickChallengeButton,
+    handleClickPlayButton,
+    handleClickSpeedButton,
+  ]);
+
   // 모션 캡처 버튼의 정보를 store에 저장합니다.
   const initMotionButtons = useCallback(() => {
     const buttons = buttonRefs.current;
 
     if (buttons) {
       const buttonList = buttons
-        .map((button, idx) => {
+        .map(button => {
           if (!button) return null;
 
           return {
-            // TODO: 상대값으로 저장됨 컨테이너 안에서의 위치로 조정하기
             minX: videoSize.width - button.offsetLeft - button.offsetWidth,
             maxX: videoSize.width - button.offsetLeft,
             minY: button.offsetTop,
             maxY: button.offsetTop + button.offsetHeight,
-            click: () => console.log(idx),
-            // click: buttonClickActions[motionButtons[idx].action],
           };
         })
         .filter(el => el != null);

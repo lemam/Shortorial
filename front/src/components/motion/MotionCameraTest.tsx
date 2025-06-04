@@ -20,7 +20,8 @@ function MotionCameraTest() {
   const SMOOTHING_FACTOR = 0.8;
 
   const { setUserPermission } = useCameraStore();
-  const { getButtons, setProgress, getProgress, setActiveButtonId } = useMotionButtonStore();
+  const { getButtons, setProgress, getProgress, setActiveButtonId, setClickButtonId, setIsClicked, getIsClicked } =
+    useMotionButtonStore();
 
   const HOVER_DURATION_MS = 3000; // 모션 버튼 접촉 지속 시간(ms)
 
@@ -133,12 +134,8 @@ function MotionCameraTest() {
                     setProgress(progress);
 
                     // 진행이 완료되면 버튼을 활성화한다.
-                    if (hoverStartTime && getProgress() >= 100) {
-                      // TODO: 버튼이 무한정 클릭된다. 밖으로 나가기 전까지 한 번만 실행되었으면 좋겠다.
-                      // 이를 해결하기 위해 boolean으로 상태 플래그를 세우는 방법이 있다.
-                      // 그리고 진행도 변수와 처리도 스토어에 전부 저장할지 고민해봐야겠다.
-
-                      button.click();
+                    if (hoverStartTime && getProgress() >= 100 && !getIsClicked()) {
+                      setClickButtonId(index);
                       hoverStartTime.current = 0;
                     }
                   }
@@ -160,6 +157,8 @@ function MotionCameraTest() {
                     hoverStartTime.current = 0;
                     setProgress(0);
                     setActiveButtonId(-1);
+                    setClickButtonId(-1);
+                    setIsClicked(false);
                   }
                 }
               }
@@ -181,7 +180,16 @@ function MotionCameraTest() {
     return () => {
       video.removeEventListener("loadeddata", detectPose);
     };
-  }, [getButtons, getProgress, poseLandmarker, setActiveButtonId, setProgress]);
+  }, [
+    poseLandmarker,
+    getButtons,
+    getIsClicked,
+    getProgress,
+    setActiveButtonId,
+    setClickButtonId,
+    setIsClicked,
+    setProgress,
+  ]);
 
   return (
     <>
