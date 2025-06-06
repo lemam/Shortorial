@@ -188,39 +188,6 @@ const LearnPage2 = () => {
     return `${minutes}:${formatedSeconds}`;
   };
 
-  // 모션 버튼들의 클릭 감지 후 실행
-  useEffect(() => {
-    if (clickButtonId >= 0 && !isClicked) {
-      switch (clickButtonId) {
-        case 0:
-          handleClickPlayButton();
-          break;
-        case 1:
-          handleClickRepeatButton();
-          break;
-        case 2:
-          handleClickFlipButton();
-          break;
-        case 3:
-          handleClickSpeedButton();
-          break;
-        case 4:
-          handleClickChallengeButton();
-          break;
-      }
-
-      setIsClicked(true); // 무한 클릭 방지
-    }
-  }, [
-    clickButtonId,
-    isClicked,
-    getClickButtonId,
-    setIsClicked,
-    handleClickChallengeButton,
-    handleClickPlayButton,
-    handleClickSpeedButton,
-  ]);
-
   // 모션 캡처 버튼의 정보를 store에 저장합니다.
   const initMotionButtons = useCallback(() => {
     const buttons = buttonRefs.current;
@@ -369,6 +336,39 @@ const LearnPage2 = () => {
     videoRef.current.currentTime = timestampList[repeatTimestampIdx];
     setCanRepeat(false);
   }, [canRepeat, repeatTimestampIdx, timestampList]);
+
+  // 모션 버튼들의 클릭 감지 후 실행
+  useEffect(() => {
+    if (clickButtonId >= 0 && !isClicked) {
+      switch (clickButtonId) {
+        case 0:
+          handleClickPlayButton();
+          break;
+        case 1:
+          handleClickRepeatButton();
+          break;
+        case 2:
+          handleClickFlipButton();
+          break;
+        case 3:
+          handleClickSpeedButton();
+          break;
+        case 4:
+          handleClickChallengeButton();
+          break;
+      }
+
+      setIsClicked(true); // 무한 클릭 방지
+    }
+  }, [
+    clickButtonId,
+    isClicked,
+    getClickButtonId,
+    setIsClicked,
+    handleClickChallengeButton,
+    handleClickPlayButton,
+    handleClickSpeedButton,
+  ]);
 
   return (
     <Container>
