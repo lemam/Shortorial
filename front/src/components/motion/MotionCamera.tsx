@@ -1,123 +1,214 @@
-import { NormalizedLandmark, DrawingUtils } from "@mediapipe/tasks-vision";
-import { useEffect } from "react";
-import { createPoseLandmarker, predictWebcam } from "../../modules/Motion";
-import { useBtnStore, useActionStore } from "../../store/useMotionStore";
-import { styled } from "styled-components";
+import { DrawingUtils, FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
+import { useCallback, useEffect, useRef, useState } from "react";
+import useCameraStore from "../../store/useCameraStore";
+import styled from "styled-components";
+import useMotionButtonStore from "../../store/useMotionButtonStore";
+import { MotionButton } from "../../constants/types";
 
-interface MotionCameraType {
-  width: number;
-  height: number;
-  className: string;
-  autoPlay: boolean;
-  isCanvas: boolean;
-}
+function MotionCamera() {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-export default function MotionCamera({
-  width,
-  height,
-  className,
-  autoPlay,
-  isCanvas,
-}: MotionCameraType) {
-  const { setBtn } = useBtnStore();
-  const { setAction } = useActionStore();
+  const [poseLandmarker, setPoseLandmarker] = useState<PoseLandmarker | null>(null);
 
-  // console.log(isCanvas);
+  // 모션 버튼의 감지 관련 변수들
+  const hoverStartTime = useRef(0);
+  const hoveredButton = useRef<MotionButton | null>(null);
+
+  // 모션 캡처의 부드러운 움직임을 위한 설정 값
+  const lastPosition = useRef({ x: 0, y: 0 });
+  const SMOOTHING_FACTOR = 0.8;
+
+  const { setUserPermission } = useCameraStore();
+  const { getButtons, setProgress, getProgress, setActiveButtonId, setClickButtonId, setIsClicked, getIsClicked } =
+    useMotionButtonStore();
+
+  const HOVER_DURATION_MS = 3000; // 모션 버튼 접촉 지속 시간(ms)
+
+  // 포즈 랜드마크 초기화
+  const createPoseLandmarker = async () => {
+    // WASM 파일을 로드하여 Vision Tasks를 실행하기 위한 준비를 한다.
+    const vision = await FilesetResolver.forVisionTasks(
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+    );
+
+    // 포즈 랜드마크 추정기 생성
+    const poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task`,
+        delegate: "GPU",
+      },
+      runningMode: "VIDEO", // 동영상에서 작업 실행
+      numPoses: 1, // 감지할 수 있는 최대 포즈(사람) 수
+    });
+
+    console.log("랜드마크 초기화 완료");
+    setPoseLandmarker(poseLandmarker);
+  };
+
+  // 카메라 접근 권한을 받은 후 video에 할당한다.
+  const initCamera = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { aspectRatio: 9 / 16 } });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    } catch (error) {
+      console.log("카메라 접근 실패:", error);
+      setUserPermission(false);
+    }
+  }, [setUserPermission]);
+
+  // 카메라, 포즈 랜드마크 초기화
   useEffect(() => {
-    // 모델 초기화
+    const video = videoRef.current;
     createPoseLandmarker();
-    const canvasElement = document.getElementById("canvas") as HTMLCanvasElement | null;
-    let canvasCtx: CanvasRenderingContext2D | null = null;
-    // 그리기 도구
-    let drawingUtils: DrawingUtils | null = null;
+    initCamera();
 
-    if (canvasElement) canvasCtx = canvasElement.getContext("2d");
-    if (canvasCtx) drawingUtils = new DrawingUtils(canvasCtx);
+    return () => {
+      // 컴포넌트가 언마운트되면 미디어 스트림 해제
+      if (video && video.srcObject) {
+        const tracks = (video.srcObject as MediaStream).getTracks();
+        tracks.forEach(track => track.stop());
+      }
+    };
+  }, [initCamera]);
 
-    // camera가 있을 HTML
-    const webcam = document.getElementById("webcam") as HTMLVideoElement | null;
-    // 최종 그림이 나갈 HTML
+  // 포즈 감지하고 캔버스에 출력
+  useEffect(() => {
+    if (!poseLandmarker || !videoRef.current || !canvasRef.current) return;
 
-    // 카메라가 있는지 확인
-    const isGetUserMedia = () => !!navigator.mediaDevices?.getUserMedia;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
 
-    // 모션인식 코드
-    const lastWebcamTime = -1;
-    const before_handmarker: NormalizedLandmark | null = null;
-    const curr_handmarker: NormalizedLandmark | null = null;
+    const detectPose = async () => {
+      if (!poseLandmarker || !video) return;
 
-    // 카메라가 있으면 작동 - 페이지 접근시 바로 카메라 켜지고 화면에 보이도록 설정
-    if (isGetUserMedia() && webcam) {
-      // getUsermedia parameters.
-      const constraints: MediaStreamConstraints = {
-        video: {
-          aspectRatio: 9 / 16,
-        },
-        audio: false,
-      };
+      // 캔버스 프레임 크기 설정
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
-      // 카메라 스트리밍 시작 + 모션인식
-      navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-        if (webcam) {
-          webcam.srcObject = stream;
-          webcam.addEventListener("loadeddata", () =>
-            predictWebcam(
-              "learn",
-              webcam,
-              canvasCtx,
-              canvasElement,
-              drawingUtils,
-              lastWebcamTime,
-              before_handmarker,
-              curr_handmarker,
-              setBtn,
-              setAction
-            )
-          );
+      // 포즈 감지
+      const results = poseLandmarker.detectForVideo(video, performance.now());
+
+      // 캔버스에 렌더링
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (results.landmarks) {
+          const drawingUtils = new DrawingUtils(ctx);
+
+          results.landmarks.forEach(landmark => {
+            // 카메라 좌우반전에 따른 랜드마크 위치 재계산
+            const flipLandmark = landmark.map(point => {
+              const temp = { ...point };
+              temp.x = 1 - temp.x;
+              return temp;
+            });
+
+            // 오른쪽 새끼손가락 랜드마크를 기준으로 70% 이상 화면에 보이면
+            if (flipLandmark[18].visibility >= 0.7) {
+              // 손 랜드마크를 픽셀 단위 좌표로 변환
+              // 노이즈를 줄이기 위한 이전 값을 이용한 평균 값
+              const handX =
+                SMOOTHING_FACTOR * lastPosition.current.x +
+                (1 - SMOOTHING_FACTOR) * flipLandmark[18].x * canvas.offsetWidth;
+              const handY =
+                SMOOTHING_FACTOR * lastPosition.current.y +
+                (1 - SMOOTHING_FACTOR) * flipLandmark[18].y * canvas.offsetHeight;
+
+              lastPosition.current = { x: handX, y: handY };
+
+              const buttons = getButtons(); // 모션 버튼 리스트
+
+              // 모션 버튼 접촉 여부 확인
+              for (const [index, button] of buttons.entries()) {
+                // 1. 손에 버튼이 접촉한 경우
+                if (handX >= button.minX && handX <= button.maxX && handY >= button.minY && handY <= button.maxY) {
+                  // 이전에 저장한 버튼과 계속 접촉하고 있는 경우
+                  if (hoveredButton.current && button === hoveredButton.current) {
+                    // 진행도 저장
+                    const progress = Math.min(((Date.now() - hoverStartTime.current) / HOVER_DURATION_MS) * 100, 100);
+                    setProgress(progress);
+
+                    // 진행이 완료되면 버튼을 활성화한다.
+                    if (hoverStartTime && getProgress() >= 100 && !getIsClicked()) {
+                      setClickButtonId(index);
+                      hoverStartTime.current = 0;
+                    }
+                  }
+
+                  // 저장하지 않은 새로운 버튼과 접촉한 경우
+                  if (hoveredButton.current !== button) {
+                    // 새로운 hover button을 저장한다.
+                    hoveredButton.current = button;
+                    hoverStartTime.current = Date.now();
+                    setProgress(0);
+                    setActiveButtonId(index);
+                  }
+                }
+                // 2. 손에 접촉한 버튼이 없는 경우
+                else {
+                  // 이전에 저장한 버튼과 접촉이 이어지지 않았다면 hover button을 초기화한다.
+                  if (hoveredButton.current && button === hoveredButton.current) {
+                    hoveredButton.current = null;
+                    hoverStartTime.current = 0;
+                    setProgress(0);
+                    setActiveButtonId(-1);
+                    setClickButtonId(-1);
+                    setIsClicked(false);
+                  }
+                }
+              }
+            }
+
+            // 랜드마크 그리기
+            drawingUtils.drawLandmarks(flipLandmark, { radius: 5 });
+            drawingUtils.drawConnectors(flipLandmark, PoseLandmarker.POSE_CONNECTIONS);
+          });
         }
-      });
-    }
-    if (webcam) {
-      // const cleanup = () => {
-      //   const stream = webcam?.srcObject as MediaStream;
-      //   const tracks = stream?.getTracks();
-      //   tracks?.forEach((track) => track.stop());
-      //   webcam.srcObject = null;
-      // };
+      }
 
-      // window.addEventListener("popstate", cleanup);
-      return () => {
-        // cleanup();
-        // window.removeEventListener("popstate", cleanup);
-      };
-    }
-  }, [setBtn, setAction]);
+      // 연속적으로 프레임을 업데이트
+      requestAnimationFrame(detectPose);
+    };
+
+    video.addEventListener("loadeddata", detectPose);
+
+    return () => {
+      video.removeEventListener("loadeddata", detectPose);
+    };
+  }, [
+    poseLandmarker,
+    getButtons,
+    getIsClicked,
+    getProgress,
+    setActiveButtonId,
+    setClickButtonId,
+    setIsClicked,
+    setProgress,
+  ]);
 
   return (
-    <div id="motion">
-      <video
-        id="webcam"
-        width={width}
-        height={height}
-        className={className}
-        autoPlay={autoPlay}
-        playsInline
-      ></video>
-      <Canvas
-        id="canvas"
-        width={width}
-        height={height}
-        style={{ objectFit: "cover" }}
-        isCanvas={isCanvas}
-      ></Canvas>
-    </div>
+    <>
+      <Camera ref={videoRef} autoPlay playsInline></Camera>
+      <Canvas ref={canvasRef}></Canvas>
+    </>
   );
 }
 
-const Canvas = styled.canvas<{ isCanvas: boolean }>`
+const Camera = styled.video`
+  width: 100%;
+  transform: scaleX(-1);
+`;
+
+const Canvas = styled.canvas`
   position: absolute;
-  display: ${(props) => (props.isCanvas ? "flex" : "none")};
-  color: black;
   top: 0;
   left: 0;
+  width: 100%;
 `;
+
+export default MotionCamera;

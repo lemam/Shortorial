@@ -1,655 +1,584 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { Flip, Pause, PlayArrow, Repeat, Videocam, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Flip, Pause, PlayArrow, Videocam } from "@mui/icons-material";
+import { TbRepeat, TbRepeatOff } from "react-icons/tb";
 
-import SectionButtonList from "../components/buttonList/SectionButtonList";
 import MotionCamera from "../components/motion/MotionCamera";
-import VideoMotionButton from "../components/button/VideoMotionButton";
-import StarEffect from "../components/style/StarEffect";
+import VideoMotionButton2 from "../components/button/VideoMotionButton2";
 
-import useLearnStore from "../store/useLearnStore";
-import { useActionStore, useBtnStore, useMotionDetectionStore } from "../store/useMotionStore";
-import { useMotionLandmarkStore, useVideoLandmarkStore, useValueStore, useCountStore } from "../store/useAccStore";
-import { VideoSection, Shorts } from "../constants/types";
-import { predictVideo, setBtnInfo } from "../modules/Motion";
-import { Acc } from "../modules/Acc";
 import { getShortsInfo } from "../apis/shorts";
-import noRepeat from "/src/assets/icon/repeat-off.svg";
-import greatImage from "../assets/score/great.png";
-import goodImage from "../assets/score/good.png";
+import useCameraStore from "../store/useCameraStore";
+import useMotionButtonStore from "../store/useMotionButtonStore";
+import { Shorts } from "../constants/types";
+
+type LearnState = "INIT" | "PAUSE" | "READY" | "PLAY";
+
+interface Size {
+  width: number;
+  height: number;
+}
+
+const mediaSize = {
+  medium: 1024,
+  small: 640,
+};
+
+const TIMESTAMP_INTERVAL = 3; // 타임스탬프 구간 당 시간(초)
 
 const LearnPage = () => {
-  type LearnState = "INIT" | "PAUSE" | "READY" | "PLAY";
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const video = videoRef.current;
-  const leftSectionRef = useRef<HTMLDivElement>(null);
-  const centerSectionRef = useRef<HTMLDivElement>(null);
-
-  const [videoSize, setVideoSize] = useState({ width: 0, height: 0 });
-  const [centerSectionSize, setCenterSectionSize] = useState({
-    width: 0,
-    height: 0,
-  });
-
-  const [startFlag, setStartFlag] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const interval = intervalRef.current;
-
-  const navigate = useNavigate();
   const params = useParams();
+  const navigate = useNavigate();
+  const { userPermission } = useCameraStore();
 
   const [state, setState] = useState<LearnState>("INIT");
 
-  const [videoInfo, setVideoInfo] = useState<Shorts>({
-    shortsNo: 0,
-    shortsUrl: "",
-    shortsTitle: "",
-    shortsDirector: "",
-    shortsTime: 0,
-    shortsChallengers: 0,
-    shortsLink: "",
-    shortsDate: "",
-    musicName: "",
-    singerName: "",
-  });
+  const [videoInfo, setVideoInfo] = useState<Shorts | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [sectionList, setSectionList] = useState<VideoSection[]>([]);
+  const timestampSectionRef = useRef<HTMLDivElement>(null);
+  const [videoSize, setVideoSize] = useState<Size>({ width: 0, height: 0 });
 
-  const [currentTime, setCurrentTime] = useLearnStore(state => [state.currentTime, state.setCurrentTime]);
+  const [isRepeating, setIsRepeating] = useState<boolean>(false);
+  const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const [playSpeed, setPlaySpeed] = useState<number>(1);
 
-  const [timer, resetTimer, countdownTimer] = useLearnStore(state => [
-    state.timer,
-    state.resetTimer,
-    state.countdownTimer,
-  ]);
+  const [timestampList, setTimestampList] = useState<number[]>([]);
+  const [currTimestampIdx, setCurrTimestampIdx] = useState<number>(0); // 현재 타임스탬프 인덱스
+  const [repeatTimestampIdx, setRepeatTimestampIdx] = useState<number>(0); // 구간 반복할 타임스탬프 인덱스
+  const [canRepeat, setCanRepeat] = useState<boolean>(false);
 
-  const [isLooping, loopSection, setIsLooping, setLoopSection] = useLearnStore(state => [
-    state.isLooping,
-    state.loopSection,
-    state.setIsLooping,
-    state.setLoopSection,
-  ]);
+  const buttonRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { setButtons, getClickButtonId, getIsClicked, setIsClicked } = useMotionButtonStore();
+  const clickButtonId = getClickButtonId(); // 클릭할 버튼 id
+  const isClicked = getIsClicked(); // 버튼 클릭 여부
 
-  const [isFlipped, setIsFlipped] = useLearnStore(state => [state.isFlipped, state.setIsFlipped]);
+  const TIMER = 3;
+  const [currentTimer, setCurrentTimer] = useState<number>(TIMER);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [playSpeed, changePlaySpeed] = useLearnStore(state => [state.playSpeed, state.changePlaySpeed]);
+  // 쇼츠 영상 데이터 가져오기
+  const loadVideo = async (shortsNo: string) => {
+    const data: Shorts = await getShortsInfo(shortsNo);
+    if (data) setVideoInfo(data);
+  };
 
-  const currentSection = useLearnStore(state => state.currentSection);
-  // const setCurrentSection = useLearnStore((state) => state.setCurrentSection);
+  /**
+   * 화면 크기에 맞춰 비디오 요소의 크기를 계산합니다.
+   *
+   * 브라우저 전체 크기에서 TimestampSection 크기를 뺀 나머지 공간을 컨테이너라고 하겠습니다.
+   * 다시 말해, 컨테이너는 현재 사용할 수 있는 최대 넓이를 뜻합니다.
+   *
+   * 먼저 컨테이너의 가로, 세로 길이를 구합니다. (srcWidth, scrHeight)
+   * 그리고 위에서 구한 가로, 세로 길이 각각을 기준으로 하는 9:16 비율의 길이를 구합니다. (ratioWidth, ratioHeight)
+   *
+   * 마지막으로 컨테이너가 비율에 맞춰 계산한 값을 수용 가능한지 확인합니다.
+   * 컨테이너의 크기가 비율에 맞춰 계산한 값보다 큰 경우 비율에 맞춰 계산한 값을 적용할 수 있습니다.
+   * 그렇지 않은 경우, 스크린 밖으로 나가지 않도록 가로세로의 값을 조정합니다.
+   */
+  const calcVideoSize = useCallback(() => {
+    const section = timestampSectionRef.current;
 
-  const btn = useBtnStore(state => state.btn);
-  const action = useActionStore(state => state.action);
-  const [canAction, setCanAction] = useState(true);
+    if (section && videoInfo) {
+      let srcWidth = 0;
+      let srcHeight = 0;
 
-  const [playCount, challengeCount, repeatCount, flipCount, speedCount, canvasCount] = useMotionDetectionStore(
-    state => [
-      state.playCount,
-      state.challengeCount,
-      state.repeatCount,
-      state.flipCount,
-      state.speedCount,
-      state.canvasCount,
-    ]
-  );
+      // 컨테이너 크기 계산
+      if (window.innerWidth > mediaSize.medium) {
+        srcWidth = (window.innerWidth - section.offsetWidth) / 2;
+        srcHeight = section.offsetHeight;
+      } else {
+        srcWidth = section.offsetWidth;
+        srcHeight = window.innerHeight - section.offsetHeight;
 
-  // 영상 정보 가져오기
-  const loadVideo = useCallback(async () => {
-    if (params.shortsNo) {
-      const data: Shorts = await getShortsInfo(params.shortsNo);
-      if (data) {
-        setVideoInfo(data);
-        initSectionList(data.shortsTime);
+        if (window.innerWidth > mediaSize.small) srcWidth /= 2; // 미디어 사이즈가 medium인 경우
+      }
+
+      // 9:16 비율의 화면 크기 계산
+      const ratioWidth = (srcHeight * 9) / 16;
+      const ratioHeight = (srcWidth * 16) / 9;
+
+      // 컨테이너에 맞춰 크기 조정
+      const width = srcWidth >= ratioWidth ? ratioWidth : srcWidth;
+      const height = srcWidth >= ratioWidth ? srcHeight : ratioHeight;
+
+      setVideoSize({ width, height });
+    }
+  }, [videoInfo]);
+
+  // 재생 버튼 클릭 이벤트 핸들러
+  const handleClickPlayButton = useCallback(() => {
+    if (state === "PAUSE") {
+      if (isRepeating) setRepeatTimestampIdx(currTimestampIdx); // 반복할 구간 저장
+      setState("READY");
+    } else setState("PAUSE");
+  }, [currTimestampIdx, isRepeating, state]);
+
+  // 반복 버튼 클릭 이벤트 핸들러
+  const handleClickRepeatButton = () => {
+    setIsRepeating(prev => !prev);
+  };
+
+  // 거울 모드 버튼 클릭 이벤트 핸들러
+  const handleClickFlipButton = () => {
+    setIsFlipped(prev => !prev);
+  };
+
+  // 속도 버튼 클릭 이벤트 핸들러
+  const handleClickSpeedButton = useCallback(() => {
+    const speeds = [1, 0.75, 0.5];
+    const idx = speeds.findIndex(el => el === playSpeed);
+    setPlaySpeed(speeds[(idx + 1) % speeds.length]);
+  }, [playSpeed]);
+
+  // 챌린지 이동 버튼 클릭 이벤트 핸들러
+  const handleClickChallengeButton = useCallback(() => {
+    navigate(`/challenge/${params.shortsNo}`);
+  }, [navigate, params.shortsNo]);
+
+  // 타임스탬프 버튼 클릭 이벤트 핸들러
+  function handleClickTimestamp(event: React.MouseEvent<HTMLButtonElement>): void {
+    // PAUSE 상태일 때만 클릭할 수 있습니다.
+    if (state === "PAUSE" && videoRef.current) {
+      videoRef.current.currentTime = Number(event.currentTarget.value); // 클릭한 시간으로 영상 이동
+    }
+  }
+
+  // Video TimeUpdate 이벤트 핸들러
+  const handleTimeUpdate = useCallback(() => {
+    if (videoRef.current) {
+      // 현재 재생 시간에 해당하는 타임 스탬프 인덱스 계산
+      const idx = Math.floor(videoRef.current.currentTime / TIMESTAMP_INTERVAL);
+      setCurrTimestampIdx(prev => (prev !== idx ? idx : prev));
+    }
+  }, []);
+
+  // Video Ended 이벤트 핸들러
+  const handleEnded = useCallback(() => {
+    const video = videoRef.current;
+
+    if (state === "PLAY" && video) {
+      // 구간 반복인 경우 마지막 구간 반복
+      if (isRepeating) {
+        video.currentTime = timestampList[repeatTimestampIdx];
+        video.play();
+      } else {
         setState("PAUSE");
       }
     }
+  }, [isRepeating, repeatTimestampIdx, state, timestampList]);
+
+  // 현재 로딩된 영상의 타임스탬프 리스트를 생성하여 저장합니다.
+  const calcTimeStampList = useCallback(() => {
+    if (!videoInfo) return;
+
+    const size = Math.ceil(videoInfo.shortsTime / TIMESTAMP_INTERVAL);
+    const timeArr = Array.from({ length: size }, (_, idx) => idx * TIMESTAMP_INTERVAL);
+    setTimestampList(timeArr);
+  }, [videoInfo]);
+
+  // 숫자(초)를 0:00 형식으로 바꾼 문자열을 반환합니다.
+  const formatTime = (time: number) => {
+    if (!time) return "0:00";
+
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    const formatedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+    return `${minutes}:${formatedSeconds}`;
+  };
+
+  // 모션 캡처 버튼의 정보를 store에 저장합니다.
+  const initMotionButtons = useCallback(() => {
+    const buttons = buttonRefs.current;
+
+    if (buttons) {
+      const buttonList = buttons
+        .map(button => {
+          if (!button) return null;
+
+          return {
+            minX: videoSize.width - button.offsetLeft - button.offsetWidth,
+            maxX: videoSize.width - button.offsetLeft,
+            minY: button.offsetTop,
+            maxY: button.offsetTop + button.offsetHeight,
+          };
+        })
+        .filter(el => el != null);
+
+      setButtons(buttonList);
+    }
+  }, [setButtons, videoSize]);
+
+  /**
+   * 컴포넌트가 마운트 되고 난 후, 영상의 데이터를 가져와 저장합니다.
+   */
+  useEffect(() => {
+    if (params.shortsNo) loadVideo(params.shortsNo);
   }, [params.shortsNo]);
 
-  // 구간 리스트 초기화
-  const initSectionList = (videoLength: number) => {
-    const secondsPerSection = 3;
-    const numberOfSections = videoLength / secondsPerSection;
-    const result: VideoSection[] = [];
+  /**
+   * videoInfo와 videoRef가 로딩이 완료된 후 실행되는 이펙트입니다.
+   * 준비 완료 상태인 PAUSE 상태로 변환하고, 영상의 타임스탬프 리스트를 저장합니다.
+   */
+  useEffect(() => {
+    const video = videoRef.current;
 
-    for (let i = 0; i < numberOfSections; i++) {
-      result.push({
-        id: i,
-        start: i * secondsPerSection,
-        end: (i + 1) * secondsPerSection,
-        acc: 0,
-        maxAcc: 0,
-      });
-    }
-
-    setSectionList(result);
-  };
-
-  // 영상 시간 이동하기
-  const moveVideoTime = useCallback(
-    (startTime: number) => {
-      if (video) {
-        video.currentTime = startTime;
-        setCurrentTime(startTime);
-      }
-    },
-    [setCurrentTime, video]
-  );
-
-  // 타이머 인터벌 초기화
-  const initInterval = useCallback(() => {
-    if (interval) clearInterval(interval);
-    intervalRef.current = null;
-    resetTimer();
-  }, [interval, resetTimer]);
-
-  // 카운트다운 시작
-  const startCountdown = useCallback(() => {
-    if (interval) initInterval();
-    intervalRef.current = setInterval(countdownTimer, 1000);
-    setState("READY");
-  }, [countdownTimer, initInterval, interval]);
-
-  // 영상 재생
-  const playVideo = useCallback(() => {
-    if (video) {
-      if (video.ended) {
-        video.currentTime = 0;
-        setStartFlag(false);
-        setCurrentTime(0);
-      }
-
-      video.playbackRate = playSpeed;
-      video.play();
-      setState("PLAY");
-      if (!startFlag) {
-        setTimeout(() => {
-          setStartFlag(true);
-        }, 3000);
-      }
-    }
-  }, [playSpeed, setCurrentTime, video]);
-
-  // 영상 일시정지
-  const pauseVideo = useCallback(() => {
-    if (video) {
-      video.pause();
-      initInterval();
-      moveVideoTime(currentSection.start); // 현재 구간 시작 시간으로 이동
+    if (videoInfo && video) {
       setState("PAUSE");
-      setStartFlag(false);
-      // setAccFlag(false);
+      calcTimeStampList(); // 타임스탬프 저장
     }
-  }, [currentSection.start, initInterval, moveVideoTime, video]);
+  }, [calcTimeStampList, videoInfo]);
 
-  const [flag, setFlag] = useState(false);
-  // 영상의 현재 시간을 갱신, 반복인 경우 현재 시간 이전으로 되돌아가기
-  const handleTimeUpdate = useCallback(() => {
-    if (video) {
-      // 반복하지 않는 경우
-      if (!isLooping) {
-        console.log("not Loop");
-        setCurrentTime(video.currentTime);
-        if (video.ended) {
-          {
-            video.currentTime = 0;
-            setState("PAUSE");
-            setFlag(true);
-            setTimeout(() => {
-              setStartFlag(false);
-            }, 500);
-            // setAccFlag(false);
-          }
-        }
-        return;
-      }
-
-      // 반복하는 경우
-      else if (isLooping && loopSection) {
-        if (video.currentTime >= loopSection.end || video.ended) {
-          setFlag(true);
-          video.currentTime = loopSection.start;
-          setCurrentTime(loopSection.start);
-          if (video.ended) playVideo();
-          return;
-        }
-      }
-    }
-  }, [isLooping, loopSection, playVideo, setCurrentTime, video]);
-
-  // 구간 반복 토글
-  const toggleLooping = () => {
-    if (isLooping) {
-      setIsLooping(false);
-      setLoopSection(null);
-    } else {
-      setIsLooping(true);
-      setLoopSection(currentSection);
-    }
-  };
-
-  // 다음 구간으로 이동
-  const moveToNextSection = () => {
-    if (currentSection.id >= sectionList.length - 1) return;
-
-    if (video) {
-      const nextTime = sectionList[currentSection.id + 1].start;
-      video.currentTime = nextTime;
-      setCurrentTime(nextTime);
-    }
-  };
-
-  // 이전 구간으로 이동
-  const moveToPrevSection = () => {
-    if (currentSection.id <= 0) return;
-
-    if (video) {
-      const nextTime = sectionList[currentSection.id - 1].start;
-      video.currentTime = nextTime;
-      setCurrentTime(nextTime);
-    }
-  };
-
-  // 컴포넌트가 처음 마운트될 때 실행
+  /**
+   * load 이벤트를 등록합니다.
+   */
   useEffect(() => {
-    loadVideo();
-  }, [loadVideo]);
+    window.addEventListener("load", initMotionButtons);
 
-  // 비디오 크기 초기화
-  const initVideoSize = useCallback(() => {
-    const height = centerSectionSize.height;
-    const width = Math.floor((centerSectionSize.height * 9) / 16);
-    setVideoSize({ width, height });
-  }, [centerSectionSize.height]);
+    return () => window.removeEventListener("load", initMotionButtons);
+  }, [initMotionButtons]);
 
-  // Left Section 너비 반환
-  const getLeftSectionWidth = useCallback(() => {
-    if (leftSectionRef.current) {
-      const { width } = leftSectionRef.current.getBoundingClientRect() ?? 0;
-      return width;
+  /**
+   * videoRef에 이벤트를 등록합니다.
+   */
+  useEffect(() => {
+    const video = videoRef.current;
+
+    if (videoInfo && video) {
+      video.addEventListener("timeupdate", handleTimeUpdate);
+      video.addEventListener("ended", handleEnded);
     }
-  }, []);
-
-  // 화면 크기 바뀔 때마다 실행 - videoSize 초기화
-  const handleResize = useCallback(() => {
-    if (centerSectionRef.current) {
-      const { width, height } = centerSectionRef.current.getBoundingClientRect();
-      setCenterSectionSize({ width, height });
-      initVideoSize();
-    }
-  }, [initVideoSize]);
-
-  // window resize 이벤트 추가
-  useEffect(() => {
-    setTimeout(handleResize, 100);
-    window.addEventListener("resize", () => setTimeout(handleResize, 100));
-
-    return () => window.removeEventListener("resize", () => setTimeout(handleResize, 200));
-  }, [handleResize, initVideoSize]);
-
-  // 화면의 준비가 모두 완료했을 때 실행
-  useEffect(() => {
-    if (state === "INIT") {
-      if (videoInfo && sectionList && centerSectionRef) {
-        initInterval();
-      }
-    }
-  }, [centerSectionRef, initInterval, sectionList, state, videoInfo]);
-
-  // 카운트다운이 끝나면 영상 재생
-  useEffect(() => {
-    if (interval && timer <= 0) {
-      initInterval();
-      playVideo();
-    }
-  }, [initInterval, interval, playVideo, timer]);
-
-  useEffect(() => {
-    if (video) predictVideo(video);
-  }, []);
-
-  // 영상에 timeupdate 이벤트 추가
-  useEffect(() => {
-    if (video) video.addEventListener("timeupdate", handleTimeUpdate);
 
     return () => {
-      if (video) video.removeEventListener("timeupdate", handleTimeUpdate);
-    };
-  }, [handleTimeUpdate, video]);
-
-  // 영상 버튼 정보 가져오기
-  useEffect(() => {
-    setBtnInfo();
-  }, [centerSectionSize]);
-
-  // 영상 이동 액션 감지
-  useEffect(() => {
-    if (state !== "PAUSE") return;
-
-    switch (action) {
-      case "prev":
-        if (canAction) {
-          moveToPrevSection();
-          setCanAction(false);
-        }
-        break;
-      case "next":
-        if (canAction) {
-          moveToNextSection();
-          setCanAction(false);
-        }
-        break;
-      case "none":
-        setCanAction(true);
-        break;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [action]);
-
-  // 영상 버튼 모션 액션 감지
-  useEffect(() => {
-    switch (btn) {
-      case "play":
-        if (state === "PAUSE") startCountdown();
-        else pauseVideo();
-        break;
-      case "challenge":
-        if (state === "PAUSE") navigate(`/challenge/${params.shortsNo}`);
-        break;
-      case "repeat":
-        if (state === "PAUSE") toggleLooping();
-        break;
-      case "flip":
-        if (state === "PAUSE") setIsFlipped(!isFlipped);
-        break;
-      case "speed":
-        if (state === "PAUSE") changePlaySpeed();
-        break;
-      case "canvas":
-        console.log("canvas");
-        canvasSetting();
-        break;
-      default:
-        break;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [btn]);
-
-  const [isCanvas, setIsCanvas] = useState(false);
-
-  const canvasSetting = () => {
-    setIsCanvas(!isCanvas);
-  };
-
-  // landmark 정보
-  const videoLandmark = useVideoLandmarkStore.getState().videoLandmark;
-  const motionLandmark = useMotionLandmarkStore.getState().motionLandmark;
-  const [acc, setAcc] = useState(0);
-  const [accValue, setAccValue] = useValueStore(state => [state.accValue, state.setAccValue]);
-  const [count, setCount] = useCountStore(state => [state.count, state.setCount]);
-
-  const [scoreImage, setScoreImage] = useState("");
-  // 정확도 계산하기
-  useEffect(() => {
-    if (sectionList.length > 0 || state === "PAUSE") {
-      const sectionListTmp = sectionList;
-
-      if (currentSection.id > 0) {
-        sectionListTmp[currentSection.id - 1].maxAcc = Math.max(acc / count, sectionListTmp[currentSection.id - 1].acc);
-        sectionListTmp[currentSection.id - 1].acc = acc / count;
-      } else {
-        sectionListTmp[sectionListTmp.length - 1].maxAcc = Math.max(
-          acc / count,
-          sectionListTmp[sectionListTmp.length - 1].acc
-        );
-        sectionListTmp[sectionListTmp.length - 1].acc = acc / count;
+      if (video) {
+        video.removeEventListener("timeupdate", handleTimeUpdate);
+        video.removeEventListener("ended", handleEnded);
       }
-      settingImage(acc / count);
-      setSectionList(sectionListTmp);
-      setAccValue(0);
-      setCount(0);
-    }
-  }, [currentSection.id, state]);
+    };
+  }, [handleEnded, handleTimeUpdate, videoInfo]);
 
+  /**
+   * 화면 크기에 맞춰 video 크기를 계산합니다.
+   * resize 이벤트 리스너를 등록하여 브라우저 크기 변경 시에도 실행됩니다.
+   */
   useEffect(() => {
-    if (sectionList.length > 0 && flag) {
-      const sectionListTmp = sectionList;
-      sectionListTmp[currentSection.id].maxAcc = Math.max(acc / count, sectionListTmp[currentSection.id].acc);
-      sectionListTmp[currentSection.id].acc = acc / count;
-      console.log(sectionListTmp);
-      setSectionList(sectionListTmp);
-    }
-    settingImage(acc / count);
-    setAccValue(0);
-    setCount(0);
-    setFlag(false);
-  }, [flag]);
+    calcVideoSize();
+    window.addEventListener("resize", calcVideoSize);
 
-  const [isVisible, setIsVisible] = useState(false);
-  const settingImage = (score: number) => {
-    setIsVisible(true);
-    if (score > 40) {
-      setScoreImage(greatImage);
-    } else {
-      setScoreImage(goodImage);
-    }
-    setTimeout(() => {
-      setIsVisible(false);
-    }, 500);
-  };
+    return () => window.removeEventListener("resize", calcVideoSize);
+  }, [calcVideoSize]);
 
+  // PUASE 상태 업데이트
   useEffect(() => {
-    if (state !== "PLAY") {
-      setIsVisible(false);
+    const video = videoRef.current;
+
+    if (state === "PAUSE" && video) {
+      video.pause();
     }
+  }, [currTimestampIdx, state, timestampList]);
+
+  // READY 상태 업데이트
+  // 카운트다운 시작 및 종료 시점을 감지합니다.
+  useEffect(() => {
+    let timer = timerRef.current;
+
+    if (state === "READY") {
+      // 카운트다운 시작
+      timer = setInterval(() => {
+        setCurrentTimer(prev => {
+          // 카운트다운 완료 - Interval 해제 후 PLAY 상태로 변환
+          if (prev <= 1) {
+            if (timer) clearInterval(timer);
+            setState("PLAY");
+            return TIMER;
+          }
+
+          return prev - 1; // 1초 감소
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [state]);
-  useEffect(() => {
-    const fetchData = async () => {
-      if (videoLandmark && motionLandmark) {
-        setAcc(await Acc(videoLandmark, motionLandmark));
-        if (state === "PLAY") {
-          setAccValue(acc + accValue);
-          setCount(count + 1);
-        }
-      }
-    };
 
-    fetchData();
-  }, [videoLandmark, motionLandmark]);
+  // PLAY 상태 업데이트
+  useEffect(() => {
+    if (state === "PLAY") {
+      const video = videoRef.current;
+
+      // 영상 재생
+      if (video) {
+        if (video.ended) video.currentTime = 0;
+        video.playbackRate = playSpeed;
+        video.play();
+      }
+    }
+  }, [playSpeed, state]);
+
+  /**
+   * 구간 반복 기능을 위해 현재 시간이 설정해둔 반복 구간을 넘어가는지 상태를 체크합니다.
+   * 넘어갔다면 repeatFlag를 true로 설정합니다.
+   */
+  useEffect(() => {
+    if (state === "PLAY" && isRepeating) {
+      if (currTimestampIdx > repeatTimestampIdx) {
+        setCanRepeat(true);
+      }
+    }
+  }, [currTimestampIdx, isRepeating, repeatTimestampIdx, state]);
+
+  // 구간 반복
+  useEffect(() => {
+    if (!canRepeat || !videoRef.current) return;
+    videoRef.current.currentTime = timestampList[repeatTimestampIdx];
+    setCanRepeat(false);
+  }, [canRepeat, repeatTimestampIdx, timestampList]);
+
+  // 모션 버튼들의 클릭 감지 후 실행
+  useEffect(() => {
+    if (clickButtonId >= 0 && !isClicked) {
+      switch (clickButtonId) {
+        case 0:
+          handleClickPlayButton();
+          break;
+        case 1:
+          handleClickRepeatButton();
+          break;
+        case 2:
+          handleClickFlipButton();
+          break;
+        case 3:
+          handleClickSpeedButton();
+          break;
+        case 4:
+          handleClickChallengeButton();
+          break;
+      }
+
+      setIsClicked(true); // 무한 클릭 방지
+    }
+  }, [
+    clickButtonId,
+    isClicked,
+    getClickButtonId,
+    setIsClicked,
+    handleClickChallengeButton,
+    handleClickPlayButton,
+    handleClickSpeedButton,
+  ]);
 
   return (
     <Container>
-      <StarEffect numStars={80} />
-      {state === "INIT" ? (
-        <LoadingText>Loading...</LoadingText>
-      ) : (
-        <>
-          <LeftSection ref={leftSectionRef}>
-            <SectionButtonList
-              sectionList={sectionList}
-              parentWidth={getLeftSectionWidth()}
-              currentTime={currentTime}
-              isLooping={isLooping}
-              clickHandler={section => moveVideoTime(section.start)}
-            />
-          </LeftSection>
-          <CenterSection ref={centerSectionRef}>
-            <VideoContainer>
-              <video
-                width={videoSize.width}
-                height={videoSize.height}
-                src={videoInfo.shortsLink}
-                ref={videoRef}
-                className={isFlipped ? "flip" : ""}
-                crossOrigin="anonymous"
-              ></video>
-            </VideoContainer>
-            <VideoContainer id="dom">
-              <MotionCamera
-                width={videoSize.width}
-                height={videoSize.height}
-                className="camera flip"
-                autoPlay
-                isCanvas={isCanvas}
-              ></MotionCamera>
-              <Image src={scoreImage} $visible={isVisible && startFlag} />
-              <VideoMotionButtonList>
-                {state === "PAUSE" ? (
-                  <VideoMotionButton
-                    id="play"
-                    icon={<PlayArrow />}
-                    toolTip="재생"
-                    onClick={startCountdown}
-                    progress={playCount}
-                  />
-                ) : (
-                  <VideoMotionButton
-                    id="play"
-                    icon={<Pause />}
-                    toolTip="일시정지"
-                    onClick={pauseVideo}
-                    progress={playCount}
-                  />
-                )}
-                <FoldList>
-                  {isLooping ? (
-                    <VideoMotionButton
-                      id="repeat"
-                      icon={<Repeat />}
-                      toolTip="구간 반복 해제"
-                      onClick={toggleLooping}
-                      progress={repeatCount}
-                      isVisible={state === "PAUSE"}
-                    />
-                  ) : (
-                    <VideoMotionButton
-                      id="repeat"
-                      imgSrc={noRepeat}
-                      toolTip="구간 반복"
-                      onClick={toggleLooping}
-                      progress={repeatCount}
-                      isVisible={state === "PAUSE"}
-                    />
-                  )}
-                  <VideoMotionButton
-                    id="flip"
-                    icon={<Flip />}
-                    toolTip="거울 모드"
-                    onClick={() => setIsFlipped(!isFlipped)}
-                    progress={flipCount}
-                    isVisible={state === "PAUSE"}
-                  />
-                  <VideoMotionButton
-                    id="speed"
-                    text={`${playSpeed}x`}
-                    toolTip="재생 속도"
-                    onClick={changePlaySpeed}
-                    progress={speedCount}
-                    isVisible={state === "PAUSE"}
-                  />
-                  <VideoMotionButton
-                    id="challenge"
-                    icon={<Videocam />}
-                    toolTip="챌린지 모드로 이동"
-                    link={`/challenge/${params.shortsNo}`}
-                    progress={challengeCount}
-                    isVisible={state === "PAUSE"}
-                  />
-                  <VideoMotionButton
-                    id="canvasBtn"
-                    icon={isCanvas ? <VisibilityOff /> : <Visibility />}
-                    toolTip={isCanvas ? "가이드 해제" : "가이드 표시"}
-                    progress={canvasCount}
-                    isVisible={state === "PAUSE"}
-                    onClick={canvasSetting}
-                  />
-                </FoldList>
-              </VideoMotionButtonList>
-              {state === "READY" && <Timer>{timer}</Timer>}
-            </VideoContainer>
-          </CenterSection>
-          <RightSection></RightSection>
-        </>
+      {!userPermission && (
+        <CameraAlert>
+          <CameraAlertBox>
+            <div>
+              카메라 접근이 차단되었습니다. 상단 아이콘 <Videocam />을 클릭하여 접근을 허용 후 새로고침해주세요.
+            </div>
+          </CameraAlertBox>
+        </CameraAlert>
       )}
+      <Main>
+        <TimestampSection ref={timestampSectionRef}>
+          <TimestampList>
+            {timestampList.map(
+              (time, idx) =>
+                videoRef.current && (
+                  <Timestamp key={idx} $active={idx === currTimestampIdx} onClick={handleClickTimestamp} value={time}>
+                    {formatTime(time)}
+                  </Timestamp>
+                )
+            )}
+          </TimestampList>
+        </TimestampSection>
+        <VideoSection>
+          {videoInfo && (
+            <VideoContainer>
+              <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
+                <Video src={videoInfo.shortsLink} crossOrigin="anonymous" ref={videoRef} isFlipped={isFlipped}></Video>
+              </VideoBox>
+            </VideoContainer>
+          )}
+          <VideoContainer className={`camera ${window.innerWidth < mediaSize.small ? "hidden" : ""}`}>
+            <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
+              <MotionCamera />
+              <MotionButtonList>
+                <VideoMotionButton2
+                  idx={0}
+                  ref={el => (buttonRefs.current[0] = el)}
+                  icon={state === "PAUSE" ? <PlayArrow /> : <Pause />}
+                  onClick={handleClickPlayButton}
+                />
+                {state === "PAUSE" && (
+                  <>
+                    <VideoMotionButton2
+                      idx={1}
+                      ref={el => (buttonRefs.current[1] = el)}
+                      icon={isRepeating ? <TbRepeat size={24} /> : <TbRepeatOff size={24} />}
+                      onClick={handleClickRepeatButton}
+                    />
+                    <VideoMotionButton2
+                      idx={2}
+                      ref={el => (buttonRefs.current[2] = el)}
+                      icon={<Flip />}
+                      onClick={handleClickFlipButton}
+                    />
+                    <VideoMotionButton2
+                      idx={3}
+                      ref={el => (buttonRefs.current[3] = el)}
+                      icon={`${playSpeed}x`}
+                      onClick={handleClickSpeedButton}
+                    />
+                    <VideoMotionButton2
+                      idx={4}
+                      ref={el => (buttonRefs.current[4] = el)}
+                      icon={<Videocam />}
+                      onClick={handleClickChallengeButton}
+                    />
+                  </>
+                )}
+              </MotionButtonList>
+              {state === "READY" && <Timer>{currentTimer}</Timer>}
+            </VideoBox>
+          </VideoContainer>
+        </VideoSection>
+      </Main>
     </Container>
   );
 };
+
+export default LearnPage;
 
 const Container = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
   background-color: #000;
-
-  @media screen and (orientation: portrait) {
-    display: flex;
-    flex-direction: column-reverse;
-  }
-
   background: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(48, 13, 45, 1) 80%, rgba(112, 0, 102, 1) 100%);
 `;
 
-const Section = styled.section`
-  position: relative;
-  display: flex;
-`;
-
-const RightSection = styled(Section)`
-  flex: 1;
-  margin: 8px;
-
-  @media screen and (orientation: portrait) {
-    display: none;
-  }
-`;
-
-const CenterSection = styled(Section)`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
+const CameraAlert = styled.div`
+  position: absolute;
   width: 100%;
   height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+`;
 
-  @media screen and (orientation: portrait) {
-    height: 80%;
-    flex: auto;
+const CameraAlertBox = styled.div`
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 160px;
+  padding: 16px;
+  font-size: 32px;
+  color: white;
+  text-align: center;
+  word-break: keep-all;
+  background: #232323;
+  border-radius: 8px;
+  z-index: 100;
+`;
+
+const Main = styled(Container)`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  @media screen and (max-width: ${mediaSize.medium}px) {
+    flex-direction: column-reverse;
   }
 `;
 
-const LeftSection = styled(Section)`
-  flex: 1;
-  justify-content: flex-end;
-  align-items: center;
-  margin: 8px;
-  color: #fff;
+const TimestampSection = styled.div`
+  position: relative;
+  padding: 0 24px;
 
-  @media screen and (orientation: portrait) {
-    align-items: center;
-    height: 20%;
-    flex: auto;
+  @media screen and (max-width: ${mediaSize.medium}px) {
+    padding: 16px 24px;
   }
+`;
+
+const TimestampList = styled.li`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 160px;
+  height: 100%;
+  list-style: none;
+
+  @media screen and (max-width: ${mediaSize.medium}px) {
+    flex-direction: row;
+    width: 100%;
+  }
+`;
+
+const Timestamp = styled.button<{ $active: boolean }>`
+  width: 100%;
+  height: 50px;
+  margin: 8px 0;
+  border-radius: 4px;
+  background-color: ${props => (props.$active ? "#FF95BD50" : "#353535")};
+  border: 1px solid ${props => (props.$active ? "#FB2576" : "#808080")};
+
+  @media screen and (max-width: ${mediaSize.medium}px) {
+    margin: 0 4px;
+  }
+`;
+
+const VideoSection = styled.section`
+  position: relative;
+  display: flex;
+  justify-content: center;
 `;
 
 const VideoContainer = styled.div`
   position: relative;
   display: flex;
+  align-items: center;
   height: 100%;
-  justify-content: center;
-  video {
-    display: flex;
-    object-fit: cover;
+  overflow: hidden;
+
+  &.hidden {
+    visibility: hidden;
   }
 
-  video.flip {
-    transform: scaleX(-1);
-  }
-
-  @media screen and (orientation: portrait) {
-    .camera {
-      display: none;
+  @media screen and (max-width: ${mediaSize.small}px) {
+    &.camera {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
     }
   }
+`;
+
+const VideoBox = styled.div`
+  position: relative;
+  height: 100%;
+  aspect-ratio: 9/16;
+  background-color: #000;
+`;
+
+const Video = styled.video<{ isFlipped: boolean }>`
+  width: 100%;
+  transform: ${props => props.isFlipped && "scaleX(-1)"};
+`;
+
+const MotionButtonList = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 24px 8px 0;
 `;
 
 const Timer = styled.div`
@@ -668,41 +597,3 @@ const Timer = styled.div`
   border: 5px solid #fff;
   border-radius: 50%;
 `;
-
-const VideoMotionButtonList = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 18px 8px 0;
-  box-sizing: border-box;
-`;
-
-const FoldList = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  height: auto;
-  min-height: 80%;
-  max-height: 100%;
-`;
-
-const LoadingText = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  font-size: 24px;
-  color: #fff;
-`;
-
-const Image = styled.img<{ $visible: boolean }>`
-  position: absolute;
-  width: 50%;
-  display: ${props => (props.$visible ? "flex" : "none")};
-  z-index: 2;
-`;
-export default LearnPage;
