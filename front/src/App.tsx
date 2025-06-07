@@ -29,7 +29,6 @@ function App() {
           <Route path="/challenge/result" element={<PrivateRoute component={<ChallengeResultPage />} />} />
           <Route path="/video-trim" element={<VideoTrimPage />} />
           <Route path="/video-marker" element={<VideoMarkerPage />} />
-          {/* <Route path="/video-resize" element={<VideoResizePage />} /> */}
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/feed" element={<FeedPage />} />
         </Routes>

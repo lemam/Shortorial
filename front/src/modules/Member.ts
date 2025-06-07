@@ -47,10 +47,7 @@ async function checkId(id: string, getCheckRslt: (value: string) => void) {
   return true;
 }
 
-async function checkPass(
-  password: string,
-  getCheckRslt: (value: string) => void
-) {
+async function checkPass(password: string, getCheckRslt: (value: string) => void) {
   // 입력값이 없을 경우
   if (!password) {
     getCheckRslt("비밀번호를 입력해주세요.");
@@ -61,25 +58,16 @@ async function checkPass(
   // 공백 없이 영어, 숫자, 특수문자만 입력, 6글자 이상, 16글자 이하
   const pwRegex = /^[a-zA-Z0-9!@*&-_]{6,16}$/;
   if (!pwRegex.test(password)) {
-    getCheckRslt(
-      "비밀번호는 6 ~ 16자의 영문, 숫자, 특수문자(!@*&-_)만 입력 가능합니다."
-    );
+    getCheckRslt("비밀번호는 6 ~ 16자의 영문, 숫자, 특수문자(!@*&-_)만 입력 가능합니다.");
     return false;
   }
-
-  // 비밀번호 확인을 입력한 적이 있다면 비밀번호 확인도 같이 검사한다.
-  // if (get().passwordConfirm) get().checkPasswordConfirm();
 
   // 모든 검사 통과!
   getCheckRslt("사용 가능한 비밀번호입니다.");
   return true;
 }
 
-async function passConfirm(
-  passwordConfirm: string,
-  passwordOrigin: string,
-  getCheckRslt: (value: string) => void
-) {
+async function passConfirm(passwordConfirm: string, passwordOrigin: string, getCheckRslt: (value: string) => void) {
   // 입력값이 없을 경우
   if (!passwordConfirm) {
     getCheckRslt("비밀번호를 다시 한 번 입력해주세요.");
@@ -97,10 +85,7 @@ async function passConfirm(
   return true;
 }
 
-async function checkNickname(
-  nickname: string,
-  getCheckRslt: (value: string) => void
-) {
+async function checkNickname(nickname: string, getCheckRslt: (value: string) => void) {
   // 입력값이 없을 경우
   if (!nickname) {
     getCheckRslt("닉네임을 입력해주세요.");

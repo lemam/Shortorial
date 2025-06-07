@@ -1,10 +1,10 @@
 // 비디오를 클릭하면 시작 지점과 끝 지점을 잡을 수 있는 기능
 // 트림 기능 없음
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from "react";
 
-const VideoMarker = () => {
+const VideoMarkerPage = () => {
   const [videoSrc, setVideoSrc] = useState("");
-  const [markers, setMarkers] = useState<{ start: number | null, end: number | null }>({ start: null, end: null });
+  const [markers, setMarkers] = useState<{ start: number | null; end: number | null }>({ start: null, end: null });
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,4 +46,4 @@ const VideoMarker = () => {
   );
 };
 
-export default VideoMarker;
+export default VideoMarkerPage;

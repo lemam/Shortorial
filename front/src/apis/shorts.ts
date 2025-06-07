@@ -69,8 +69,6 @@ export const getShortsList = async (page: number, size: number = 6) => {
 export const getShortsInfo = async (shortsNo: string) => {
   try {
     const response = await axios.get(`${REST_SHORTS_LIST_URL}/${shortsNo}`);
-    console.log(response.data);
-
     return response.data;
   } catch (error) {
     console.error(error);
