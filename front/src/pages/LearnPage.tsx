@@ -5,7 +5,7 @@ import { Flip, Pause, PlayArrow, Videocam } from "@mui/icons-material";
 import { TbRepeat, TbRepeatOff } from "react-icons/tb";
 
 import MotionCamera from "../components/motion/MotionCamera";
-import VideoMotionButton2 from "../components/button/VideoMotionButton2";
+import LearnMotionButton from "../components/button/LearnMotionButton";
 
 import { getShortsInfo } from "../apis/shorts";
 import useCameraStore from "../store/useCameraStore";
@@ -406,7 +406,7 @@ const LearnPage = () => {
             <VideoBox style={{ width: `${videoSize.width}px`, height: `${videoSize.height}px` }}>
               <MotionCamera />
               <MotionButtonList>
-                <VideoMotionButton2
+                <LearnMotionButton
                   idx={0}
                   ref={el => (buttonRefs.current[0] = el)}
                   icon={state === "PAUSE" ? <PlayArrow /> : <Pause />}
@@ -414,25 +414,25 @@ const LearnPage = () => {
                 />
                 {state === "PAUSE" && (
                   <>
-                    <VideoMotionButton2
+                    <LearnMotionButton
                       idx={1}
                       ref={el => (buttonRefs.current[1] = el)}
                       icon={isRepeating ? <TbRepeat size={24} /> : <TbRepeatOff size={24} />}
                       onClick={handleClickRepeatButton}
                     />
-                    <VideoMotionButton2
+                    <LearnMotionButton
                       idx={2}
                       ref={el => (buttonRefs.current[2] = el)}
                       icon={<Flip />}
                       onClick={handleClickFlipButton}
                     />
-                    <VideoMotionButton2
+                    <LearnMotionButton
                       idx={3}
                       ref={el => (buttonRefs.current[3] = el)}
                       icon={`${playSpeed}x`}
                       onClick={handleClickSpeedButton}
                     />
-                    <VideoMotionButton2
+                    <LearnMotionButton
                       idx={4}
                       ref={el => (buttonRefs.current[4] = el)}
                       icon={<Videocam />}

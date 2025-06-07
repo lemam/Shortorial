@@ -9,7 +9,7 @@ interface MotionButtonProps {
   onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
-const VideoMotionButton2 = React.forwardRef<HTMLDivElement, MotionButtonProps>(({ idx, icon, onClick }, ref) => {
+const LearnMotionButton = React.forwardRef<HTMLDivElement, MotionButtonProps>(({ idx, icon, onClick }, ref) => {
   const { getProgress, getActiveButtonId } = useMotionButtonStore();
 
   return (
@@ -22,7 +22,7 @@ const VideoMotionButton2 = React.forwardRef<HTMLDivElement, MotionButtonProps>((
   );
 });
 
-export default VideoMotionButton2;
+export default LearnMotionButton;
 
 const ControlButtonContainer = styled.div`
   position: relative;

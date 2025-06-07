@@ -1,6 +1,5 @@
 import { Modal } from "react-bootstrap";
 import styled from "styled-components";
-// import { Link } from "react-router-dom";
 
 interface ModalType {
   progress: string;

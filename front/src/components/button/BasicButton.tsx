@@ -15,29 +15,16 @@ interface ButtonStyleType {
 }
 
 const BasicButton = ({ text, color = "basic", onClick, style }: ButtonType) => {
-  // 크기에 따른 버튼 css 설정 객체
-  // const buttonSizes: ButtonStyleType = {
-  //   md: "px-5 py-2",
-  //   lg: "px-8 py-3",
-  // };
-
   const buttonColors: ButtonStyleType = {
     basic: "#FB2576",
-    // gray: "#343a40",
   };
 
   const hoverButtonColors: ButtonStyleType = {
     basic: "#d4206e",
-    // gray: "#1d2124",
   };
 
   return (
-    <Button
-      color={buttonColors[color]}
-      $hoverColor={hoverButtonColors[color]}
-      onClick={onClick}
-      style={style}
-    >
+    <Button color={buttonColors[color]} $hoverColor={hoverButtonColors[color]} onClick={onClick} style={style}>
       {text}
     </Button>
   );
@@ -58,9 +45,9 @@ const Button = styled.button<{ color: string; $hoverColor: string }>`
   height: 50px;
   width: 100%;
   color: white;
-  background-color: ${(props) => props.color};
+  background-color: ${props => props.color};
   &:hover {
-    background-color: ${(props) => props.$hoverColor};
+    background-color: ${props => props.$hoverColor};
   }
 
   @media screen and (max-width: 479px) {

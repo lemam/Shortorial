@@ -96,8 +96,6 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
   };
 
   useEffect(() => {
-    console.log(uploadShorts);
-
     if (uploadShorts.youtubeUrl) {
       setLink(uploadShorts.youtubeUrl);
       setShare(false);
@@ -109,9 +107,7 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
     const alertParam = urlParams.get("auth");
 
     if (alertParam === "true") {
-      alert(
-        "유튜브 권한 설정이 완료되었습니다.\n공유 버튼을 누르면 채널에 비공개 동영상으로 업로드 됩니다."
-      );
+      alert("유튜브 권한 설정이 완료되었습니다.\n공유 버튼을 누르면 채널에 비공개 동영상으로 업로드 됩니다.");
       urlParams.delete("auth");
       const newUrl = window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
@@ -125,18 +121,9 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
         <Video crossOrigin="anonymous" src={uploadShorts.uploadUrl} controls></Video>
         <MyVideoControlComponent>
           {!download && <DownloadIcon onClick={downloadVideo} fontSize="large"></DownloadIcon>}
-          {download && (
-            <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>
-          )}
-          {!share && !link && (
-            <IosShareIcon onClick={shareShortsToYoutube} fontSize="large"></IosShareIcon>
-          )}
-          {!share && link && (
-            <YoutubeIcon
-              fontSize="large"
-              onClick={() => (window.location.href = link)}
-            ></YoutubeIcon>
-          )}
+          {download && <DownloadingIcon src="../src/assets/mypage/downloading.gif"></DownloadingIcon>}
+          {!share && !link && <IosShareIcon onClick={shareShortsToYoutube} fontSize="large"></IosShareIcon>}
+          {!share && link && <YoutubeIcon fontSize="large" onClick={() => (window.location.href = link)}></YoutubeIcon>}
           {share && <SharingIcon src="../src/assets/mypage/downloading.gif"></SharingIcon>}
           <DeleteIcon fontSize="large" onClick={deleteUploadedShorts}></DeleteIcon>
         </MyVideoControlComponent>
@@ -149,12 +136,7 @@ const UploadComponent = ({ uploadShorts, onDelete }: UploadComponentProps) => {
       )}
       {modify && (
         <TitleContainer>
-          <InputBox
-            type="text"
-            value={title}
-            onChange={handleTitleChange}
-            placeholder="제목을 입력하세요."
-          />
+          <InputBox type="text" value={title} onChange={handleTitleChange} placeholder="제목을 입력하세요." />
           <CheckIcon onClick={saveTitle}></CheckIcon>
         </TitleContainer>
       )}

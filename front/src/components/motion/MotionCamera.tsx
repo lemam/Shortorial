@@ -42,7 +42,6 @@ function MotionCamera() {
       numPoses: 1, // 감지할 수 있는 최대 포즈(사람) 수
     });
 
-    console.log("랜드마크 초기화 완료");
     setPoseLandmarker(poseLandmarker);
   };
 

@@ -51,13 +51,7 @@ const VideoMotionButton = ({
 
   return (
     <Link to={link} onClick={handleLinkClick}>
-      <Container
-        id={id}
-        onClick={onClick}
-        ref={containerRef}
-        $progress={progress}
-        $isVisible={isVisible}
-      >
+      <Container id={id} onClick={onClick} ref={containerRef} $progress={progress} $isVisible={isVisible}>
         <ProgressContainer>
           <CircularProgress
             variant="determinate"
@@ -86,8 +80,8 @@ const Container = styled.button<{ $progress: number; $isVisible: boolean }>`
   align-items: center;
   background-color: #35353580;
   border-radius: 50%;
-  visibility: ${(props) => (props.$isVisible ? "visible" : "hidden !important")};
-  opacity: ${(props) => (props.$isVisible ? "1" : "0")};
+  visibility: ${props => (props.$isVisible ? "visible" : "hidden !important")};
+  opacity: ${props => (props.$isVisible ? "1" : "0")};
   transition-property: opacity, visibility;
   transition-duration: 0.5s;
 
@@ -121,14 +115,13 @@ const Container = styled.button<{ $progress: number; $isVisible: boolean }>`
 
   &:hover .tooltipText,
   &:active .tooltipText,
-  ${(props) => props.$progress > 0 && ".tooltipText"} {
+  ${props => props.$progress > 0 && ".tooltipText"} {
     visibility: visible;
   }
 
   @media screen and (min-width: 768px) {
     width: 60px;
     height: 60px;
-    /* margin-bottom: 50px; */
 
     .text {
       font-size: 18px;
