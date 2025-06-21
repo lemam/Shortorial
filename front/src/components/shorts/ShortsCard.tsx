@@ -13,7 +13,6 @@ interface ShortsCardProps {
 const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
   const { isMuted, toggleMute } = useShortsVideoStore();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [showThumbnail, setShowThumbnail] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const videoId = useMemo(() => {
@@ -23,18 +22,12 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
 
   // 영상에 마우스가 들어오면 영상 재생을 시작한다.
   const handleMouseEnter = () => {
-    if (!isLoading) {
-      setShowThumbnail(false);
-      playVideo();
-    }
+    if (!isLoading) playVideo();
   };
 
   // 영상에서 마우스를 떼면 재생된 영상을 초기화한다.
   const handleMouseLeave = () => {
-    if (!isLoading) {
-      setShowThumbnail(true);
-      pauseVideo();
-    }
+    if (!isLoading) pauseVideo();
   };
 
   // 클릭했을 때 모달을 띄우기 위한 메소드
@@ -46,10 +39,12 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
     }
   };
 
+  // 영상 재생
   const playVideo = () => {
     videoRef.current?.play();
   };
 
+  // 영상 종료
   const pauseVideo = () => {
     const video = videoRef.current;
     if (video) {
@@ -63,16 +58,12 @@ const ShortsCard = ({ shortsInfo, handleOpenModal }: ShortsCardProps) => {
       {isLoading && <S.CardVideoSkeleton />}
       <S.CardVideoContainer style={{ display: `${isLoading ? "none" : "block"}` }}>
         <S.CardVideoBox onClick={openModal}>
-          <S.Thumbnail
-            src={`https://img.youtube.com/vi/${videoId}/frame0.jpg`}
-            alt={`${shortsInfo.shortsTitle} 섬네일`}
-            opacity={`${showThumbnail ? 1 : 0}`}
-          />
           <S.CardVideo
             muted={isMuted}
             src={shortsInfo.shortsLink}
             crossOrigin="anonymous"
             onLoadedData={() => setIsLoading(false)}
+            poster={`https://img.youtube.com/vi/${videoId}/frame0.jpg`}
             ref={videoRef}
           ></S.CardVideo>
         </S.CardVideoBox>

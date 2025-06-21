@@ -91,12 +91,3 @@ export const CardVideoBox = styled.div`
   width: 100%;
   height: 100%;
 `;
-
-export const Thumbnail = styled.img<{ opacity: string }>`
-  position: absolute;
-  width: 100%;
-  border-radius: 12px;
-  z-index: 1;
-  opacity: ${props => props.opacity};
-  transition: opacity 0.2s;
-`;
